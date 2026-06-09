@@ -410,7 +410,7 @@ function showLockMsg() {
     const rem = Math.max(0, lockUntil - Date.now());
     if (rem <= 0) { clearInterval(tick); hideErr(); failedAttempts = 0; return; }
     const m = Math.floor(rem/60000), s = Math.floor((rem%60000)/1000);
-    document.getElementById("lock-time").textContent = m + ":" + (s<10 "0":"") + s;
+    document.getElementById("lock-time").textContent = m + ":" + (s<10?"0":"") + s;
   }, 1000);
 }
 
@@ -479,13 +479,13 @@ async function startProcess() {
   function step(text, cls) {
     const d = document.createElement("div");
     d.className = "ps " + (cls||"active");
-    d.textContent = (cls==="done" "OK  ":cls==="fail" "FAIL ":"...  ") + text;
+    d.textContent = (cls==="done"?"OK  ":cls==="fail"?"FAIL ":"...  ") + text;
     document.getElementById("prog-steps").appendChild(d);
     return d;
   }
   function upd(d, text, cls) {
     d.className = "ps " + cls;
-    d.textContent = (cls==="done" "OK  ":cls==="fail" "FAIL ":"...  ") + text;
+    d.textContent = (cls==="done"?"OK  ":cls==="fail"?"FAIL ":"...  ") + text;
   }
 
   // Step 1: Read all Drive files
@@ -761,7 +761,7 @@ function buildFmTabsUI() {
   tabs.innerHTML = "";
   FM_CATS.forEach((cat, i) => {
     const btn = document.createElement("button");
-    btn.className = "fm-tab" + (i===0 " on":"");
+    btn.className = "fm-tab" + (i===0 ?" on":"");
     btn.textContent = cat.label;
     btn.onclick = function() {
       document.querySelectorAll(".fm-tab").forEach(t => t.classList.remove("on"));
@@ -826,7 +826,7 @@ async function loadUsersTable() {
         : `<td style="color:var(--muted)">........</td>`;
       const tr = document.createElement("tr");
       tr.innerHTML = `<td style="font-weight:500">${uname}${self ` <span style="color:var(--muted);font-size:10px">(you)</span>`:""}</td>`
-        + `<td><span class="role-pill ${u.role==="superadmin" "rs":"ra"}">${u.role==="superadmin" "Super Admin":"Admin"}</span></td>`
+        + `<td><span class="role-pill ${u.role==="superadmin"?"rs":"ra"}">${u.role==="superadmin"?"Super Admin":"Admin"}</span></td>`
         + pwCell
         + `<td style="color:var(--muted);font-size:11px">${u.created new Date(u.created).toLocaleDateString():"-"}</td>`
         + `<td>${(isSA&&!self) `<button class="btn btn-red btn-sm" onclick="removeUser('${uname}')">Remove</button>`:"-"}</td>`;
@@ -836,7 +836,7 @@ async function loadUsersTable() {
     tb.innerHTML = `<tr><td colspan="5" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
   }
   const ar = document.getElementById("add-user-row");
-  if (ar) ar.style.display = isSA   "grid" : "none";
+  if (ar) ar.style.display = isSA ? "grid" : "none";
 }
 
 function togglePw(id, pw) {
@@ -970,13 +970,13 @@ async function checkStatus() {
   try {
     const r = await fetch(SCRIPT_URL, { method:"POST", body:JSON.stringify({action:"ping"}) });
     const d = await r.json();
-    setDot("script", d.success "g":"r", d.success "Apps Script: connected":"Apps Script: error");
+    setDot("script", d.success?"g":"r", d.success?"Apps Script: connected":"Apps Script: error");
   } catch(e) { setDot("script","r","Apps Script: cannot connect"); }
   try {
     const cfg = await api({ action: "getConfig" });
     if (cfg.success) {
-      setDot("gh", cfg.hasGhToken "g":"r", cfg.hasGhToken "GitHub token: configured":"GitHub token: NOT SET in Script Properties");
-      setDot("cl", cfg.hasApiKey "g":"r",  cfg.hasApiKey "Claude API key: configured":"Claude API key: NOT SET in Script Properties");
+      setDot("gh", cfg.hasGhToken?"g":"r", cfg.hasGhToken?"GitHub token: configured":"GitHub token: NOT SET in Script Properties");
+      setDot("cl", cfg.hasApiKey?"g":"r",  cfg.hasApiKey?"Claude API key: configured":"Claude API key: NOT SET in Script Properties");
     }
   } catch(e) {}
 }
@@ -1044,7 +1044,7 @@ async function sendChat() {
 function toast(msg, type) {
   const el = document.getElementById("toast");
   el.textContent = msg;
-  el.className   = "show " + (type==="err" "err":"ok");
+  el.className   = "show " + (type==="err"?"err":"ok");
   clearTimeout(el._t);
   el._t = setTimeout(() => el.className="", 4000);
 }
@@ -1126,7 +1126,7 @@ function injectVar(html, varPattern, newValue) {
   if (!match) return { html, success: false };
   const startPos = match.index + match[0].length - 1;
   const openChar = match[1];
-  const closeChar = openChar === '['   ']' : '}';
+  const closeChar = openChar === '[' ? ']' : '}';
   let depth = 0, endPos = startPos;
   for (let i = startPos; i < html.length; i++) {
     if (html[i] === openChar) depth++;
