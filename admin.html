@@ -1,0 +1,1574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Leaf Labs - Admin</title>
+<style>
+:root{--bg:#0e1414;--panel:#16201f;--panel2:#1c2826;--ink:#e8efe9;--muted:#92a39c;
+  --line:#283533;--green:#3fae6b;--gd:#2c7d4c;--gold:#d9a441;--red:#e5484d;--blue:#4a9ed9}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+#login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:20px}
+.lc{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:40px 36px;width:100%;max-width:380px;text-align:center}
+.lc h1{font-size:22px;font-weight:700;margin-bottom:4px}
+.lc p{color:var(--muted);font-size:13px;margin-bottom:28px}
+.msg{border-radius:8px;padding:10px 14px;font-size:13px;margin-bottom:14px;display:none;text-align:left}
+.msg-err{background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.3);color:#ff7378}
+.msg-warn{background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.3);color:#f5a524}
+.field{text-align:left;margin-bottom:14px}
+.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.8px;font-weight:600}
+.field input,.field select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:10px 14px;color:var(--ink);font-size:14px;outline:none;transition:border-color .15s}
+.field input:focus{border-color:var(--green)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-green{background:var(--green);color:#0e1414}.btn-green:hover{opacity:.88}
+.btn-ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}.btn-ghost:hover{border-color:var(--green)}
+.btn-red{background:rgba(229,72,77,.15);color:var(--red);border:1px solid rgba(229,72,77,.3)}.btn-red:hover{opacity:.8}
+.btn-sm{padding:6px 12px;font-size:12px}
+.btn-full{width:100%}
+#app-wrap{display:none}
+.topbar{background:var(--panel);border-bottom:1px solid var(--line);padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.brand{display:flex;align-items:center;gap:10px}
+.brand-icon{width:34px;height:34px;border-radius:8px;background:linear-gradient(135deg,var(--green),var(--gd));display:flex;align-items:center;justify-content:center;font-size:18px}
+.brand-name{font-size:15px;font-weight:700}
+.tr{display:flex;align-items:center;gap:12px}
+.who{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:4px 12px;font-size:12px;color:var(--muted)}
+.who b{color:var(--green)}
+.nav{background:var(--panel2);border-bottom:1px solid var(--line);padding:0 20px;display:flex;gap:2px;overflow-x:auto}
+.nb{padding:13px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap}
+.nb:hover{color:var(--ink)}.nb.on{color:var(--green);border-bottom-color:var(--green)}
+.content{max-width:1100px;margin:0 auto;padding:24px 20px 100px}
+.page{display:none}.page.on{display:block}
+.ph{margin-bottom:20px}
+.ph h2{font-size:20px;font-weight:700;margin-bottom:4px}
+.ph p{color:var(--muted);font-size:13px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px;margin-bottom:18px}
+.card h3{font-size:14px;font-weight:600;margin-bottom:14px}
+.card-note{color:var(--muted);font-size:12px;margin-top:10px}
+.upd-badge{display:none;align-items:center;gap:6px;background:rgba(63,174,107,.08);border:1px solid rgba(63,174,107,.2);border-radius:16px;padding:4px 12px;font-size:12px;color:var(--green);margin-bottom:18px}
+.proc-box{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:32px 28px;text-align:center}
+.proc-box h3{font-size:18px;font-weight:700;margin-bottom:8px}
+.proc-box p{color:var(--muted);font-size:13px;margin-bottom:24px;max-width:500px;margin-left:auto;margin-right:auto}
+.proc-btn{background:linear-gradient(135deg,var(--green),var(--gd));color:#0e1414;padding:14px 0;font-size:15px;font-weight:700;border-radius:12px;border:none;cursor:pointer;width:100%;max-width:460px;transition:opacity .15s}
+.proc-btn:hover:not(:disabled){opacity:.88}
+.proc-btn:disabled{opacity:.4;cursor:not-allowed}
+.prog-wrap{display:none;margin-top:20px;max-width:460px;margin-left:auto;margin-right:auto}
+.prog-bg{background:var(--panel2);border-radius:6px;height:8px;margin-bottom:8px}
+.prog-bar{height:8px;background:linear-gradient(90deg,var(--green),var(--gd));border-radius:6px;transition:width .4s;width:0}
+.prog-lbl{font-size:12px;color:var(--muted);text-align:left;margin-bottom:8px}
+.prog-steps{display:flex;flex-direction:column;gap:3px;text-align:left}
+.ps{font-size:12px;padding:3px 0;color:var(--muted)}
+.ps.done{color:var(--green)}.ps.active{color:var(--blue)}.ps.fail{color:var(--red)}
+.success-wrap{display:none;background:rgba(63,174,107,.06);border:1px solid rgba(63,174,107,.25);border-radius:10px;padding:16px 18px;margin-top:16px;text-align:left;max-width:460px;margin-left:auto;margin-right:auto}
+.success-wrap h4{color:var(--green);margin-bottom:6px}
+.dl-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.dl-a{background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 12px;font-size:12px;color:var(--blue);text-decoration:none}
+.dl-a:hover{border-color:var(--blue)}
+.fm-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.fm-tab{padding:6px 14px;border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--muted);transition:all .15s}
+.fm-tab.on{background:rgba(63,174,107,.1);border-color:rgba(63,174,107,.4);color:var(--green)}
+.fm-item{display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:8px}
+.fm-name{font-size:13px;font-weight:500}
+.fm-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{text-align:left;padding:8px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--line);font-weight:600}
+.tbl td{padding:10px 12px;border-bottom:1px solid var(--line)}
+.tbl tr:last-child td{border-bottom:none}
+.role-pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:700}
+.rs{background:rgba(217,164,65,.15);color:var(--gold)}
+.ra{background:rgba(63,174,107,.1);color:var(--green)}
+.add-row{display:grid;gap:10px;align-items:end;background:var(--panel2);border-radius:10px;padding:14px 16px;margin-top:14px}
+.ar3{grid-template-columns:1fr 1fr 1fr auto}
+.ar2{grid-template-columns:1fr 1fr auto}
+.add-row label{display:block;font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.add-row input,.add-row select{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 10px;color:var(--ink);font-size:13px;outline:none}
+.add-row input:focus{border-color:var(--green)}
+.hist-tbl{width:100%;border-collapse:collapse;font-size:12px}
+.hist-tbl th{text-align:left;padding:7px 10px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--line);font-weight:600}
+.hist-tbl td{padding:8px 10px;border-bottom:1px solid var(--line)}
+.hist-tbl tr:last-child td{border-bottom:none}
+.at{display:inline-block;padding:1px 7px;border-radius:5px;font-size:10px;font-weight:700;background:rgba(74,158,217,.1);color:var(--blue)}
+.sgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.scard{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.scard h3{font-size:14px;font-weight:600;margin-bottom:14px}
+.sr{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:8px}
+.sd{width:8px;height:8px;border-radius:50%}
+.sg{background:var(--green)}.srd{background:var(--red)}.sy{background:var(--gold)}.sm{background:var(--muted)}
+.li-item{margin-bottom:10px}
+.li-label{font-size:11px;color:var(--muted);margin-bottom:4px;font-weight:600}
+.li-row{display:flex;gap:8px}
+.li-row input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:7px 10px;color:var(--muted);font-size:11px;outline:none}
+#toast{position:fixed;bottom:20px;right:20px;background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:10px 16px;font-size:13px;z-index:9999;opacity:0;transform:translateY(6px);transition:all .2s;pointer-events:none;max-width:320px}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.ok{border-color:rgba(63,174,107,.5);color:var(--green)}
+#toast.err{border-color:rgba(229,72,77,.5);color:#ff7378}
+#confirm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;align-items:center;justify-content:center}
+#confirm.show{display:flex}
+.cc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:26px 28px;width:340px}
+.cc h3{font-size:16px;margin-bottom:8px}
+.cc p{color:var(--muted);font-size:13px;margin-bottom:20px}
+.cc-btns{display:flex;gap:8px;justify-content:flex-end}
+#chat-btn{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,var(--green),var(--gd));color:#0e1414;border:none;border-radius:28px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;z-index:8000;display:none;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(63,174,107,.4);transition:transform .15s}
+#chat-btn:hover{transform:scale(1.05)}
+#chat-box{position:fixed;bottom:80px;right:24px;width:370px;max-height:540px;background:var(--panel);border:1px solid var(--line);border-radius:16px;display:none;flex-direction:column;z-index:8000;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+#chat-box.open{display:flex}
+.ch{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+.ch h4{font-size:14px;font-weight:600}.ch p{font-size:11px;color:var(--muted)}
+.ch-close{background:none;border:none;color:var(--muted);cursor:pointer;font-size:18px;line-height:1}
+.ch-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.cm{max-width:88%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5}
+.cm.u{background:rgba(63,174,107,.15);border:1px solid rgba(63,174,107,.25);align-self:flex-end;border-radius:12px 12px 4px 12px}
+.cm.a{background:var(--panel2);border:1px solid var(--line);align-self:flex-start;border-radius:12px 12px 12px 4px}
+.cm.t{color:var(--muted);font-style:italic;align-self:flex-start}
+.ch-inp{padding:12px 14px;border-top:1px solid var(--line);display:flex;gap:8px}
+.ch-inp input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:9px 12px;color:var(--ink);font-size:13px;outline:none}
+.ch-inp input:focus{border-color:var(--green)}
+.ch-send{background:var(--green);color:#0e1414;border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer}
+.ch-send:disabled{opacity:.4;cursor:not-allowed}
+.ch-rem{font-size:11px;color:var(--muted);padding:0 14px 8px;text-align:right}
+@media(max-width:600px){.ar3{grid-template-columns:1fr;}.ar2{grid-template-columns:1fr 1fr;}}
+</style>
+</head>
+<body>
+
+<!-- ======================================================
+     CONFIG — Apps Script URL is the only secret here.
+     All other secrets are in Apps Script Script Properties.
+     GitHub token, API key, folder IDs — none here.
+====================================================== -->
+<script>
+var SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
+var GITHUB_OWNER = "abhishekidhate1998";
+var GITHUB_REPO  = "lll-dashboards";
+var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
+var DASHBOARDS   = [
+  {file:"master_dashboard.html",         label:"Master Dashboard"},
+  {file:"weekly_exec.html",              label:"Weekly Exec"},
+  {file:"retail_intel.html",             label:"Retail Intel"},
+  {file:"weekly_refresh.html",           label:"Weekly Refresh"},
+  {file:"sales_dashboard.html",          label:"Sales Dashboard"},
+  {file:"sales_action_form.html",        label:"Action Form"},
+  {file:"lit_sales_command_center.html", label:"Command Center"}
+];
+</script>
+
+<!-- LOGIN -->
+<div id="login-wrap">
+  <div class="lc">
+    <div style="font-size:40px;margin-bottom:14px">&#127807;</div>
+    <h1>Little Leaf Labs</h1>
+    <p>Admin Panel &mdash; Sign in to continue</p>
+    <div class="msg msg-err" id="msg-err"></div>
+    <div class="msg msg-warn" id="msg-lock">
+      Too many attempts. Wait <span id="lock-time">15:00</span> or
+      <a href="#" onclick="resetLock();return false;" style="color:var(--green);text-decoration:none">reset</a>.
+    </div>
+    <div class="field"><label>Username</label>
+      <input type="text" id="inp-u" placeholder="Username" autocomplete="username">
+    </div>
+    <div class="field"><label>Password</label>
+      <input type="password" id="inp-p" placeholder="Password" autocomplete="current-password">
+    </div>
+    <button class="btn btn-green btn-full" id="login-btn" onclick="doLogin()">Sign In</button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-wrap">
+  <div class="topbar">
+    <div class="brand">
+      <div class="brand-icon">&#127807;</div>
+      <div class="brand-name">Little Leaf Labs &mdash; Admin</div>
+    </div>
+    <div class="tr">
+      <div class="who">Signed in as <b id="who-name">-</b></div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+  <div class="nav">
+    <button class="nb on" onclick="showPage('process',this)">&#9654; Process &amp; Deploy</button>
+    <button class="nb"    onclick="showPage('files',this)">&#128193; File Manager</button>
+    <button class="nb"    onclick="showPage('users',this)">&#128101; Users</button>
+    <button class="nb"    onclick="showPage('history',this)">&#128203; History</button>
+    <button class="nb"    onclick="showPage('settings',this)">&#9881; Settings</button>
+  </div>
+  <div class="content">
+
+    <!-- PROCESS -->
+    <div class="page on" id="page-process">
+      <div class="upd-badge" id="upd-badge">Last updated: <span id="upd-time">-</span></div>
+      <div class="proc-box">
+        <h3>Process &amp; Deploy All Dashboards</h3>
+        <p>Upload CSV files directly to your Google Drive folders first. Then click below to read all data, build all 7 dashboards, and deploy them live to GitHub Pages.</p>
+        <button class="proc-btn" id="proc-btn" onclick="startProcess()">&#128640; Process &amp; Deploy All Dashboards</button>
+        <div class="prog-wrap" id="prog-wrap">
+          <div class="prog-bg"><div class="prog-bar" id="prog-bar"></div></div>
+          <div class="prog-lbl" id="prog-lbl">Starting...</div>
+          <div class="prog-steps" id="prog-steps"></div>
+        </div>
+        <div class="success-wrap" id="success-wrap">
+          <h4>&#10003; All dashboards deployed!</h4>
+          <p id="success-time" style="font-size:12px;color:var(--muted);margin-bottom:8px"></p>
+          <p style="font-size:12px;color:var(--muted)">Live on GitHub Pages in 1-2 minutes.</p>
+          <div class="dl-row" id="success-links"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILES -->
+    <div class="page" id="page-files">
+      <div class="ph"><h2>File Manager</h2>
+        <p>CSV files in your Google Drive folders. Upload files directly in Google Drive, then return here to deploy.</p>
+      </div>
+      <div class="card">
+        <div class="fm-tabs" id="fm-tabs"></div>
+        <div id="fm-list"><p style="color:var(--muted);font-size:13px">Select a folder tab above.</p></div>
+      </div>
+    </div>
+
+    <!-- USERS -->
+    <div class="page" id="page-users">
+      <div class="ph"><h2>User Management</h2>
+        <p>Admin users and dashboard viewers. Only Super Admin can add or remove accounts.</p>
+      </div>
+      <div class="card">
+        <h3>Admin Users</h3>
+        <table class="tbl">
+          <thead><tr><th>Username</th><th>Role</th><th>Password</th><th>Created</th><th></th></tr></thead>
+          <tbody id="users-body"><tr><td colspan="5" style="color:var(--muted);font-size:13px;padding:14px">Loading...</td></tr></tbody>
+        </table>
+        <div class="add-row ar3" id="add-user-row" style="display:none">
+          <div><label>Username</label><input type="text" id="new-u" placeholder="e.g. suwarna"></div>
+          <div><label>Password</label><input type="password" id="new-p" placeholder="Min 4 chars"></div>
+          <div><label>Role</label>
+            <select id="new-r"><option value="admin">Admin</option><option value="superadmin">Super Admin</option></select>
+          </div>
+          <button class="btn btn-green btn-sm" onclick="addUser()" style="white-space:nowrap">+ Add</button>
+        </div>
+      </div>
+      <div class="card" id="viewers-card" style="display:none">
+        <h3>Dashboard Viewers</h3>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Viewer passwords are verified by Apps Script at login time. They are never stored in dashboard HTML files.</p>
+        <table class="tbl">
+          <thead><tr><th>Username</th><th>Password</th><th>Created</th><th></th></tr></thead>
+          <tbody id="viewers-body"><tr><td colspan="4" style="color:var(--muted);font-size:13px;padding:14px">Loading...</td></tr></tbody>
+        </table>
+        <div class="add-row ar2" style="margin-top:14px">
+          <div><label>Username</label><input type="text" id="new-vu" placeholder="e.g. chris"></div>
+          <div><label>Password</label><input type="password" id="new-vp" placeholder="Min 4 chars"></div>
+          <button class="btn btn-green btn-sm" onclick="addViewer()" style="white-space:nowrap">+ Add Viewer</button>
+        </div>
+        <p class="card-note">Changes take effect immediately &mdash; no redeploy needed to add or remove viewers.</p>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="page" id="page-history">
+      <div class="ph"><h2>Activity History</h2></div>
+      <div class="card">
+        <table class="hist-tbl">
+          <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+          <tbody id="hist-body"></tbody>
+        </table>
+        <p id="hist-empty" style="text-align:center;color:var(--muted);font-size:13px;padding:20px 0;display:none">No history yet.</p>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="ph"><h2>Settings</h2></div>
+      <div class="sgrid">
+        <div class="scard">
+          <h3>System Status</h3>
+          <div class="sr"><div class="sd sm" id="dot-script"></div><span id="st-script">Click Check to verify</span></div>
+          <div class="sr"><div class="sd sm" id="dot-gh"></div><span id="st-gh">GitHub token status</span></div>
+          <div class="sr"><div class="sd sm" id="dot-cl"></div><span id="st-cl">Claude API key status</span></div>
+          <button class="btn btn-ghost btn-full" style="margin-top:12px" onclick="checkStatus()">&#10003; Check All</button>
+        </div>
+        <div class="scard">
+          <h3>Change My Password</h3>
+          <div class="field"><label>Current Password</label><input type="password" id="cp-cur" placeholder="Current"></div>
+          <div class="field"><label>New Password</label><input type="password" id="cp-new" placeholder="New (min 4 chars)"></div>
+          <div class="field"><label>Confirm Password</label><input type="password" id="cp-cf" placeholder="Confirm new"></div>
+          <div class="msg msg-err" id="cp-err" style="display:none"></div>
+          <button class="btn btn-green btn-full" onclick="changeMyPass()">Update Password</button>
+        </div>
+        <div class="scard" style="grid-column:1/-1">
+          <h3>Dashboard Links</h3>
+          <p style="font-size:12px;color:var(--muted);margin-bottom:14px">Share these links with viewers. They need their username and password to access.</p>
+          <div id="dash-links"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CHATBOT -->
+<button id="chat-btn" onclick="toggleChat()">&#127807; Ask Claude</button>
+<div id="chat-box">
+  <div class="ch">
+    <div><h4>Little Leaf Assistant</h4><p>Powered by Claude &bull; 20 questions/hour</p></div>
+    <button class="ch-close" onclick="toggleChat()">&#215;</button>
+  </div>
+  <div class="ch-msgs" id="ch-msgs">
+    <div class="cm a">Hi! Ask me anything about your business data &mdash; revenue, customers, inventory, sales trends, and more.</div>
+  </div>
+  <div class="ch-rem" id="ch-rem"></div>
+  <div class="ch-inp">
+    <input type="text" id="ch-inp" placeholder="Ask a question..." onkeydown="if(event.key==='Enter')sendChat()">
+    <button class="ch-send" id="ch-send" onclick="sendChat()">Send</button>
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="confirm"><div class="cc">
+  <h3 id="c-ttl">Confirm</h3>
+  <p id="c-msg"></p>
+  <div class="cc-btns">
+    <button class="btn btn-ghost btn-sm" onclick="closeConfirm()">Cancel</button>
+    <button class="btn btn-red btn-sm" id="c-ok">Confirm</button>
+  </div>
+</div></div>
+
+<script>
+
+// ============================================================
+// STATE
+// ============================================================
+var sessionToken   = null;
+var currentUser    = null;
+var failedAttempts = 0;
+var lockUntil      = 0;
+var confirmCb      = null;
+
+// ============================================================
+// API HELPER
+// ============================================================
+async function api(params) {
+  if (sessionToken) params.token = sessionToken;
+  const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(params) });
+  return res.json();
+}
+
+// ============================================================
+// LOGIN
+// ============================================================
+document.getElementById("inp-p").addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
+document.getElementById("inp-u").addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
+
+async function doLogin() {
+  const now = Date.now();
+  if (lockUntil > now) { showLockMsg(); return; }
+  const username = document.getElementById("inp-u").value.trim();
+  const password = document.getElementById("inp-p").value;
+  if (!username || !password) {
+    showErr("Please enter username and password."); return;
+  }
+  const btn = document.getElementById("login-btn");
+  btn.disabled = true; btn.textContent = "Signing in...";
+  hideErr();
+  try {
+    const data = await fetch(SCRIPT_URL, {
+      method: "POST",
+      body:   JSON.stringify({ action: "adminLogin", username, password })
+    }).then(r => r.json());
+    if (data.success) {
+      failedAttempts = 0; lockUntil = 0;
+      sessionToken = data.token;
+      currentUser  = { username: data.username, role: data.role };
+      sessionStorage.setItem("lll_tok",  data.token);
+      sessionStorage.setItem("lll_user", data.username);
+      sessionStorage.setItem("lll_role", data.role);
+      document.getElementById("login-wrap").style.display = "none";
+      document.getElementById("app-wrap").style.display   = "block";
+      document.getElementById("who-name").textContent     = data.username;
+      initApp();
+    } else {
+      failedAttempts++;
+      showErr(data.error || "Incorrect username or password.");
+      if (failedAttempts >= 3) { lockUntil = Date.now() + 15*60*1000; showLockMsg(); }
+    }
+  } catch(e) { showErr("Connection failed. Check your internet connection."); }
+  btn.disabled = false; btn.textContent = "Sign In";
+}
+
+function showErr(msg) {
+  const el = document.getElementById("msg-err");
+  el.textContent = msg; el.style.display = "block";
+}
+function hideErr() {
+  document.getElementById("msg-err").style.display = "none";
+  document.getElementById("msg-lock").style.display = "none";
+}
+
+function showLockMsg() {
+  document.getElementById("msg-err").style.display  = "none";
+  document.getElementById("msg-lock").style.display = "block";
+  const tick = setInterval(function() {
+    const rem = Math.max(0, lockUntil - Date.now());
+    if (rem <= 0) { clearInterval(tick); hideErr(); failedAttempts = 0; return; }
+    const m = Math.floor(rem/60000), s = Math.floor((rem%60000)/1000);
+    document.getElementById("lock-time").textContent = m + ":" + (s<10 "0":"") + s;
+  }, 1000);
+}
+
+function resetLock() {
+  lockUntil = 0; failedAttempts = 0; hideErr();
+}
+
+async function doLogout() {
+  try { await api({ action: "logout" }); } catch(e) {}
+  sessionToken = null; currentUser = null;
+  sessionStorage.clear();
+  document.getElementById("app-wrap").style.display   = "none";
+  document.getElementById("login-wrap").style.display = "flex";
+  document.getElementById("inp-u").value = "";
+  document.getElementById("inp-p").value = "";
+  hideErr();
+}
+
+// ============================================================
+// INIT
+// ============================================================
+async function initApp() {
+  buildFmTabsUI();
+  buildDashLinks();
+  document.getElementById("chat-btn").style.display = "flex";
+  showPage("process", document.querySelector(".nb.on"));
+  try {
+    const cfg = await api({ action: "getConfig" });
+    if (cfg.success && cfg.lastUpdated) {
+      document.getElementById("upd-time").textContent    = new Date(cfg.lastUpdated).toLocaleString();
+      document.getElementById("upd-badge").style.display = "flex";
+    }
+  } catch(e) {}
+  loadUsersTable();
+  if (currentUser.role === "superadmin") {
+    loadViewersTable();
+    document.getElementById("viewers-card").style.display = "block";
+  }
+}
+
+function showPage(name, btn) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("on"));
+  document.querySelectorAll(".nb").forEach(b => b.classList.remove("on"));
+  document.getElementById("page-" + name).classList.add("on");
+  if (btn) btn.classList.add("on");
+  if (name === "files")    { buildFmTabsUI(); loadFmFiles("quickbooks"); }
+  if (name === "users")    { loadUsersTable(); if(currentUser&&currentUser.role==="superadmin") loadViewersTable(); }
+  if (name === "history")  loadHistory();
+  if (name === "settings") { buildDashLinks(); checkStatus(); }
+}
+
+// ============================================================
+// PROCESS & DEPLOY
+// ============================================================
+async function startProcess() {
+  if (SCRIPT_URL === "PASTE_YOUR_APPS_SCRIPT_URL_HERE") {
+    toast("Update SCRIPT_URL in admin.html with your Apps Script URL first.", "err"); return;
+  }
+
+  const btn = document.getElementById("proc-btn");
+  btn.disabled = true;
+  document.getElementById("prog-wrap").style.display    = "block";
+  document.getElementById("success-wrap").style.display = "none";
+  document.getElementById("prog-steps").innerHTML        = "";
+
+  function step(text, cls) {
+    const d = document.createElement("div");
+    d.className = "ps " + (cls||"active");
+    d.textContent = (cls==="done" "OK  ":cls==="fail" "FAIL ":"...  ") + text;
+    document.getElementById("prog-steps").appendChild(d);
+    return d;
+  }
+  function upd(d, text, cls) {
+    d.className = "ps " + cls;
+    d.textContent = (cls==="done" "OK  ":cls==="fail" "FAIL ":"...  ") + text;
+  }
+
+  // Step 1: Read all Drive files
+  setProgress(5, "Reading CSV files from Google Drive...");
+  const s1 = step("Reading all CSV files from Google Drive...");
+  let driveFiles = {};
+  try {
+    const r = await api({ action: "readAllFiles" });
+    if (!r.success) throw new Error(r.error || "Failed to read Drive files");
+    driveFiles = r.files;
+    if (r.totalFiles === 0) throw new Error("No CSV files found in Drive. Upload files to your Google Drive folders first.");
+    upd(s1, "Read " + r.totalFiles + " files from " + Object.keys(driveFiles).length + " folders", "done");
+    (r.errors||[]).forEach(e => toast(e, "err"));
+  } catch(e) { upd(s1, e.message, "fail"); toast(e.message, "err"); btn.disabled=false; return; }
+
+  // Step 2: Process data
+  setProgress(20, "Processing data...");
+  const s2 = step("Processing all data sources...");
+  let qb, apex, distru, metrc, lit;
+  try {
+    qb     = await readQBData(driveFiles);
+    apex   = await readApexData(driveFiles);
+    distru = await readDistruData(driveFiles);
+    metrc  = await readMetrcData(driveFiles);
+    lit    = await readLitData(driveFiles);
+    upd(s2, "All data processed successfully", "done");
+  } catch(e) { upd(s2, "Processing failed: " + e.message, "fail"); toast(e.message,"err"); btn.disabled=false; return; }
+
+  const now     = new Date();
+  const timeStr = now.toLocaleString("en-US", {month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
+
+  // Step 3: Build dashboards
+  setProgress(40, "Building 7 dashboards...");
+  const s3 = step("Building all 7 dashboards...");
+  const built = {};
+  try {
+    const builders = [
+      ["master_dashboard.html",         h => buildMasterDashboard(h, qb, apex, distru, metrc, lit, timeStr)],
+      ["weekly_exec.html",              h => buildWeeklyExec(h, qb, apex, metrc, lit, timeStr)],
+      ["retail_intel.html",             h => buildRetailIntel(h, apex, lit, timeStr)],
+      ["weekly_refresh.html",           h => buildWeeklyRefresh(h, qb, apex, metrc, timeStr)],
+      ["sales_dashboard.html",          h => buildSalesDashboard(h, lit, timeStr)],
+      ["sales_action_form.html",        h => buildSalesActionForm(h, apex, timeStr)],
+      ["lit_sales_command_center.html", h => buildLitCommandCenter(h, lit, apex, timeStr)]
+    ];
+    for (const [file, fn] of builders) {
+      let html = await fetchDashboard(file);
+      html = fn(html);
+      html = injectViewerLogin(html, SCRIPT_URL);
+      html = injectChatbot(html, SCRIPT_URL);
+      built[file] = html;
+    }
+    upd(s3, "All 7 dashboards built", "done");
+  } catch(e) { upd(s3, "Build failed: " + e.message, "fail"); toast(e.message,"err"); btn.disabled=false; return; }
+
+  // Step 4: Deploy Set 1 (4 dashboards)
+  setProgress(60, "Deploying Set 1 of 2...");
+  const s4 = step("Deploying Set 1: Master, Weekly Exec, Retail Intel, Weekly Refresh...");
+  try {
+    const set1 = {};
+    ["master_dashboard.html","weekly_exec.html","retail_intel.html","weekly_refresh.html"].forEach(f => set1[f]=built[f]);
+    const r = await api({ action:"deployDashboards", set:1, dashboardContent:set1, lastUpdated:now.toISOString() });
+    if (r.failed && r.failed.length) upd(s4, "Set 1 partial failures: " + r.failed.join(", "), "fail");
+    else upd(s4, "Set 1 deployed: " + (r.updated||[]).length + " dashboards", "done");
+  } catch(e) { upd(s4, "Set 1 failed: " + e.message, "fail"); toast(e.message,"err"); btn.disabled=false; return; }
+
+  // Step 5: Deploy Set 2 (3 dashboards)
+  setProgress(80, "Deploying Set 2 of 2...");
+  const s5 = step("Deploying Set 2: Sales Dashboard, Action Form, Command Center...");
+  try {
+    const set2 = {};
+    ["sales_dashboard.html","sales_action_form.html","lit_sales_command_center.html"].forEach(f => set2[f]=built[f]);
+    const r = await api({ action:"deployDashboards", set:2, dashboardContent:set2, lastUpdated:now.toISOString() });
+    if (r.failed && r.failed.length) upd(s5, "Set 2 partial failures: " + r.failed.join(", "), "fail");
+    else upd(s5, "Set 2 deployed: " + (r.updated||[]).length + " dashboards", "done");
+  } catch(e) { upd(s5, "Set 2 failed: " + e.message, "fail"); toast(e.message,"err"); btn.disabled=false; return; }
+
+  setProgress(100, "Complete!");
+  document.getElementById("success-wrap").style.display = "block";
+  document.getElementById("success-time").textContent   = "Deployed: " + timeStr + " | Live in 1-2 minutes";
+  document.getElementById("upd-time").textContent       = timeStr;
+  document.getElementById("upd-badge").style.display    = "flex";
+
+  const lDiv = document.getElementById("success-links");
+  lDiv.innerHTML = "";
+  DASHBOARDS.forEach(d => {
+    const a = document.createElement("a");
+    a.className   = "dl-a"; a.href = BASE_URL + "/" + d.file; a.target = "_blank";
+    a.textContent = d.label + " ->";
+    lDiv.appendChild(a);
+  });
+
+  btn.disabled = false;
+  toast("All 7 dashboards deployed!", "ok");
+}
+
+function setProgress(pct, lbl) {
+  const b = document.getElementById("prog-bar");
+  const l = document.getElementById("prog-lbl");
+  if (b) b.style.width = pct + "%";
+  if (l) l.textContent = lbl;
+}
+
+async function fetchDashboard(filename) {
+  try {
+    const url = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/main/" + filename + " t=" + Date.now();
+    const res = await fetch(url);
+    if (res.ok) return await res.text();
+  } catch(e) {}
+  return "<!DOCTYPE html><html><head><meta charset='UTF-8'></head><body></body></html>";
+}
+
+// ============================================================
+// INJECT VIEWER LOGIN -- calls Apps Script to verify, no passwords in HTML
+// ============================================================
+function injectViewerLogin(html, scriptUrl) {
+  html = html.replace(/<!-- LLL_VIEWER_START -->[\s\S]* <!-- LLL_VIEWER_END -->/g, "");
+  const s = "<!-- LLL_VIEWER_START -->"
+    + "<scr" + "ipt>(function(){"
+    + "var SU='" + scriptUrl + "';"
+    + "var SK='lll_vs';"
+    + "function getToken(){try{var d=JSON.parse(sessionStorage.getItem(SK)||'{}');return d.token||null;}catch(e){return null;}}"
+    + "function showLogin(){"
+    +   "var o=document.createElement('div');"
+    +   "o.id='_lll_ov';"
+    +   "o.style='position:fixed;inset:0;background:#0e1414;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:sans-serif';"
+    +   "o.innerHTML='<div style=\"background:#16201f;border:1px solid #283533;border-radius:18px;padding:40px 36px;width:340px;text-align:center\">"
+    +     "<div style=\"font-size:36px;margin-bottom:14px\">&#127807;</div>"
+    +     "<h2 style=\"color:#e8efe9;font-size:20px;font-weight:700;margin-bottom:6px\">Little Leaf Labs</h2>"
+    +     "<p style=\"color:#92a39c;font-size:13px;margin-bottom:24px\">Enter your credentials to view this dashboard</p>"
+    +     "<input id=\"_lll_u\" type=\"text\" placeholder=\"Username\" autocomplete=\"username\" style=\"width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 14px;color:#e8efe9;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box\">"
+    +     "<input id=\"_lll_p\" type=\"password\" placeholder=\"Password\" autocomplete=\"current-password\" style=\"width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 14px;color:#e8efe9;font-size:14px;outline:none;margin-bottom:12px;box-sizing:border-box\">"
+    +     "<div id=\"_lll_e\" style=\"color:#ff7378;font-size:12px;min-height:20px;margin-bottom:10px\"></div>"
+    +     "<button id=\"_lll_b\" style=\"width:100%;background:#3fae6b;color:#0e1414;padding:11px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none\">Sign In</button>"
+    +   "</div>';"
+    +   "document.body.appendChild(o);"
+    +   "setTimeout(function(){var i=document.getElementById('_lll_u');if(i)i.focus();},100);"
+    +   "function go(){"
+    +     "var u=document.getElementById('_lll_u').value.trim();"
+    +     "var p=document.getElementById('_lll_p').value;"
+    +     "var e=document.getElementById('_lll_e');"
+    +     "if(!u||!p){e.textContent='Please enter username and password.';return;}"
+    +     "document.getElementById('_lll_b').disabled=true;"
+    +     "e.textContent='Verifying...';"
+    +     "fetch(SU,{method:'POST',body:JSON.stringify({action:'viewerLogin',username:u,password:p})})"
+    +     ".then(r=>r.json())"
+    +     ".then(d=>{"
+    +       "if(d.success){"
+    +         "sessionStorage.setItem(SK,JSON.stringify({token:d.token,username:d.username}));"
+    +         "document.getElementById('_lll_ov').remove();"
+    +       "}else{"
+    +         "e.textContent=d.error||'Incorrect credentials';"
+    +         "document.getElementById('_lll_p').value='';"
+    +         "document.getElementById('_lll_b').disabled=false;"
+    +       "}"
+    +     "})"
+    +     ".catch(function(){e.textContent='Connection error. Check internet.';document.getElementById('_lll_b').disabled=false;});"
+    +   "}"
+    +   "document.getElementById('_lll_b').addEventListener('click',go);"
+    +   "document.getElementById('_lll_p').addEventListener('keydown',function(e2){if(e2.key==='Enter')go();});"
+    +   "document.getElementById('_lll_u').addEventListener('keydown',function(e2){if(e2.key==='Enter')go();});"
+    + "}"
+    + "var tok=getToken();"
+    + "if(!tok){"
+    +   "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}"
+    + "}else{"
+    +   "fetch(SU,{method:'POST',body:JSON.stringify({action:'verifyToken',token:tok,role:'viewer'})})"
+    +   ".then(r=>r.json())"
+    +   ".then(d=>{"
+    +     "if(!d.success){sessionStorage.removeItem(SK);"
+    +       "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}"
+    +     "}"
+    +   "})"
+    +   ".catch(function(){});"
+    + "}"
+    + "})();</" + "script><!-- LLL_VIEWER_END -->";
+  if (html.includes("<head>")) return html.replace("<head>", "<head>" + s);
+  return s + html;
+}
+
+// ============================================================
+// INJECT CHATBOT -- Claude chatbot widget for every dashboard
+// ============================================================
+function injectChatbot(html, scriptUrl) {
+  html = html.replace(/<!-- LLL_BOT_START -->[\s\S]* <!-- LLL_BOT_END -->/g, "");
+  const css = "<style>"
+    + "#_lb{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#3fae6b,#2c7d4c);color:#0e1414;border:none;border-radius:28px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;z-index:8000;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(63,174,107,.4);transition:transform .15s}"
+    + "#_lb:hover{transform:scale(1.05)}"
+    + "#_lp{position:fixed;bottom:80px;right:24px;width:360px;max-height:520px;background:#16201f;border:1px solid #283533;border-radius:16px;display:none;flex-direction:column;z-index:8000;box-shadow:0 8px 40px rgba(0,0,0,.5)}"
+    + "#_lp.open{display:flex}"
+    + "._lh{padding:14px 16px;border-bottom:1px solid #283533;display:flex;align-items:center;justify-content:space-between}"
+    + "._lh h4{font-size:14px;font-weight:600;color:#e8efe9}._lh p{font-size:11px;color:#92a39c}"
+    + "._lhc{background:none;border:none;color:#92a39c;cursor:pointer;font-size:18px;line-height:1}"
+    + "._lm{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}"
+    + "._lmsg{max-width:88%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;color:#e8efe9}"
+    + "._lmsg.u{background:rgba(63,174,107,.15);border:1px solid rgba(63,174,107,.25);align-self:flex-end;border-radius:12px 12px 4px 12px}"
+    + "._lmsg.a{background:#1c2826;border:1px solid #283533;align-self:flex-start;border-radius:12px 12px 12px 4px}"
+    + "._lmsg.t{color:#92a39c;font-style:italic;align-self:flex-start}"
+    + "._lr{font-size:11px;color:#92a39c;padding:0 14px 8px;text-align:right}"
+    + "._li{padding:12px 14px;border-top:1px solid #283533;display:flex;gap:8px}"
+    + "._li input{flex:1;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:9px 12px;color:#e8efe9;font-size:13px;outline:none}"
+    + "._li input:focus{border-color:#3fae6b}"
+    + "._ls{background:#3fae6b;color:#0e1414;border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer}"
+    + "._ls:disabled{opacity:.4;cursor:not-allowed}"
+    + "</style>";
+  const html_el = '<button id="_lb" onclick="_lt()">&#127807; Ask Claude</button>'
+    + '<div id="_lp">'
+    + '<div class="_lh"><div><h4>Little Leaf Assistant</h4><p>Powered by Claude</p></div><button class="_lhc" onclick="_lt()">&#215;</button></div>'
+    + '<div class="_lm" id="_lm"><div class="_lmsg a">Hi! Ask me anything about this dashboard &mdash; revenue, customers, inventory, trends, and more.</div></div>'
+    + '<div class="_lr" id="_lr"></div>'
+    + '<div class="_li"><input type="text" id="_lci" placeholder="Ask a question..." onkeydown="if(event.key===\'Enter\')_ls2()"><button class="_ls" id="_lsb" onclick="_ls2()">Send</button></div>'
+    + '</div>';
+  const script = "<scr" + "ipt>"
+    + "var _LSU='" + scriptUrl + "';"
+    + "function _lt(){var p=document.getElementById('_lp');p.classList.toggle('open');if(p.classList.contains('open'))document.getElementById('_lci').focus();}"
+    + "function _lctx(){"
+    +   "var c=document.title+'\\n';"
+    +   "try{"
+    +     "if(typeof FOUND!=='undefined')c+='KPIs: '+JSON.stringify(FOUND)+'\\n';"
+    +     "if(typeof SEED_CUST!=='undefined')c+='Top customers: '+JSON.stringify(SEED_CUST.slice(0,15))+'\\n';"
+    +     "if(typeof SEED_SKU!=='undefined')c+='Top SKUs: '+JSON.stringify(SEED_SKU.slice(0,15))+'\\n';"
+    +     "if(typeof SEED_SALES!=='undefined')c+='Sales: '+JSON.stringify(SEED_SALES)+'\\n';"
+    +     "if(typeof D!=='undefined')c+='Data: '+JSON.stringify(D).slice(0,3000)+'\\n';"
+    +     "if(typeof MKT!=='undefined')c+='Market: '+JSON.stringify(MKT).slice(0,3000)+'\\n';"
+    +   "}catch(e){}"
+    +   "return c;"
+    + "}"
+    + "async function _ls2(){"
+    +   "var inp=document.getElementById('_lci');"
+    +   "var q=inp.value.trim();"
+    +   "if(!q)return;"
+    +   "var sess=sessionStorage.getItem('lll_vs');"
+    +   "if(!sess){alert('Please log in first.');return;}"
+    +   "var tok=JSON.parse(sess).token;"
+    +   "var msgs=document.getElementById('_lm');"
+    +   "var um=document.createElement('div');um.className='_lmsg u';um.textContent=q;msgs.appendChild(um);"
+    +   "var tm=document.createElement('div');tm.className='_lmsg t';tm.textContent='Thinking...';msgs.appendChild(tm);"
+    +   "msgs.scrollTop=msgs.scrollHeight;"
+    +   "inp.value='';"
+    +   "document.getElementById('_lsb').disabled=true;"
+    +   "try{"
+    +     "var r=await fetch(_LSU,{method:'POST',body:JSON.stringify({action:'chatbot',token:tok,question:q,context:_lctx()})});"
+    +     "var d=await r.json();"
+    +     "tm.className='_lmsg a';"
+    +     "if(d.success){"
+    +       "tm.textContent=d.answer;"
+    +       "if(d.remaining!==undefined)document.getElementById('_lr').textContent=d.remaining+' questions remaining this hour';"
+    +     "}else{tm.textContent='Error: '+(d.error||'Try again');}"
+    +   "}catch(e){tm.className='_lmsg a';tm.textContent='Connection error. Try again.';}"
+    +   "document.getElementById('_lsb').disabled=false;"
+    +   "msgs.scrollTop=msgs.scrollHeight;"
+    + "}"
+    + "</" + "script>";
+  const inject = "<!-- LLL_BOT_START -->" + css + html_el + script + "<!-- LLL_BOT_END -->";
+  if (html.includes("</body>")) return html.replace("</body>", inject + "</body>");
+  return html + inject;
+}
+
+// ============================================================
+// FILE MANAGER
+// ============================================================
+var FM_CATS = [
+  {key:"quickbooks",label:"QuickBooks"},
+  {key:"distru",    label:"Distru"},
+  {key:"apex",      label:"Apex CRM"},
+  {key:"metrc",     label:"Metrc"},
+  {key:"lit_alerts",label:"Lit Alerts"}
+];
+
+function buildFmTabsUI() {
+  const tabs = document.getElementById("fm-tabs");
+  if (!tabs) return;
+  tabs.innerHTML = "";
+  FM_CATS.forEach((cat, i) => {
+    const btn = document.createElement("button");
+    btn.className = "fm-tab" + (i===0 " on":"");
+    btn.textContent = cat.label;
+    btn.onclick = function() {
+      document.querySelectorAll(".fm-tab").forEach(t => t.classList.remove("on"));
+      btn.classList.add("on");
+      loadFmFiles(cat.key);
+    };
+    tabs.appendChild(btn);
+  });
+}
+
+async function loadFmFiles(category) {
+  const list = document.getElementById("fm-list");
+  list.innerHTML = "<p style='color:var(--muted);font-size:13px'>Loading from Google Drive...</p>";
+  try {
+    const data = await api({ action: "listFiles", category });
+    if (!data.success) throw new Error(data.error);
+    if (!data.files || data.files.length === 0) {
+      list.innerHTML = "<p style='color:var(--muted);font-size:13px'>No CSV files in this folder. Upload CSV files directly in your Google Drive folder.</p>";
+      return;
+    }
+    list.innerHTML = "";
+    data.files.forEach(f => {
+      const div = document.createElement("div");
+      div.className = "fm-item";
+      div.innerHTML = `<div><div class="fm-name">${f.name}</div><div class="fm-meta">${Math.round(f.size/1024)} KB &bull; ${new Date(f.modified).toLocaleDateString()}</div></div>`
+        + `<button class="btn btn-red btn-sm" onclick="deleteFmFile('${f.id}','${f.name}','${category}')">Delete</button>`;
+      list.appendChild(div);
+    });
+  } catch(e) {
+    list.innerHTML = "<p style='color:var(--red);font-size:13px'>Error: " + e.message + "</p>";
+  }
+}
+
+async function deleteFmFile(id, name, cat) {
+  showConfirm("Delete File", "Delete " + name + "  A backup is saved automatically.", async () => {
+    try {
+      const d = await api({ action: "deleteFile", fileId: id, category: cat });
+      if (d.success) { toast("Deleted (backup saved)", "ok"); loadFmFiles(cat); }
+      else toast("Error: " + d.error, "err");
+    } catch(e) { toast("Error: " + e.message, "err"); }
+  });
+}
+
+// ============================================================
+// USER MANAGEMENT
+// ============================================================
+async function loadUsersTable() {
+  const isSA = currentUser && currentUser.role === "superadmin";
+  const tb   = document.getElementById("users-body");
+  if (!tb) return;
+  tb.innerHTML = "<tr><td colspan='5' style='color:var(--muted);font-size:13px;padding:14px'>Loading...</td></tr>";
+  try {
+    const d = await api({ action: "getUsers" });
+    if (!d.success) throw new Error(d.error);
+    tb.innerHTML = "";
+    Object.entries(d.users||{}).forEach(([uname, u]) => {
+      const self = uname === currentUser.username;
+      const pwCell = isSA
+          `<td><span id="ps-${uname}" style="font-family:monospace">........</span>
+            <button class="btn btn-ghost btn-sm" style="padding:2px 7px;margin-left:4px;font-size:10px"
+              onclick="togglePw('ps-${uname}','${u.password||''}')">Show</button></td>`
+        : `<td style="color:var(--muted)">........</td>`;
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td style="font-weight:500">${uname}${self ` <span style="color:var(--muted);font-size:10px">(you)</span>`:""}</td>`
+        + `<td><span class="role-pill ${u.role==="superadmin" "rs":"ra"}">${u.role==="superadmin" "Super Admin":"Admin"}</span></td>`
+        + pwCell
+        + `<td style="color:var(--muted);font-size:11px">${u.created new Date(u.created).toLocaleDateString():"-"}</td>`
+        + `<td>${(isSA&&!self) `<button class="btn btn-red btn-sm" onclick="removeUser('${uname}')">Remove</button>`:"-"}</td>`;
+      tb.appendChild(tr);
+    });
+  } catch(e) {
+    tb.innerHTML = `<tr><td colspan="5" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
+  }
+  const ar = document.getElementById("add-user-row");
+  if (ar) ar.style.display = isSA   "grid" : "none";
+}
+
+function togglePw(id, pw) {
+  const el = document.getElementById(id);
+  const bt = el && el.nextElementSibling;
+  if (!el) return;
+  if (el.textContent === "........") { el.textContent = pw; if(bt) bt.textContent="Hide"; }
+  else { el.textContent = "........"; if(bt) bt.textContent="Show"; }
+}
+
+async function addUser() {
+  const u = document.getElementById("new-u").value.trim();
+  const p = document.getElementById("new-p").value;
+  const r = document.getElementById("new-r").value;
+  if (!u || !p || p.length < 4) { toast("Username and password (min 4 chars) required.", "err"); return; }
+  try {
+    const d = await api({ action:"saveUser", username:u, password:p, role:r });
+    if (d.success) { document.getElementById("new-u").value=""; document.getElementById("new-p").value=""; toast("User "+u+" added.", "ok"); loadUsersTable(); }
+    else toast(d.error, "err");
+  } catch(e) { toast(e.message, "err"); }
+}
+
+async function removeUser(uname) {
+  showConfirm("Remove User", "Remove " + uname + "  They lose access immediately.", async () => {
+    try {
+      const d = await api({ action:"deleteUser", username:uname });
+      if (d.success) { toast("User removed.", "ok"); loadUsersTable(); }
+      else toast(d.error, "err");
+    } catch(e) { toast(e.message, "err"); }
+  });
+}
+
+// ============================================================
+// VIEWER MANAGEMENT
+// ============================================================
+async function loadViewersTable() {
+  const tb = document.getElementById("viewers-body");
+  if (!tb) return;
+  tb.innerHTML = "<tr><td colspan='4' style='color:var(--muted);font-size:13px;padding:14px'>Loading...</td></tr>";
+  try {
+    const d = await api({ action: "getViewers" });
+    if (!d.success) throw new Error(d.error);
+    tb.innerHTML = "";
+    Object.entries(d.viewers||{}).forEach(([uname, v]) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td style="font-weight:500">${uname}</td>`
+        + `<td><span id="vps-${uname}" style="font-family:monospace">........</span>
+            <button class="btn btn-ghost btn-sm" style="padding:2px 7px;margin-left:4px;font-size:10px"
+              onclick="togglePw('vps-${uname}','${v.password||''}')">Show</button></td>`
+        + `<td style="color:var(--muted);font-size:11px">${v.created new Date(v.created).toLocaleDateString():"-"}</td>`
+        + `<td><button class="btn btn-red btn-sm" onclick="removeViewer('${uname}')">Remove</button></td>`;
+      tb.appendChild(tr);
+    });
+  } catch(e) {
+    tb.innerHTML = `<tr><td colspan="4" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
+  }
+}
+
+async function addViewer() {
+  const u = document.getElementById("new-vu").value.trim();
+  const p = document.getElementById("new-vp").value;
+  if (!u || !p || p.length < 4) { toast("Username and password (min 4 chars) required.", "err"); return; }
+  try {
+    const d = await api({ action:"saveViewer", username:u, password:p });
+    if (d.success) { document.getElementById("new-vu").value=""; document.getElementById("new-vp").value=""; toast("Viewer "+u+" added. Access granted immediately.", "ok"); loadViewersTable(); }
+    else toast(d.error, "err");
+  } catch(e) { toast(e.message, "err"); }
+}
+
+async function removeViewer(uname) {
+  showConfirm("Remove Viewer", "Remove viewer " + uname + "  Access revoked immediately.", async () => {
+    try {
+      const d = await api({ action:"deleteViewer", username:uname });
+      if (d.success) { toast("Viewer removed.", "ok"); loadViewersTable(); }
+      else toast(d.error, "err");
+    } catch(e) { toast(e.message, "err"); }
+  });
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+async function loadHistory() {
+  const tb    = document.getElementById("hist-body");
+  const empty = document.getElementById("hist-empty");
+  tb.innerHTML = "";
+  try {
+    const d = await api({ action: "getHistory" });
+    if (!d.success || !d.history || d.history.length === 0) { empty.style.display="block"; return; }
+    empty.style.display = "none";
+    d.history.forEach(h => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td style="color:var(--muted);white-space:nowrap">${new Date(h.time).toLocaleString()}</td>`
+        + `<td style="font-weight:500">${h.username||"-"}</td>`
+        + `<td><span class="at">${h.action||"-"}</span></td>`
+        + `<td style="color:var(--muted)">${h.details||"-"}</td>`;
+      tb.appendChild(tr);
+    });
+  } catch(e) {
+    tb.innerHTML = `<tr><td colspan="4" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
+  }
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function buildDashLinks() {
+  const c = document.getElementById("dash-links");
+  if (!c) return;
+  c.innerHTML = "";
+  [{file:"admin.html",label:"Admin Panel"}, ...DASHBOARDS].forEach(d => {
+    const url = BASE_URL + "/" + d.file;
+    const div = document.createElement("div");
+    div.className = "li-item";
+    div.innerHTML = `<div class="li-label">${d.label}</div>`
+      + `<div class="li-row"><input type="text" value="${url}" readonly id="dl-${d.file}"><button class="btn btn-ghost btn-sm" onclick="copyLink('dl-${d.file}')">Copy</button></div>`;
+    c.appendChild(div);
+  });
+}
+
+function copyLink(id) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => toast("Link copied!", "ok")).catch(() => {
+    el.select(); document.execCommand("copy"); toast("Link copied!", "ok");
+  });
+}
+
+async function checkStatus() {
+  setDot("script","y","Checking Apps Script...");
+  try {
+    const r = await fetch(SCRIPT_URL, { method:"POST", body:JSON.stringify({action:"ping"}) });
+    const d = await r.json();
+    setDot("script", d.success "g":"r", d.success "Apps Script: connected":"Apps Script: error");
+  } catch(e) { setDot("script","r","Apps Script: cannot connect"); }
+  try {
+    const cfg = await api({ action: "getConfig" });
+    if (cfg.success) {
+      setDot("gh", cfg.hasGhToken "g":"r", cfg.hasGhToken "GitHub token: configured":"GitHub token: NOT SET in Script Properties");
+      setDot("cl", cfg.hasApiKey "g":"r",  cfg.hasApiKey "Claude API key: configured":"Claude API key: NOT SET in Script Properties");
+    }
+  } catch(e) {}
+}
+
+function setDot(id, col, txt) {
+  const d = document.getElementById("dot-"+id);
+  const t = document.getElementById("st-"+id);
+  const c = {g:"sg",r:"srd",y:"sy"};
+  if (d) d.className = "sd " + (c[col]||"sm");
+  if (t) t.textContent = txt;
+}
+
+async function changeMyPass() {
+  const cur  = document.getElementById("cp-cur").value;
+  const nw   = document.getElementById("cp-new").value;
+  const cf   = document.getElementById("cp-cf").value;
+  const err  = document.getElementById("cp-err");
+  err.style.display = "none";
+  if (!cur||!nw||!cf) { err.textContent="All fields required."; err.style.display="block"; return; }
+  if (nw.length < 4)  { err.textContent="New password must be at least 4 characters."; err.style.display="block"; return; }
+  if (nw !== cf)      { err.textContent="Passwords do not match."; err.style.display="block"; return; }
+  try {
+    const d = await api({ action:"changePassword", currentPassword:cur, newPassword:nw });
+    if (d.success) {
+      ["cp-cur","cp-new","cp-cf"].forEach(i => document.getElementById(i).value="");
+      toast("Password updated!", "ok");
+    } else { err.textContent=d.error; err.style.display="block"; }
+  } catch(e) { err.textContent=e.message; err.style.display="block"; }
+}
+
+// ============================================================
+// CHATBOT (Admin panel version)
+// ============================================================
+function toggleChat() {
+  const b = document.getElementById("chat-box");
+  b.classList.toggle("open");
+  if (b.classList.contains("open")) document.getElementById("ch-inp").focus();
+}
+
+async function sendChat() {
+  const inp = document.getElementById("ch-inp");
+  const q   = inp.value.trim();
+  if (!q) return;
+  const msgs = document.getElementById("ch-msgs");
+  const um = document.createElement("div"); um.className="cm u"; um.textContent=q; msgs.appendChild(um);
+  const tm = document.createElement("div"); tm.className="cm t"; tm.textContent="Thinking..."; msgs.appendChild(tm);
+  msgs.scrollTop = msgs.scrollHeight;
+  inp.value = "";
+  document.getElementById("ch-send").disabled = true;
+  try {
+    const d = await api({ action:"chatbot", question:q, context:"Admin Panel\nRole: " + (currentUser&&currentUser.role||"admin") });
+    tm.className = "cm a";
+    if (d.success) {
+      tm.textContent = d.answer;
+      if (d.remaining !== undefined) document.getElementById("ch-rem").textContent = d.remaining + " questions remaining this hour";
+    } else { tm.textContent = "Error: " + (d.error||"Try again"); }
+  } catch(e) { tm.className="cm a"; tm.textContent="Connection error. Try again."; }
+  document.getElementById("ch-send").disabled = false;
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ============================================================
+// UTILITIES
+// ============================================================
+function toast(msg, type) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className   = "show " + (type==="err" "err":"ok");
+  clearTimeout(el._t);
+  el._t = setTimeout(() => el.className="", 4000);
+}
+
+function showConfirm(title, msg, cb) {
+  document.getElementById("c-ttl").textContent = title;
+  document.getElementById("c-msg").textContent  = msg;
+  document.getElementById("confirm").classList.add("show");
+  confirmCb = cb;
+}
+function closeConfirm() { document.getElementById("confirm").classList.remove("show"); confirmCb=null; }
+document.getElementById("c-ok").onclick = function() { closeConfirm(); if(confirmCb) confirmCb(); };
+
+// Restore session on page refresh
+(function() {
+  const tok  = sessionStorage.getItem("lll_tok");
+  const user = sessionStorage.getItem("lll_user");
+  const role = sessionStorage.getItem("lll_role");
+  if (tok && user && role) {
+    sessionToken = tok;
+    currentUser  = { username: user, role: role };
+    document.getElementById("login-wrap").style.display = "none";
+    document.getElementById("app-wrap").style.display   = "block";
+    document.getElementById("who-name").textContent     = user;
+    initApp();
+  }
+})();
+
+</script>
+<script>
+// DATA ENGINE
+function parseCSV(text) {
+  const lines = text.trim().split(/\r \n/);
+  if (!lines.length) return [];
+  const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = smartSplit(lines[i]);
+    if (vals.length < 2) continue;
+    const obj = {};
+    headers.forEach((h, j) => { obj[h] = (vals[j] || '').replace(/^"|"$/g,'').trim(); });
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function smartSplit(line) {
+  const result = [];
+  let cur = '', inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c === '"') { inQ = !inQ; }
+    else if (c === ',' && !inQ) { result.push(cur); cur = ''; }
+    else { cur += c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+function num(s) { 
+  if (!s) return 0; 
+  return parseFloat(String(s).replace(/[$,%]/g,'').replace(/,/g,'').trim()) || 0; 
+}
+
+function fmt(n, decimals=0) { 
+  return Number(n).toLocaleString('en-US', {minimumFractionDigits: decimals, maximumFractionDigits: decimals}); 
+}
+
+function fmtM(n) { return '$' + (n/1e6).toFixed(2) + 'M'; }
+
+function fmtK(n) { return '$' + Math.round(n/1000) + 'K'; }
+
+function fmtD(n) { return '$' + fmt(Math.round(n)); }
+
+function injectVar(html, varPattern, newValue) {
+  // Find the variable and replace its value using brace matching
+  const re = new RegExp(varPattern + '\\s*=\\s*([\\[\\{])');
+  const match = re.exec(html);
+  if (!match) return { html, success: false };
+  const startPos = match.index + match[0].length - 1;
+  const openChar = match[1];
+  const closeChar = openChar === '['   ']' : '}';
+  let depth = 0, endPos = startPos;
+  for (let i = startPos; i < html.length; i++) {
+    if (html[i] === openChar) depth++;
+    else if (html[i] === closeChar) { depth--; if (depth === 0) { endPos = i + 1; break; } }
+  }
+  return { html: html.slice(0, startPos) + newValue + html.slice(endPos), success: true };
+}
+
+function injectRegex(html, pattern, replacement) {
+  return html.replace(new RegExp(pattern, 'g'), replacement);
+}
+
+function injectLastUpdated(html, timeStr) {
+  const banner = `<!-- LAST_UPDATED_START --><div class="last-updated-banner" id="last-updated-banner" style="display:flex">  Last updated: <span id="last-updated-ts">${timeStr}</span></div><!-- LAST_UPDATED_END -->`;
+  if (html.includes('LAST_UPDATED_START')) {
+    return html.replace(/<!-- LAST_UPDATED_START -->[\s\S]* <!-- LAST_UPDATED_END -->/, banner);
+  }
+  return html;
+}
+
+function findFile(files, category, keywords) {
+  const catFiles = files[category] || [];
+  for (const kw of keywords) {
+    const found = catFiles.find(f => f.name.toLowerCase().replace(/[^a-z0-9]/g,'').includes(kw.replace(/[^a-z0-9]/g,'')));
+    if (found) return found;
+  }
+  return catFiles[0] || null;
+}
+
+async function readQBData(files) {
+  const qb = { rev:0, gp:0, cogs:0, net:0, gp_pct:0, cash:0, ar:0, ap:0 };
+  
+  const plFile = findFile(files, 'quickbooks', ['profit', 'loss', 'p&l', 'pl']);
+  if (plFile) {
+    const rows = parseCSV(plFile.content);
+    for (const r of rows) {
+      const k = (r[Object.keys(r)[0]] || '').toLowerCase().trim();
+      const val = num(r[Object.keys(r)[Object.keys(r).length-1]]);
+      if (k === 'total for income') qb.rev = val;
+      else if (k === 'gross profit') qb.gp = val;
+      else if (k === 'total for cost of goods sold') qb.cogs = val;
+      else if (k === 'net income') qb.net = val;
+    }
+    qb.gp_pct = qb.rev   Math.round(100 * qb.gp / qb.rev) : 0;
+  }
+
+  const bsFile = findFile(files, 'quickbooks', ['balance', 'sheet', 'bs']);
+  if (bsFile) {
+    const rows = parseCSV(bsFile.content);
+    for (const r of rows) {
+      const k = (r[Object.keys(r)[0]] || '').toLowerCase().trim();
+      const val = Math.abs(num(r[Object.keys(r)[Object.keys(r).length-1]]));
+      if (k === 'total for bank accounts') qb.cash = val;
+      else if (k.includes('accounts receivable') && !qb.ar) qb.ar = val;
+      else if (k.includes('accounts payable') && !qb.ap) qb.ap = val;
+    }
+  }
+  return qb;
+}
+
+async function readApexData(files) {
+  const apex = { buyers:[], products:[], inventory:[], contacts:[] };
+
+  const buyerFile = findFile(files, 'apex', ['buyer_perf', 'buyer performance', 'buyer_performance']);
+  if (buyerFile) apex.buyers = parseCSV(buyerFile.content);
+
+  const prodFile = findFile(files, 'apex', ['product_perf', 'product performance', 'product_performance']);
+  if (prodFile) apex.products = parseCSV(prodFile.content);
+
+  const invFile = findFile(files, 'apex', ['inventory_report', 'inventory report']);
+  if (invFile) apex.inventory = parseCSV(invFile.content);
+
+  const contactFile = findFile(files, 'apex', ['buyer contact', 'contact export', 'contact_export']);
+  if (contactFile) apex.contacts = parseCSV(contactFile.content);
+
+  // Compute totals
+  apex.total_units = apex.inventory.reduce((s,r) => s + num(r['Product Total Quantity'] || r['Quantity'] || 0), 0);
+  apex.total_val = apex.inventory.reduce((s,r) => s + num(r['Product Total Value'] || r['Value'] || 0), 0);
+  
+  // Build lapsed list
+  apex.lapsed = apex.buyers
+    .filter(b => num(b['Days Since Last Order'] || 0) >= 45 && num(b['Total Value of Orders'] || 0) > 0)
+    .map(b => ({
+      name: b['Buyer'] || b['Name'] || '',
+      days: Math.round(num(b['Days Since Last Order'] || 0)),
+      rev: num(b['Total Value of Orders'] || 0),
+      aov: num(b['Average Order Size'] || 0)
+    }))
+    .sort((a,b) => b.rev - a.rev);
+
+  // Build contact index
+  apex.contactIndex = {};
+  for (const c of apex.contacts) {
+    const key = (c['buyer name (location)'] || c['Buyer'] || '').toLowerCase().replace(/[^a-z0-9]/g,'');
+    if (key && !apex.contactIndex[key]) {
+      apex.contactIndex[key] = {
+        contact: c['contact_name'] || '',
+        email: c['email'] || '',
+        phone: c['primary_phone'] || ''
+      };
+    }
+  }
+
+  // Build SKU velocity
+  apex.skuTable = [];
+  const invByName = {};
+  for (const r of apex.inventory) {
+    const name = (r['Product Name'] || '').trim();
+    if (name) invByName[name] = num(r['Product Total Quantity'] || 0);
+  }
+
+  for (const p of apex.products) {
+    const name = (p['Name'] || '').trim();
+    const qtyInRange = num(p['Quantity In Range'] || 0);
+    const weeklyVel = Math.round((qtyInRange / 12) * 10) / 10;
+    let onHand = invByName[name] || 0;
+    if (!onHand) {
+      for (const [iname, qty] of Object.entries(invByName)) {
+        if (name.slice(0,20).toLowerCase().includes(iname.slice(0,20).toLowerCase()) ||
+            iname.slice(0,20).toLowerCase().includes(name.slice(0,20).toLowerCase())) {
+          onHand = qty; break;
+        }
+      }
+    }
+    const weeksLeft = weeklyVel > 0   Math.round((onHand / weeklyVel) * 10) / 10 : 99;
+    let status = 'OK';
+    if (weeksLeft <= 1) status = 'CRITICAL';
+    else if (weeksLeft <= 2) status = 'CRITICAL';
+    else if (weeksLeft <= 3) status = 'RED';
+    else if (weeksLeft <= 4) status = 'ORANGE';
+    
+    if (weeksLeft <= 4 && weeklyVel > 0) {
+      apex.skuTable.push({ name, on_hand: Math.round(onHand), weekly_vel: weeklyVel, weeks_left: weeksLeft, status });
+    }
+  }
+  apex.skuTable.sort((a,b) => a.weeks_left - b.weeks_left);
+
+  return apex;
+}
+
+async function readDistruData(files) {
+  const distru = { orders:[], monthly:{} };
+  const orderFile = findFile(files, 'distru', ['sales-orders', 'sales_orders', 'distru-sales']);
+  if (orderFile) {
+    distru.orders = parseCSV(orderFile.content).filter(r => 
+      ['Completed','Delivered','Paid'].includes(r['Status'] || ''));
+    
+    for (const row of distru.orders) {
+      const d = (row['Order Date'] || '').slice(0,7);
+      if (!d) continue;
+      if (!distru.monthly[d]) distru.monthly[d] = { rev:0, orders:0 };
+      distru.monthly[d].rev += num(row['Total ($)'] || 0);
+      distru.monthly[d].orders++;
+    }
+  }
+  distru.total_orders = distru.orders.length;
+  return distru;
+}
+
+async function readMetrcData(files) {
+  const metrc = { packages:[], labStatus:{}, locations:{} };
+  const pkgFile = findFile(files, 'metrc', ['packages', 'inventory', 'packagesinventory']);
+  if (pkgFile) {
+    metrc.packages = parseCSV(pkgFile.content);
+    for (const p of metrc.packages) {
+      const lab = (p['Lab Testing'] || '').trim();
+      const loc = (p['Location'] || '').trim();
+      metrc.labStatus[lab] = (metrc.labStatus[lab] || 0) + 1;
+      metrc.locations[loc] = (metrc.locations[loc] || 0) + 1;
+    }
+  }
+  metrc.prod_stages = {
+    newly_received: (metrc.locations['DISTRU NEWLY RECEIVED']||0) + (metrc.locations['NEWLY RECEIVED']||0),
+    in_testing: metrc.locations['DISTRU IN TESTING'] || 0,
+    stability: metrc.locations['DISTRU STABILITY TESTING'] || 0,
+    awaiting: (metrc.locations['AWAITING RELEASE']||0) + (metrc.locations['DISTRU AWAITING RELEASE']||0),
+    finished: metrc.locations['DISTRU FINISHED GOODS'] || 0,
+    test_passed: (metrc.labStatus['TestPassed']||0) + (metrc.labStatus['RetestPassed']||0),
+    submitted: (metrc.labStatus['SubmittedForTesting']||0) + (metrc.labStatus['TestingInProgress']||0),
+    not_submitted: metrc.labStatus['NotSubmitted'] || 0,
+    failed: metrc.labStatus['TestFailed'] || 0
+  };
+  return metrc;
+}
+
+async function readLitData(files) {
+  const lit = { brands:[], dispensaries:[], categories:[], daily:[], menu:[] };
+
+  const brandFile = findFile(files, 'lit_alerts', ['brandsanalytics', 'brands_analytics', 'overallbrands']);
+  if (brandFile) lit.brands = parseCSV(brandFile.content);
+
+  const dispFile = findFile(files, 'lit_alerts', ['dispensariesanalytics', 'dispensary_analytics', 'overalldispensaries']);
+  if (dispFile) lit.dispensaries = parseCSV(dispFile.content);
+
+  const catFile = findFile(files, 'lit_alerts', ['categoriesanalytics', 'category_analytics', 'overallcategories']);
+  if (catFile) lit.categories = parseCSV(catFile.content);
+
+  const dailyFile = findFile(files, 'lit_alerts', ['dailysummary', 'daily_summary', 'overalldaily']);
+  if (dailyFile) lit.daily = parseCSV(dailyFile.content);
+
+  const menuFile = findFile(files, 'lit_alerts', ['chris.littleleaflabs', 'menu_snapshot', 'littleleaflabs_0']);
+  if (menuFile) lit.menu = parseCSV(menuFile.content);
+
+  // Compute shelf stats
+  lit.total_doors = new Set(lit.menu.map(r => r['Dispensary'] || '')).size;
+  lit.oos = lit.menu.filter(r => (r['Available ']||'').toLowerCase() === 'no').length;
+  lit.on_shelf = lit.menu.filter(r => (r['Available ']||'').toLowerCase() === 'yes').length;
+
+  // Build market data object (same structure as const D and MKT)
+  const LLB = ['The Growfather','Dr. Zodiak',"Dr. Zodiak's Moonrock",'Little Leaf','Octane','Sugar High','Illadelph','Puff To The Moon'];
+  
+  const brandsArr = lit.brands
+    .map((r,i) => ({
+      rank: i+1,
+      brand: (r['Brand']||'').trim(),
+      units: Math.round(num(r['Est. Units']||0)),
+      avgPrice: Math.round(num(r['Est. Avg Price']||0)*100)/100,
+      value: Math.round(num(r['Est. Total Value']||0)*100)/100,
+      unitShare: Math.round(num(r['Market Share % (Units)']||0)*10)/10,
+      valueShare: Math.round(num(r['Market Share % (Value)']||0)*10)/10,
+      ll: LLB.find(lb => (r['Brand']||'').toLowerCase().includes(lb.toLowerCase())) || null
+    }))
+    .sort((a,b) => b.units - a.units)
+    .map((b,i) => ({...b, rank: i+1}));
+
+  const dispsArr = lit.dispensaries
+    .map((r,i) => ({
+      rank: i+1,
+      dispensary: (r['Dispensary']||'').trim(),
+      units: Math.round(num(r['Est. Units']||0)),
+      value: Math.round(num(r['Est. Total Value']||0)*100)/100,
+      unitShare: Math.round(num(r['Market Share % (Units)']||0)*10)/10,
+      valueShare: Math.round(num(r['Market Share % (Value)']||0)*10)/10
+    }))
+    .sort((a,b) => b.units - a.units)
+    .map((d,i) => ({...d, rank: i+1}));
+
+  const catsArr = lit.categories.map(r => {
+    const key = Object.keys(r)[0];
+    return {
+      category: (r[key]||r['Category']||'').trim(),
+      units: Math.round(num(r['Est. Units']||0)),
+      value: Math.round(num(r['Est. Total Value']||0)*100)/100,
+      unitShare: Math.round(num(r['Market Share % (Units)']||0)*10)/10,
+      valueShare: Math.round(num(r['Market Share % (Value)']||0)*10)/10
+    };
+  }).sort((a,b) => b.units - a.units);
+
+  const dailyArr = lit.daily.map(r => {
+    const key = Object.keys(r)[0];
+    return { date: r[key]||'', units: Math.round(num(r['Est. Units']||0)), value: Math.round(num(r['Est. Total Value']||0)*100)/100 };
+  });
+
+  const totalUnits = brandsArr.reduce((s,b) => s+b.units, 0);
+  const totalVal = brandsArr.reduce((s,b) => s+b.value, 0);
+
+  lit.marketData = {
+    meta: { period: 'Jan 1 - May 31, 2026', days: 151, totalBrands: brandsArr.length, totalDispensaries: dispsArr.length, marketUnits: totalUnits, marketValue: totalVal },
+    brands: brandsArr, dispensaries: dispsArr, categories: catsArr, daily: dailyArr
+  };
+
+  return lit;
+}
+
+function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
+  let h = html;
+  
+  // KPI replacements
+  const revOld = h.match(/\$[\d,]+( =<div class="l">.* Revenue)/s) .[0] || '';
+  h = h.replace(/\$2,753,930( =<div)/, fmtD(qb.rev));
+  h = h.replace(/GP \d+%/, `GP ${qb.gp_pct}%`);
+  h = h.replace(/\$1,487,822/, fmtD(qb.gp));
+  h = h.replace(/\$872,176/, fmtD(qb.cash));
+  h = h.replace(/\$795,463/, fmtD(qb.ar));
+  h = h.replace(/157,957/, fmt(apex.total_units));
+  h = h.replace(/\$4,086,944/, fmtD(apex.total_val));
+  h = h.replace(/\$1,266,108/, fmtD(qb.cogs));
+
+  // Update inventory SKU table
+  if (apex.skuTable.length > 0) {
+    const skuRows = apex.skuTable.slice(0, 16).map(s => {
+      const statusClass = s.status === 'CRITICAL'   'pill s-CRITICAL' : s.status === 'RED'   'pill s-RED' : 'pill s-ORANGE';
+      return `<tr><td class="n">${s.name}</td><td class="r">${fmt(s.on_hand)}</td><td class="r">${s.weekly_vel}</td><td class="r">${s.weeks_left}</td><td><span class="${statusClass}">${s.status}</span></td></tr>`;
+    }).join('\n');
+    h = h.replace(/<tr><td class="n">Dr\. Zodiak[^<]*[\s\S]* <\/tr>( =\s*<tr><td class="n">Account)/, skuRows);
+  }
+
+  // Update lapsed accounts table
+  if (apex.lapsed.length > 0) {
+    const lapsedRows = apex.lapsed.slice(0, 6).map(l =>
+      `<tr><td>${l.name}</td><td class="r">${l.days}</td><td class="r">${fmtD(l.rev)}</td></tr>`
+    ).join('\n');
+    h = h.replace(/<tr><td>Blulight Woodbury[\s\S]* ( =<tr><td>Door)/, lapsedRows + '\n');
+  }
+
+  // Update production stages
+  h = h.replace(/DISTRU FINISHED GOODS.* (\d+)/, `DISTRU FINISHED GOODS: ${metrc.prod_stages.finished}`);
+  h = h.replace(/DISTRU IN TESTING.* (\d+)/, `DISTRU IN TESTING: ${metrc.prod_stages.in_testing}`);
+
+  // Update shelf presence
+  h = h.replace(/\b78\b( =.*doors)/, String(lit.total_doors));
+  
+  h = injectLastUpdated(h, timeStr);
+  return h;
+}
+
+function buildRetailIntel(html, apex, lit, timeStr) {
+  let h = html;
+  
+  // Build const D from Lit data + Apex lapsed
+  const D = {
+    market: lit.marketData,
+    lapsed: apex.lapsed.slice(0, 30).map(l => ({ name: l.name, days: l.days, rev: Math.round(l.rev) })),
+    shelf: { doors: lit.total_doors, oos: lit.oos, on_shelf: lit.on_shelf, total: lit.on_shelf + lit.oos }
+  };
+  
+  const result = injectVar(h, 'const D', JSON.stringify(D));
+  if (result.success) h = result.html;
+  
+  h = injectLastUpdated(h, timeStr);
+  return h;
+}
+
+function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
+  let h = html;
+
+  // SEED_CUST
+  const custArr = apex.buyers
+    .filter(b => num(b['Total Value of Orders']||0) > 0)
+    .map(b => ({
+      name: (b['Buyer']||'').replace(/'/g,"\\'"),
+      rev: String(Math.round(num(b['Total Value of Orders']||0))),
+      orders: b['Total Number of Orders']||'0',
+      last: b['Last Order Date']||'',
+      days: b['Days Since Last Order']||'0',
+      aov: String(Math.round(num(b['Average Order Size']||0)))
+    }))
+    .sort((a,b) => num(b.rev) - num(a.rev));
+  const seedCust = '[' + custArr.map(c => `{name:'${c.name}',rev:'${c.rev}',orders:'${c.orders}',last:'${c.last}',days:'${c.days}',aov:'${c.aov}'}`).join(',') + ']';
+  const r1 = injectVar(h, 'SEED_CUST', seedCust);
+  if (r1.success) h = r1.html;
+
+  // SEED_SKU
+  const LLB = ['The Growfather','Dr. Zodiak','Little Leaf','Octane','Sugar High','Illadelph'];
+  const skuArr = apex.products.map(p => {
+    const name = (p['Name']||'').trim();
+    const brand = LLB.find(lb => name.toLowerCase().includes(lb.toLowerCase())) || 'Little Leaf';
+    return { brand, name: name.slice(0,60), rev: String(Math.round(num(p['Total Value']||0))), units: String(Math.round(num(p['Total Quantity']||0))) };
+  }).sort((a,b) => num(b.rev) - num(a.rev));
+  const seedSku = JSON.stringify(skuArr);
+  const r2 = injectVar(h, 'SEED_SKU', seedSku);
+  if (r2.success) h = r2.html;
+
+  // SEED_SALES
+  const salesArr = Object.entries(distru.monthly)
+    .sort(([a],[b]) => a.localeCompare(b))
+    .filter(([,v]) => v.rev > 0)
+    .map(([m,v]) => `{m:'${m}',rev:'${Math.round(v.rev)}',units:'${v.orders}'}`);
+  const seedSales = '[' + salesArr.join(',') + ']';
+  const r3 = injectVar(h, 'SEED_SALES', seedSales);
+  if (r3.success) h = r3.html;
+
+  // FOUND
+  const totalRev = Object.values(distru.monthly).reduce((s,v) => s+v.rev, 0);
+  const ytdRev = Object.entries(distru.monthly).filter(([m]) => m.startsWith('2026')).reduce((s,[,v]) => s+v.rev, 0);
+  const foundStr = `{rev:'${(totalRev/1e6).toFixed(2)}',ytd:'${(ytdRev/1e6).toFixed(2)}',orders:${distru.total_orders},batches:207,apexInv:'${(apex.total_val/1e6).toFixed(2)}',apexUnits:${Math.round(apex.total_units)},ar:'${fmt(Math.round(qb.ar))}',readyLabel:${metrc.prod_stages.finished},brands:5,missName:448,missCost:280}`;
+  const r4 = injectVar(h, 'FOUND', foundStr);
+  if (r4.success) h = r4.html;
+
+  h = injectLastUpdated(h, timeStr);
+  return h;
+}
+
+function buildWeeklyRefresh(html, qb, apex, metrc, timeStr) {
+  let h = html;
+  h = h.replace(/\$[\d.]+M( =<\/span>[\s\S]{0,50}Revenue)/, fmtM(qb.rev));
+  h = h.replace(/\$2,753,930/, fmtD(qb.rev));
+  h = h.replace(/\$4,586,457/, fmtD(qb.rev));
+  h = h.replace(/\$872K/, fmtK(qb.cash));
+  h = h.replace(/\$872,176/, fmtD(qb.cash));
+  h = h.replace(/\$795K/, fmtK(qb.ar));
+  h = h.replace(/\$795,463/, fmtD(qb.ar));
+  h = h.replace(/157,957|160,967/, fmt(Math.round(apex.total_units)));
+
+  // Lapsed count update
+  const lapsedCount = apex.lapsed.length;
+  const activeCount = apex.buyers.filter(b => num(b['Total Value of Orders']||0) > 0).length;
+  h = h.replace(/\d+ of \d+ accounts/, `${lapsedCount} of ${activeCount} accounts`);
+
+  h = injectLastUpdated(h, timeStr);
+  return h;
+}
+
+function buildSalesDashboard(html, lit, timeStr) {
+  let h = html;
+  const result = injectVar(h, 'const D', JSON.stringify(lit.marketData));
+  if (result.success) h = result.html;
+  h = injectLastUpdated(h, timeStr);
+  return h;
+}
+
+function buildSalesActionForm(html, apex, timeStr) {
+  let h = html;
+
+  const actionData = apex.buyers
+    .filter(b => num(b['Days Since Last Order']||0) >= 21 && num(b['Total Value of Orders']||0) > 0)
+    .map(b => {
+      const name = (b['Buyer']||'').trim();
+      const key = name.toLowerCase().replace(/[^a-z0-9]/g,'');
+      const contact = apex.contactIndex[key] || {};
+      const days = Math.round(num(b['Days Since Last Order']||0));
+      const aov = Math.round(num(b['Average Order Size']||0));
+      return {
+        name,
+        type: days >= 45   'Lapsed' : 'Reorder',
+        contact: contact.contact || '',
+        phone: contact.phone || '',
+        email: contact.email || '',
+        days,
+        metric: `Avg order $${fmt(aov)}`,
+        channel: '',
+        subject: `Restock time -- ${name}`,
+        body: `Hi ${contact.contact || 'there'}, checking in on restocking Little Leaf products. Your last order was ${days} days ago and we have fresh inventory ready. What do you need  - Matt`
+      };
+    })
+    .sort((a,b) => b.days - a.days)
+    .slice(0, 50);
+
+  const result = injectVar(h, 'DATA', JSON.stringify(actionData));
+  if (result.success) h = result.html;
+  h = injectLastUpdated(h, timeStr);
+  return h;
+}
+
+function buildLitCommandCenter(html, lit, apex, timeStr) {
+  let h = html;
+  const result = injectVar(h, 'const MKT', JSON.stringify(lit.marketData));
+  if (result.success) h = result.html;
+  h = injectLastUpdated(h, timeStr);
+  return h;
+}
+</script>
+
+</body>
+</html>
