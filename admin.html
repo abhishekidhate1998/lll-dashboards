@@ -441,21 +441,35 @@ async function doLogout() {
 // INIT
 // ============================================================
 async function initApp() {
-  buildFmTabsUI();
-  buildDashLinks();
   document.getElementById("chat-btn").style.display = "flex";
+  buildDashLinks();
+  buildFmTabsUI();
   showPage("process", document.querySelector(".nb.on"));
+
+  // OPTIMIZED: single API call loads everything at once
   try {
-    const cfg = await api({ action: "getConfig" });
-    if (cfg.success && cfg.lastUpdated) {
-      document.getElementById("upd-time").textContent    = new Date(cfg.lastUpdated).toLocaleString();
-      document.getElementById("upd-badge").style.display = "flex";
+    const d = await api({ action: "getAll" });
+    if (d.success) {
+      // Config
+      if (d.lastUpdated) {
+        document.getElementById("upd-time").textContent    = new Date(d.lastUpdated).toLocaleString();
+        document.getElementById("upd-badge").style.display = "flex";
+      }
+      // Status dots
+      setDot("gh", d.hasGhToken ? "g" : "r", d.hasGhToken ? "GitHub token: configured" : "GitHub token: NOT SET");
+      setDot("cl", d.hasApiKey  ? "g" : "r", d.hasApiKey  ? "Claude API key: configured" : "Claude API key: NOT SET");
+      setDot("script", "g", "Apps Script: connected");
+      // Users
+      if (d.users)   renderUsersFromData(d.users);
+      if (d.viewers && currentUser.role === "superadmin") {
+        renderViewersFromData(d.viewers);
+        document.getElementById("viewers-card").style.display = "block";
+      }
+      // History
+      if (d.history) renderHistoryFromData(d.history);
     }
-  } catch(e) {}
-  loadUsersTable();
-  if (currentUser.role === "superadmin") {
-    loadViewersTable();
-    document.getElementById("viewers-card").style.display = "block";
+  } catch(e) {
+    setDot("script", "r", "Apps Script: connection failed");
   }
 }
 
@@ -464,9 +478,19 @@ function showPage(name, btn) {
   document.querySelectorAll(".nb").forEach(b => b.classList.remove("on"));
   document.getElementById("page-" + name).classList.add("on");
   if (btn) btn.classList.add("on");
+  // Only reload if page is empty (not already loaded)
+  const tb = document.getElementById("hist-body");
   if (name === "files")    { buildFmTabsUI(); loadFmFiles("quickbooks"); }
-  if (name === "users")    { loadUsersTable(); if(currentUser&&currentUser.role==="superadmin") loadViewersTable(); }
-  if (name === "history")  loadHistory();
+  if (name === "users")    {
+    const ub = document.getElementById("users-body");
+    if (!ub || ub.children.length === 0) loadUsersTable();
+    if (currentUser && currentUser.role === "superadmin") {
+      const vb = document.getElementById("viewers-body");
+      if (!vb || vb.children.length === 0) loadViewersTable();
+      document.getElementById("viewers-card").style.display = "block";
+    }
+  }
+  if (name === "history")  { if (!tb || tb.children.length === 0) loadHistory(); }
   if (name === "settings") { buildDashLinks(); checkStatus(); }
 }
 
@@ -816,6 +840,67 @@ async function deleteFmFile(id, name, cat) {
 // ============================================================
 // USER MANAGEMENT
 // ============================================================
+
+// ============================================================
+// FAST RENDER HELPERS — render from already-loaded data
+// ============================================================
+function renderUsersFromData(users) {
+  const isSA = currentUser && currentUser.role === "superadmin";
+  const tb   = document.getElementById("users-body");
+  if (!tb) return;
+  tb.innerHTML = "";
+  Object.entries(users || {}).forEach(([uname, u]) => {
+    const self   = uname === currentUser.username;
+    const pwCell = isSA
+      ? `<td><span id="ps-${uname}" style="font-family:monospace">........</span>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 7px;margin-left:4px;font-size:10px"
+            onclick="togglePw('ps-${uname}','${u.password||''}')">Show</button></td>`
+      : `<td style="color:var(--muted)">........</td>`;
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td style="font-weight:500">${uname}${self ? ' <span style="color:var(--muted);font-size:10px">(you)</span>' : ""}</td>`
+      + `<td><span class="rp ${u.role === "superadmin" ? "rs" : "ra"}">${u.role === "superadmin" ? "Super Admin" : "Admin"}</span></td>`
+      + pwCell
+      + `<td style="color:var(--muted);font-size:11px">${u.created ? new Date(u.created).toLocaleDateString() : "-"}</td>`
+      + `<td>${(isSA && !self) ? `<button class="btn btn-red btn-sm" onclick="removeUser('${uname}')">Remove</button>` : "-"}</td>`;
+    tb.appendChild(tr);
+  });
+  const ar = document.getElementById("add-user-row");
+  if (ar) ar.style.display = isSA ? "grid" : "none";
+}
+
+function renderViewersFromData(viewers) {
+  const tb = document.getElementById("viewers-body");
+  if (!tb) return;
+  tb.innerHTML = "";
+  Object.entries(viewers || {}).forEach(([uname, v]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td style="font-weight:500">${uname}</td>`
+      + `<td><span id="vps-${uname}" style="font-family:monospace">........</span>
+          <button class="btn btn-ghost btn-sm" style="padding:2px 7px;margin-left:4px;font-size:10px"
+            onclick="togglePw('vps-${uname}','${v.password||''}')">Show</button></td>`
+      + `<td style="color:var(--muted);font-size:11px">${v.created ? new Date(v.created).toLocaleDateString() : "-"}</td>`
+      + `<td><button class="btn btn-red btn-sm" onclick="removeViewer('${uname}')">Remove</button></td>`;
+    tb.appendChild(tr);
+  });
+}
+
+function renderHistoryFromData(history) {
+  const tb    = document.getElementById("hist-body");
+  const empty = document.getElementById("hist-empty");
+  if (!tb) return;
+  tb.innerHTML = "";
+  if (!history || history.length === 0) { if(empty) empty.style.display = "block"; return; }
+  if (empty) empty.style.display = "none";
+  history.forEach(h => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td style="color:var(--muted);white-space:nowrap">${new Date(h.time).toLocaleString()}</td>`
+      + `<td style="font-weight:500">${h.username || "-"}</td>`
+      + `<td><span class="at">${h.action || "-"}</span></td>`
+      + `<td style="color:var(--muted)">${h.details || "-"}</td>`;
+    tb.appendChild(tr);
+  });
+}
+
 async function loadUsersTable() {
   const isSA = currentUser && currentUser.role === "superadmin";
   const tb   = document.getElementById("users-body");
@@ -928,23 +1013,15 @@ async function removeViewer(uname) {
 // HISTORY
 // ============================================================
 async function loadHistory() {
+  // Data may already be loaded from initApp getAll call
   const tb    = document.getElementById("hist-body");
   const empty = document.getElementById("hist-empty");
-  tb.innerHTML = "";
+  if (tb && tb.children.length > 0) return; // already loaded
   try {
     const d = await api({ action: "getHistory" });
-    if (!d.success || !d.history || d.history.length === 0) { empty.style.display="block"; return; }
-    empty.style.display = "none";
-    d.history.forEach(h => {
-      const tr = document.createElement("tr");
-      tr.innerHTML = `<td style="color:var(--muted);white-space:nowrap">${new Date(h.time).toLocaleString()}</td>`
-        + `<td style="font-weight:500">${h.username||"-"}</td>`
-        + `<td><span class="at">${h.action||"-"}</span></td>`
-        + `<td style="color:var(--muted)">${h.details||"-"}</td>`;
-      tb.appendChild(tr);
-    });
+    if (d.success) renderHistoryFromData(d.history);
   } catch(e) {
-    tb.innerHTML = `<tr><td colspan="4" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
+    if (tb) tb.innerHTML = `<tr><td colspan="4" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
   }
 }
 
