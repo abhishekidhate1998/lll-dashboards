@@ -623,7 +623,7 @@ function setProgress(pct, lbl) {
 
 async function fetchDashboard(filename) {
   try {
-    const url = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/main/" + filename + " t=" + Date.now();
+    const url = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/main/" + filename + "?t=" + Date.now();
     const res = await fetch(url);
     if (res.ok) return await res.text();
   } catch(e) {}
@@ -662,7 +662,8 @@ function injectViewerLogin(html, scriptUrl) {
     +     "if(!u||!p){e.textContent='Please enter username and password.';return;}"
     +     "document.getElementById('_lll_b').disabled=true;"
     +     "e.textContent='Verifying...';"
-    +     "fetch(SU,{method:'POST',body:JSON.stringify({action:'viewerLogin',username:u,password:p})})"
+    +     "var _vp=btoa(unescape(encodeURIComponent(JSON.stringify({action:'viewerLogin',username:u,password:p}))));"
+    + "fetch(SU+'?p='+encodeURIComponent(_vp),{method:'GET'})"
     +     ".then(r=>r.json())"
     +     ".then(d=>{"
     +       "if(d.success){"
@@ -684,7 +685,8 @@ function injectViewerLogin(html, scriptUrl) {
     + "if(!tok){"
     +   "if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}"
     + "}else{"
-    +   "fetch(SU,{method:'POST',body:JSON.stringify({action:'verifyToken',token:tok,role:'viewer'})})"
+    +   "var _vt=btoa(unescape(encodeURIComponent(JSON.stringify({action:'verifyToken',token:tok,role:'viewer'}))));"
+    + "fetch(SU+'?p='+encodeURIComponent(_vt),{method:'GET'})"
     +   ".then(r=>r.json())"
     +   ".then(d=>{"
     +     "if(!d.success){sessionStorage.removeItem(SK);"
@@ -759,7 +761,8 @@ function injectChatbot(html, scriptUrl) {
     +   "inp.value='';"
     +   "document.getElementById('_lsb').disabled=true;"
     +   "try{"
-    +     "var r=await fetch(_LSU,{method:'POST',body:JSON.stringify({action:'chatbot',token:tok,question:q,context:_lctx()})});"
+    +     "var _cp=btoa(unescape(encodeURIComponent(JSON.stringify({action:'chatbot',token:tok,question:q,context:_lctx()}))));"
+    + "var r=await fetch(_LSU+'?p='+encodeURIComponent(_cp),{method:'GET'});"
     +     "var d=await r.json();"
     +     "tm.className='_lmsg a';"
     +     "if(d.success){"
