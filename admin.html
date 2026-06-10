@@ -348,7 +348,14 @@ var confirmCb      = null;
 // ============================================================
 async function api(params) {
   if (sessionToken) params.token = sessionToken;
-  // Use GET with base64 encoded payload to avoid Workspace CORS redirect
+  // Large payload actions use POST, all others use GET
+  // GET bypasses Workspace CORS redirect issue
+  const largeActions = ["deployDashboards", "readAllFiles"];
+  if (largeActions.includes(params.action)) {
+    const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(params) });
+    return res.json();
+  }
+  // Small actions use GET with base64 encoded payload
   const payload = btoa(unescape(encodeURIComponent(JSON.stringify(params))));
   const url     = SCRIPT_URL + "?p=" + encodeURIComponent(payload);
   const res     = await fetch(url, { method: "GET" });
