@@ -833,7 +833,7 @@ async function loadUsersTable() {
       tr.innerHTML = `<td style="font-weight:500">${uname}${self?` <span style="color:var(--muted);font-size:10px">(you)</span>`:""}</td>`
         + `<td><span class="role-pill ${u.role==="superadmin"?"rs":"ra"}">${u.role==="superadmin"?"Super Admin":"Admin"}</span></td>`
         + pwCell
-        + `<td style="color:var(--muted);font-size:11px">${u.created new Date(u.created).toLocaleDateString():"-"}</td>`
+        + `<td style="color:var(--muted);font-size:11px">${u.created ? new Date(u.created).toLocaleDateString() : "-"}</td>`
         + `<td>${(isSA&&!self)?`<button class="btn btn-red btn-sm" onclick="removeUser('${uname}')">Remove</button>`:"-"}</td>`;
       tb.appendChild(tr);
     });
@@ -891,7 +891,7 @@ async function loadViewersTable() {
         + `<td><span id="vps-${uname}" style="font-family:monospace">........</span>
             <button class="btn btn-ghost btn-sm" style="padding:2px 7px;margin-left:4px;font-size:10px"
               onclick="togglePw('vps-${uname}','${v.password||''}')">Show</button></td>`
-        + `<td style="color:var(--muted);font-size:11px">${v.created new Date(v.created).toLocaleDateString():"-"}</td>`
+        + `<td style="color:var(--muted);font-size:11px">${v.created ? new Date(v.created).toLocaleDateString() : "-"}</td>`
         + `<td><button class="btn btn-red btn-sm" onclick="removeViewer('${uname}')">Remove</button></td>`;
       tb.appendChild(tr);
     });
