@@ -348,7 +348,11 @@ var confirmCb      = null;
 // ============================================================
 async function api(params) {
   if (sessionToken) params.token = sessionToken;
-  const res = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(params) });
+  const res = await fetch(SCRIPT_URL, {
+    method:      "POST",
+    credentials: "include",
+    body:        JSON.stringify(params)
+  });
   return res.json();
 }
 
@@ -372,6 +376,7 @@ async function doLogin() {
   try {
     const data = await fetch(SCRIPT_URL, {
       method: "POST",
+      credentials: "include",
       body:   JSON.stringify({ action: "adminLogin", username, password })
     }).then(r => r.json());
     if (data.success) {
@@ -825,7 +830,7 @@ async function loadUsersTable() {
               onclick="togglePw('ps-${uname}','${u.password||''}')">Show</button></td>`
         : `<td style="color:var(--muted)">........</td>`;
       const tr = document.createElement("tr");
-      tr.innerHTML = `<td style="font-weight:500">${uname}${self ` <span style="color:var(--muted);font-size:10px">(you)</span>`:""}</td>`
+      tr.innerHTML = `<td style="font-weight:500">${uname}${self?` <span style="color:var(--muted);font-size:10px">(you)</span>`:""}</td>`
         + `<td><span class="role-pill ${u.role==="superadmin"?"rs":"ra"}">${u.role==="superadmin"?"Super Admin":"Admin"}</span></td>`
         + pwCell
         + `<td style="color:var(--muted);font-size:11px">${u.created new Date(u.created).toLocaleDateString():"-"}</td>`
@@ -968,7 +973,7 @@ function copyLink(id) {
 async function checkStatus() {
   setDot("script","y","Checking Apps Script...");
   try {
-    const r = await fetch(SCRIPT_URL, { method:"POST", body:JSON.stringify({action:"ping"}) });
+    const r = await fetch(SCRIPT_URL, { method:"POST", credentials:"include", body:JSON.stringify({action:"ping"}) });
     const d = await r.json();
     setDot("script", d.success?"g":"r", d.success?"Apps Script: connected":"Apps Script: error");
   } catch(e) { setDot("script","r","Apps Script: cannot connect"); }
@@ -1170,7 +1175,7 @@ async function readQBData(files) {
       else if (k === 'total for cost of goods sold') qb.cogs = val;
       else if (k === 'net income') qb.net = val;
     }
-    qb.gp_pct = qb.rev   Math.round(100 * qb.gp / qb.rev) : 0;
+    qb.gp_pct = qb.rev ? Math.round(100 * qb.gp / qb.rev) : 0;
   }
 
   const bsFile = findFile(files, 'quickbooks', ['balance', 'sheet', 'bs']);
@@ -1251,7 +1256,7 @@ async function readApexData(files) {
         }
       }
     }
-    const weeksLeft = weeklyVel > 0   Math.round((onHand / weeklyVel) * 10) / 10 : 99;
+    const weeksLeft = weeklyVel > 0 ? Math.round((onHand / weeklyVel) * 10) / 10 : 99;
     let status = 'OK';
     if (weeksLeft <= 1) status = 'CRITICAL';
     else if (weeksLeft <= 2) status = 'CRITICAL';
@@ -1408,7 +1413,7 @@ function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
   // Update inventory SKU table
   if (apex.skuTable.length > 0) {
     const skuRows = apex.skuTable.slice(0, 16).map(s => {
-      const statusClass = s.status === 'CRITICAL'   'pill s-CRITICAL' : s.status === 'RED'   'pill s-RED' : 'pill s-ORANGE';
+      const statusClass = s.status === 'CRITICAL' ? 'pill s-CRITICAL' : s.status === 'RED' ? 'pill s-RED' : 'pill s-ORANGE';
       return `<tr><td class="n">${s.name}</td><td class="r">${fmt(s.on_hand)}</td><td class="r">${s.weekly_vel}</td><td class="r">${s.weeks_left}</td><td><span class="${statusClass}">${s.status}</span></td></tr>`;
     }).join('\n');
     h = h.replace(/<tr><td class="n">Dr\. Zodiak[^<]*[\s\S]* <\/tr>( =\s*<tr><td class="n">Account)/, skuRows);
@@ -1541,7 +1546,7 @@ function buildSalesActionForm(html, apex, timeStr) {
       const aov = Math.round(num(b['Average Order Size']||0));
       return {
         name,
-        type: days >= 45   'Lapsed' : 'Reorder',
+        type: days >= 45 ? 'Lapsed' : 'Reorder',
         contact: contact.contact || '',
         phone: contact.phone || '',
         email: contact.email || '',
