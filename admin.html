@@ -432,10 +432,10 @@ async function startProcess() {
   let driveFiles = {};
   try {
     const r = await api({ action:"readAllFiles" });
-    if (!r.success) throw?new Error(r.error || "Failed to read Drive files");
+    if (!r.success) throw new Error(r.error || "Failed to read Drive files");
     driveFiles = r.files || {};
     const total = r.totalFiles || 0;
-    if (total === 0) throw?new Error("No CSV files found in Google Drive. Please upload CSV files to your Drive folders first.");
+    if (total === 0) throw new Error("No CSV files found in Google Drive. Please upload CSV files to your Drive folders first.");
     upd(s1, "Read " + total + " files from " + Object.keys(driveFiles).length + " folders", "done");
     (r.errors||[]).forEach(e => toast(e, "err"));
   } catch(e) { upd(s1, e.message, "fail"); toast(e.message,"err"); btn.disabled=false; return; }
@@ -473,12 +473,12 @@ async function startProcess() {
     try {
       const url = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/main/" + file + " t=" + Date.now();
       const res = await fetch(url);
-      if (!res.ok) throw?new Error("HTTP " + res.status);
+      if (!res.ok) throw new Error("HTTP " + res.status);
       const html = await res.text();
       const sizeKB = Math.round(html.length / 1024);
       const minKB  = MIN_SIZES[file] || 5;
       if (sizeKB < minKB) {
-        throw?new Error(label + " template is too small (" + sizeKB + "KB, expected " + minKB + "KB+). Upload the original " + file + " to GitHub first.");
+        throw new Error(label + " template is too small (" + sizeKB + "KB, expected " + minKB + "KB+). Upload the original " + file + " to GitHub first.");
       }
       templates[file] = html;
     } catch(e) {
@@ -515,7 +515,7 @@ async function startProcess() {
       html = buildFn(html);
       html = injectViewerLogin(html, SCRIPT_URL);
       html = injectChatbot(html, SCRIPT_URL);
-      if (html.length < 5000) throw?new Error(file + " result too small - build may have failed");
+      if (html.length < 5000) throw new Error(file + " result too small - build may have failed");
       built[file] = html;
     } catch(e) {
       buildErrors.push(file + ": " + e.message);
@@ -748,7 +748,7 @@ async function loadFmFiles(category) {
   list.innerHTML = "<p style='color:var(--muted);font-size:13px'>Loading...</p>";
   try {
     const d = await api({ action:"listFiles", category });
-    if (!d.success) throw?new Error(d.error);
+    if (!d.success) throw new Error(d.error);
     if (!d.files || d.files.length===0) {
       list.innerHTML = "<p style='color:var(--muted);font-size:13px'>No CSV files in this folder. Upload files directly to Google Drive.</p>";
       return;
@@ -807,7 +807,7 @@ async function loadUsersTable() {
   if (tb) tb.innerHTML = "<tr><td colspan='5' style='color:var(--muted);font-size:13px;padding:14px'>Loading...</td></tr>";
   try {
     const d = await api({ action:"getUsers" });
-    if (!d.success) throw?new Error(d.error);
+    if (!d.success) throw new Error(d.error);
     renderUsersData(d.users);
   } catch(e) {
     if (tb) tb.innerHTML = `<tr><td colspan="5" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
@@ -863,7 +863,7 @@ async function loadViewersTable() {
   if (tb) tb.innerHTML = "<tr><td colspan='4' style='color:var(--muted);font-size:13px;padding:14px'>Loading...</td></tr>";
   try {
     const d = await api({action:"getViewers"});
-    if(!d.success) throw?new Error(d.error);
+    if(!d.success) throw new Error(d.error);
     renderViewersData(d.viewers);
   } catch(e) {
     if(tb) tb.innerHTML = `<tr><td colspan="4" style="color:var(--red);font-size:13px;padding:14px">${e.message}</td></tr>`;
@@ -1203,7 +1203,7 @@ async function readApexData(files) {
     const weeklyVel = Math.round((qtyInRange / 12) * 10) / 10;
     let onHand = invByName[name] || 0;
     if (!onHand) {
-      Object.keys(invByName).forEach(function(iname) { var qty=invByName[iname];
+      var _inv_keys=Object.keys(invByName); for(var _ik=0;_ik<_inv_keys.length;_ik++){var iname=_inv_keys[_ik],qty=invByName[iname];
         if (name.slice(0,20).toLowerCase().includes(iname.slice(0,20).toLowerCase()) ||
             iname.slice(0,20).toLowerCase().includes(name.slice(0,20).toLowerCase())) {
           onHand = qty; break;
