@@ -791,7 +791,7 @@ function renderUsersData(users) {
           <button class="btn btn-ghost btn-sm" style="padding:2px 7px;margin-left:4px;font-size:10px" onclick="togglePw('ps-${uname}','${(u.password||'').replace(/'/g,"\\'")}')">Show</button></td>`
       : `<td style="color:var(--muted)">........</td>`;
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td style="font-weight:500">${uname}${self ' <span style="color:var(--muted);font-size:10px">(you)</span>':""}</td>`
+    tr.innerHTML = `<td style="font-weight:500">${uname}${self?' <span style="color:var(--muted);font-size:10px">(you)</span>':""}</td>`
       + `<td><span class="rp ${u.role==="superadmin"?"rs":"ra"}">${u.role==="superadmin"?"Super Admin":"Admin"}</span></td>`
       + pwCell
       + `<td style="color:var(--muted);font-size:11px">${u.created?new Date(u.created).toLocaleDateString():"-"}</td>`
@@ -1367,7 +1367,7 @@ function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
   // Update inventory SKU table
   if (apex.skuTable.length > 0) {
     const skuRows = apex.skuTable.slice(0, 16).map(s => {
-      const statusClass = s.status === 'CRITICAL'   'pill s-CRITICAL' : s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
+      const statusClass = s.status === 'CRITICAL' ? 'pill s-CRITICAL' : s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
       return `<tr><td class="n">${s.name}</td><td class="r">${fmt(s.on_hand)}</td><td class="r">${s.weekly_vel}</td><td class="r">${s.weeks_left}</td><td><span class="${statusClass}">${s.status}</span></td></tr>`;
     }).join('\n');
     h = h.replace(/<tr><td class="n">Dr\. Zodiak[^<]*[\s\S]* <\/tr>( =\s*<tr><td class="n">Account)/, skuRows);
