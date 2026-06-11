@@ -1085,9 +1085,9 @@ let PKG_OVR = {};
 let UNITS = {};
 let PROD=[], LAB=[], INV=[], PO=[];
 
-function pkgCost(r,idx){ return (PKG_OVR[r.id] .[idx]    r.pkg[idx].cost); }
+function pkgCost(r,idx){ return (PKG_OVR[r.id]?.[idx] ?? r.pkg[idx].cost); }
 
-function lcost(l,c){return (l.cost!=null) l.cost:(c[l.key]||0);}
+function lcost(l,c){return (l.cost!=null)?l.cost:(c[l.key]||0);}
 //    Labor / OpEx cost engine                                          
 // Today: ONE global $/unit rate (cost bar) applies to every SKU.
 // System is wired for per-SKU rates later: set LABOR_SKU[id]/OPEX_SKU[id]
