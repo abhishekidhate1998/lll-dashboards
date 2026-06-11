@@ -1094,8 +1094,8 @@ function lcost(l,c){return (l.cost!=null)?l.cost:(c[l.key]||0);}
 // (or a recipe.labor / recipe.opex field) and it overrides the global --
 // no other code changes needed. Empty maps = global rate everywhere.
 let LABOR_SKU={}, OPEX_SKU={};
-function labCost(r,c){ return (r&&LABOR_SKU[r.id]!=null) LABOR_SKU[r.id]:((r&&r.labor!=null) r.labor:c.labor); }
-function opxCost(r,c){ return (r&&OPEX_SKU[r.id]!=null) OPEX_SKU[r.id]:((r&&r.opex!=null) r.opex:c.opex); }
+function labCost(r,c){ return (r&&LABOR_SKU[r.id]!=null)?LABOR_SKU[r.id]:((r&&r.labor!=null)?r.labor:c.labor); }
+function opxCost(r,c){ return (r&&OPEX_SKU[r.id]!=null)?OPEX_SKU[r.id]:((r&&r.opex!=null)?r.opex:c.opex); }
 function buildCards(){
   const c=costs();
   const host=$('#cards'); host.innerHTML='';
@@ -1225,7 +1225,7 @@ function resetFc(){ UNITS={}; store.set('units',UNITS); buildForecast(); }
 function genTable(elId, key, cols, data, statusFn){
   const t=$(elId);
   let sortKey=null, sortDir=1;
-  function nv(v){const n=parseFloat(String(v).replace(/[$,%\s]/g,''));return isNaN(n) null:n;}
+  function nv(v){const n=parseFloat(String(v).replace(/[$,%\s]/g,''));return isNaN(n)?null:n;}
   function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
   function sortBy(k){ sortDir = (sortKey===k)  -sortDir : -1; sortKey=k;
     data.sort((a,b)=>{const x=nv(a[k]),y=nv(b[k]); if(x!=null&&y!=null)return (x-y)*sortDir; return String(a[k]  '').localeCompare(String(b[k]  ''))*sortDir;});
@@ -1590,7 +1590,7 @@ function buildOverview(){
     `<div class="card"><div class="top"><div><h3>Cannabis Raw Materials -- Reorder Now</h3><div class="meta">live Inventory</div></div></div><ul style="margin:10px 0 0;padding-left:18px;line-height:1.75;font-size:13px">${reorderList}</ul></div>`+
     `<div class="card"><div class="top"><div><h3>Data Gaps</h3><div class="meta">Distru product master</div></div></div><ul style="margin:10px 0 0;padding-left:18px;line-height:1.75;font-size:13px"><li><b style="color:var(--red)">${FOUND.missCost}</b> products missing Cost Per Unit</li><li><b style="color:var(--gold)">${FOUND.missName}</b> missing External Product Name</li><li class="dim">Fixing unblocks margin + labels on every SKU</li></ul></div>`+
     `<div class="card" style="border-left:3px solid var(--red)"><div class="top"><div><h3>Flagged -- Critical</h3><div class="meta">see Flagged tab</div></div></div><ul style="margin:10px 0 0;padding-left:18px;line-height:1.75;font-size:13px"><li><b style="color:var(--red)">$842,383</b> A/R outstanding (~90% uncollected)</li><li><b style="color:var(--gold)">236</b> packages test-approved, not in finished goods</li><li>Apex inv $4.09M vs v1 $2.19M -- reconcile</li></ul></div>`;
-  const so=(typeof STOCKOUT!=='undefined') STOCKOUT:[];
+  const so=(typeof STOCKOUT!=='undefined')?STOCKOUT:[];
   const soDate=v=>{const d=parseFloat(String(v).replace(/[^0-9.\-]/g,''));if(isNaN(d))return '--';if(d<=0)return '<b style="color:var(--red)">NOW</b>';const dt=new Date(Date.now()+d*86400000);return '<b style="color:var(--red)">'+String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getDate()).padStart(2,'0')+'</b>';};
   $('#ov_stockout').innerHTML=`<thead><tr><th>Product (strain . weight)</th><th class="r">Out-of-Stock</th><th class="r">Days Left</th><th class="r">On Hand</th><th class="r">Rev at Risk</th><th>SKU</th></tr></thead><tbody>`+
     (so.length so.map(r=>`<tr><td class="mat" style="white-space:normal">${r.name}</td><td class="r">${soDate(r.days)}</td><td class="r dim">${r.days} d</td><td class="r">${r.oh}</td><td class="r money">$${r.risk}</td><td class="dim">${r.sku}</td></tr>`).join(''):'<tr><td colspan="6" class="dim" style="padding:14px">No SKUs project to stock out within 7 days.</td></tr>')+`</tbody>`;
