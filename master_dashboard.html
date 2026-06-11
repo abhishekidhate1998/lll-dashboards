@@ -889,7 +889,7 @@ const fmt0 = n => (n).toLocaleString('en-US',{maximumFractionDigits:0});
 function pnum(v){const n=parseFloat(String(v).replace(/[$,%\s]/g,''));return isNaN(n)?0:n;}
 
 const store = {
-  async get(k,def){ try{const r=await window.storage.get(k); return r?JSON.parse(r.value):def;}catch(e){return def;} },
+  async get(k,def){ try{const r=await window.storage.get(k); return r JSON.parse(r.value):def;}catch(e){return def;} },
   async set(k,v){ try{await window.storage.set(k,JSON.stringify(v));}catch(e){} }
 };
 
@@ -1085,7 +1085,7 @@ let PKG_OVR = {};
 let UNITS = {};
 let PROD=[], LAB=[], INV=[], PO=[];
 
-function pkgCost(r,idx){ return (PKG_OVR[r.id]?.[idx] ?? r.pkg[idx].cost); }
+function pkgCost(r,idx){ return (PKG_OVR[r.id]?.[idx]    r.pkg[idx].cost); }
 
 function lcost(l,c){return (l.cost!=null)?l.cost:(c[l.key]||0);}
 //    Labor / OpEx cost engine                                          
@@ -1102,13 +1102,13 @@ function buildCards(){
   RECIPES.forEach(r=>{
     let cannBom = r.cannabis.reduce((s,l)=>s+l.qty*lcost(l,c),0);
     let pkgSub = r.pkg.reduce((s,_,i)=>s+pkgCost(r,i),0);
-    const units = r.perUnit?1:(r.yieldG / r.unitG);
+    const units = r.perUnit?1: (r.yieldG / r.unitG);
     const cannPerUnit = r.perUnit?cannBom:cannBom/units;
     const allIn = cannPerUnit + pkgSub + labCost(r,c) + opxCost(r,c);
 
     let cannRows = r.cannabis.map(l=>{
       const lc=l.qty*lcost(l,c);
-      const perU = r.perUnit   '' : ` <span class="dim" style="font-size:11px">($${(lc/units).toFixed(3)}/u)</span>`;
+      const perU = r.perUnit?'': ` <span class="dim" style="font-size:11px">($${(lc/units).toFixed(3)}/u)</span>`;
       return `<tr><td class="mat">${l.mat}</td><td class="r dim">${l.qty} ${l.unit}</td>
         <td class="r dim">${fmt4(lcost(l,c))}/g</td><td class="r money">${fmt(lc)}${perU}</td></tr>`;
     }).join('');
@@ -1124,15 +1124,15 @@ function buildCards(){
     card.innerHTML=`
       <div class="top">
         <div><h3>${r.name}</h3><div class="meta">${r.cat} . <span class="tag">${r.basis}</span></div></div>
-        <span class="pill">${r.perUnit?'Per Unit':'Bulk Batch'}</span>
+        <span class="pill">${r.perUnit 'Per Unit':'Bulk Batch'}</span>
       </div>
       <table>
-        <thead><tr><th>Line Item</th><th class="r">Qty</th><th class="r">Unit Cost</th><th class="r">${r.perUnit?'Cost':'Ext. Cost'}</th></tr></thead>
+        <thead><tr><th>Line Item</th><th class="r">Qty</th><th class="r">Unit Cost</th><th class="r">${r.perUnit 'Cost':'Ext. Cost'}</th></tr></thead>
         <tbody>
           <tr><td colspan="4" class="sub">Cannabis Materials</td></tr>
           ${cannRows}
-          <tr class="tot"><td class="lbl">Cannabis Subtotal${r.perUnit?'':' (batch)'}</td><td></td><td></td>
-              <td class="r gold money">${fmt(cannBom)}${r.perUnit?'':' <span style="color:var(--mut);font-weight:400;font-size:11px">('+fmt(cannPerUnit)+'/u)</span>'}</td></tr>
+          <tr class="tot"><td class="lbl">Cannabis Subtotal${r.perUnit '':' (batch)'}</td><td></td><td></td>
+              <td class="r gold money">${fmt(cannBom)}${r.perUnit '':' <span style="color:var(--mut);font-weight:400;font-size:11px">('+fmt(cannPerUnit)+'/u)</span>'}</td></tr>
 
           <tr><td colspan="4" class="sub">Packaging (per unit)</td></tr>
           ${pkgRows}
@@ -1147,8 +1147,8 @@ function buildCards(){
       </table>
       <div class="split">
         <div class="b">
-          <div class="k">${r.perUnit?'Per Unit Build':'Bulk Batch Build'}</div>
-          <div class="v">${fmt(cannBom)}<small>${r.perUnit?' material':' cannabis'}</small></div>
+          <div class="k">${r.perUnit 'Per Unit Build':'Bulk Batch Build'}</div>
+          <div class="v">${fmt(cannBom)}<small>${r.perUnit ' material':' cannabis'}</small></div>
           <div class="x">${r.perUnit (r.unitG+' g unit'):('Yield '+fmt0(r.yieldG)+' g -> '+fmt0(units)+'   '+r.unitG+' g units')}</div>
         </div>
         <div class="b">
@@ -1231,13 +1231,13 @@ function genTable(elId, key, cols, data, statusFn){
     data.sort((a,b)=>{const x=nv(a[k]),y=nv(b[k]); if(x!=null&&y!=null)return (x-y)*sortDir; return String(a[k]  '').localeCompare(String(b[k]  ''))*sortDir;});
     store.set(key,data); render(); }
   function render(){
-    let head=cols.map(c=>{const w=c.w `min-width:${c.w}px;`:'';const sc=c.k?'cursor:pointer;':'';const st=(w||sc) ` style="${w}${sc}"`:'';return `<th class="${c.r?'r':''}"${c.k ` data-sort="${c.k}" title="Sort by ${c.h}"`:''}${st}>${c.h}${sortKey&&sortKey===c.k (sortDir>0?'  ':'  '):(c.k?'  ':'')}</th>`;}).join('')+'<th></th>';
+    let head=cols.map(c=>{const w=c.w `min-width:${c.w}px;`:'';const sc=c.k 'cursor:pointer;':'';const st=(w||sc)?` style="${w}${sc}"`:'';return `<th class="${c.r 'r':''}"${c.k ` data-sort="${c.k}" title="Sort by ${c.h}"`:''}${st}>${c.h}${sortKey&&sortKey===c.k (sortDir>0 '  ':'  '):(c.k '  ':'')}</th>`;}).join('')+'<th></th>';
     let body=data.map((row,ri)=>{
       let tds=cols.map(c=>{
         if(c.calc) return `<td class="r money gold">${c.calc(row)}</td>`;
         if(c.status){const s=statusFn(row);return `<td><span class="status ${s.cls}">${s.txt}</span></td>`;}
-        if(c.plain) return `<td class="mat" style="white-space:normal;line-height:1.35${c.w `;min-width:${c.w}px`:''}">${row[c.k]  ''}</td>`;
-        if(c.sel) return `<td><select class="in-cell" data-i="${ri}" data-k="${c.k}">${c.sel.map(o=>`<option ${row[c.k]===o?'selected':''}>${o}</option>`).join('')}</select></td>`;
+        if(c.plain)?return `<td class="mat" style="white-space:normal;line-height:1.35${c.w `;min-width:${c.w}px`:''}">${row[c.k]  ''}</td>`;
+        if(c.sel) return `<td><select class="in-cell" data-i="${ri}" data-k="${c.k}">${c.sel.map(o=>`<option ${row[c.k]===o 'selected':''}>${o}</option>`).join('')}</select></td>`;
         const val=row[c.k]  '';
         if(c.r) return `<td class="r"><input class="in-cell" style="text-align:right" title="${esc(val)}" data-i="${ri}" data-k="${c.k}" value="${esc(val)}"></td>`;
         // text columns: wrapping, fully-readable, still editable
@@ -1261,7 +1261,7 @@ function genTable(elId, key, cols, data, statusFn){
   return {render,data};
 }
 // Keep sticky table headers parked just below the sticky top bar (tabs can wrap -> variable height)
-function setHH(){const h=document.querySelector('header'); if(h)?document.documentElement.style.setProperty('--hh',(h.offsetHeight)+'px');}
+function setHH(){const h=document.querySelector('header'); if(h) document.documentElement.style.setProperty('--hh',(h.offsetHeight)+'px');}
 addEventListener('resize',setHH); addEventListener('load',setHH); setHH();
 let prodT, labT, invT, poT;
 
@@ -1274,9 +1274,9 @@ function prodStage(r){
   // 4 stages: WIP (forming) -> Final Production (packaged/sealed, awaiting testing) -> Label Batch (testing passed) -> RFS (labeled/released)
   const lab=(r.lab||'').toLowerCase(), loc=(r.location||'').toLowerCase(), asm=(r.assembly||'').toLowerCase();
   const released = loc.includes('released')||loc.includes('finished');
-  if(lab==='passed' && released) return {cls:'s-ok',txt:'Ready For Sale'};
-  if(lab==='passed') return {cls:'s-mid',txt:'Label Batch'};
-  if(asm==='completed' || loc.includes('vault')) return {cls:'s-mid',txt:'Final Production (awaiting testing)'};
+  if(lab==='passed' && released)?return {cls:'s-ok',txt:'Ready For Sale'};
+  if(lab==='passed')?return {cls:'s-mid',txt:'Label Batch'};
+  if(asm==='completed' || loc.includes('vault'))?return {cls:'s-mid',txt:'Final Production (awaiting testing)'};
   return {cls:'s-low',txt:'WIP'};
 }
 const PROD_COLS=[{h:'Date',k:'date'},
@@ -1289,7 +1289,7 @@ const PROD_COLS=[{h:'Date',k:'date'},
   {h:'Metrc Location',k:'location',sel:LOC_OPTS},
   {h:'Lab / COA',k:'lab',sel:LABS_OPTS},
   {h:'Output / Batch Size',k:'wip',r:1},{h:'Exp Units',k:'exp',r:1},{h:'Actual Units',k:'units',r:1},
-  {h:'Yield Var',calc:r=>{const e=+r.exp||0,u=+r.units||0; if(!e||!u)return '--'; const v=(u-e)/e*100; return (v>=0?'+':'')+v.toFixed(1)+'%';}},
+  {h:'Yield Var',calc:r=>{const e=+r.exp||0,u=+r.units||0; if(!e||!u)return '--'; const v=(u-e)/e*100; return (v>=0 '+':'')+v.toFixed(1)+'%';}},
   {h:'Stage',status:1}];
 function addBatch(){PROD.unshift({date:new Date().toISOString().slice(0,10),asm_no:'',url:'',brand:'Dr. Zodiak's Moonrock',product:'',batch:'',metrc:'',assembly:'In Progress',location:'Production / WIP',lab:'Not Submitted',final:'',wip:'',exp:'',units:''});store.set('prod',PROD);prodT.render();buildOverview();}
 const SEED_PROD=[
@@ -1390,7 +1390,7 @@ const SEED_SALES=[
   {m:'2026-04',rev:'648861',units:'76'},
   {m:'2026-05',rev:'569502',units:'61'}
 ];
-const SEED_SKU=[{"brand":"Little Leaf","name":"1.2g - Granddaddy Purp Berry - Moonrock Infused Preroll [Hig","rev":"412568","units":"26642"},{"brand":"Little Leaf","name":"1.2g - Sour Diesel - Moonrock Infused Preroll [High Potency]","rev":"385782","units":"24680"},{"brand":"Little Leaf","name":"1.2g - Pineapple Express - Moonrock Infused Preroll [High Po","rev":"326900","units":"21117"},{"brand":"Little Leaf","name":"1.2g - Super Lemon Cherry Haze - Moonrock Infused Preroll [H","rev":"300920","units":"19050"},{"brand":"Little Leaf","name":"2g-(S) Sour Diesel- Cold Pressed - Live Rosin Terpenes- Disp","rev":"300761","units":"6645"},{"brand":"Little Leaf","name":"2g-(I) Granddaddy Purp Berry- Cryo Liquid Diamond - Disposab","rev":"257417","units":"5720"},{"brand":"Little Leaf","name":"1.2g (H) White Widow X Strawberry Cough Moonrock Infused Pre","rev":"243020","units":"15875"},{"brand":"Little Leaf","name":"3.5G (H) Purple Runtz Ground Infused Infused Flower (Max Pot","rev":"220942","units":"5995"},{"brand":"Little Leaf","name":"3.5G (S) Mango Jack Herer Ground Infused Infused Flower (Max","rev":"214979","units":"5775"},{"brand":"Little Leaf","name":"2g-(H) Apple Fritter - Cold Pressed - Live Rosin Terpenes - ","rev":"189666","units":"4133"},{"brand":"Little Leaf","name":"2g (S) Pineapple Express - Cryo Liquid Diamond - Disposable","rev":"175795","units":"3915"},{"brand":"Little Leaf","name":"2g (S/H) Mango Custard Green Crack - Cryo Liquid Diamond - D","rev":"172144","units":"3853"},{"brand":"Little Leaf","name":"1.2g (S) Tropical Maui Wowie Moonrock Infused Preroll XL","rev":"140691","units":"9535"},{"brand":"Little Leaf","name":"1g (H) Strawberry Shortcake x White Widow - Cryo Liquid Diam","rev":"133526","units":"4740"},{"brand":"Little Leaf","name":"1g (S/H) Tropical Cookies x Orange Creamsicle - Cryo Liquid ","rev":"123850","units":"4337"},{"brand":"Little Leaf","name":"1g (I) Berry Smash Moonrock Infused Preroll","rev":"113793","units":"9965"},{"brand":"Little Leaf","name":"1g (S) Strawberry Shortcake Moonrock Infused Preroll","rev":"107585","units":"9680"},{"brand":"Little Leaf","name":"1g (H) Lush Ice - Cryo Liquid Diamond - Disposable","rev":"102454","units":"3620"},{"brand":"Little Leaf","name":"1.2g (I) Do Si Dos Moonrock Infused Preroll XL","rev":"99900","units":"6665"},{"brand":"Little Leaf","name":"1.2g (S) Blue Dream Razz Moonrock Infused Preroll XL","rev":"97057","units":"6519"},{"brand":"Little Leaf","name":"3.5G (H) White Widow Ground Infused Infused Flower (Hybrid)","rev":"94664","units":"2840"},{"brand":"Little Leaf","name":"1G (I) Grandaddy Purp Berry- Cryo - Live Rosin Terpene Dispo","rev":"91167","units":"3205"},{"brand":"Little Leaf","name":"1g (S) Tropical Passionfruit Moonrock Infused Preroll","rev":"83983","units":"7536"},{"brand":"Little Leaf","name":"1g (I/H) Peaches & Cream Runtz - Cryo Liquid Diamond - Dispo","rev":"75414","units":"2725"},{"brand":"Little Leaf","name":"1g (H) Watermelon Sorbet - Cryo Liquid Diamond - Disposable","rev":"70257","units":"2885"},{"brand":"Little Leaf","name":"3.5G (S) Acapulco Ground Infused Infused Flower (Energy)","rev":"69414","units":"2347"},{"brand":"Little Leaf","name":"1g (I/H) Cherry Gelato - Cryo Liquid Diamond - Disposable","rev":"64636","units":"2330"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  Pinkies (S)  3.5g","rev":"56654","units":"1745"},{"brand":"Little Leaf","name":"[100mg] (I) Dream Berry Nano-Infused Gummies (THC:CBN) [10 p","rev":"51977","units":"5245"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  2G Double Hitter Wig Splitter  Bobby ","rev":"51309","units":"1307"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Snowballz  Razzle Dazzle (H)  2g","rev":"45134","units":"1273"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Big Homie  Live Resin  OG X Lynwood L","rev":"43531","units":"977"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  2G Double Hitter Wig Splitter  Razzle","rev":"43222","units":"1110"},{"brand":"Little Leaf","name":"[100mg] Smacked Bar - 20pcs (5mg/Pc) Peanut Butter Cup Choco","rev":"43119","units":"3011"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Snowballz  Pinkies (S)  2g","rev":"42920","units":"1160"},{"brand":"Little Leaf","name":"[100mg] (S) Tropical Charge Nano-Infused Gummies (THC:CBG) [","rev":"40787","units":"4202"},{"brand":"Little Leaf","name":"[100mg] (H) Strawberry Nano-Infused Gummies [10 pcs]","rev":"38944","units":"4210"},{"brand":"Little Leaf","name":"Moonwalkers - Strawberries & Bananas - (5) .6g Prerolls","rev":"38063","units":"1190"},{"brand":"Little Leaf","name":"[100mg] Fast Asleep Cherry THC:CBN Pectin Gummies","rev":"35579","units":"4045"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Snowballz  Bobby Blue","rev":"35479","units":"1085"},{"brand":"Little Leaf","name":"1.2g (H) Frozen Watermelon Sorbet Moonrock Infused Preroll X","rev":"35317","units":"2520"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  OG (I)  3.5g","rev":"34079","units":"1138"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  Bobby Blues (H)  3.5g","rev":"32049","units":"992"},{"brand":"Little Leaf","name":"[100mg] (H) Green Apple Nano-Infused Gummies [10 pcs]","rev":"31195","units":"3425"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Fuzzy Wuzzys  Razzle ","rev":"29424","units":"915"},{"brand":"Little Leaf","name":"[100mg] Fast Energy Pink Lemonade THC:CBG Pectin Gummies","rev":"28203","units":"3170"},{"brand":"Little Leaf","name":"Moonwalkers - Watermelon Crush - (5) .6g Prerolls","rev":"28025","units":"870"},{"brand":"Little Leaf","name":"[100mg] Fast Relax Grape THC:CBN Pectin Gummies","rev":"26840","units":"2920"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Fuzzy Wuzziez  Pinkie","rev":"26816","units":"852"},{"brand":"Little Leaf","name":"1G (S) Sour Diesel - Cold Pressed - Live Rosin Terpene Dispo","rev":"25980","units":"1035"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Snowballz  Kodiak (H)  2g","rev":"25000","units":"689"},{"brand":"Little Leaf","name":"[100mg] Smacked Milk Chocolate Crunch Bar 100mg","rev":"24832","units":"1690"},{"brand":"Little Leaf","name":"Moonwalkers - Mango Madness - (5) .6g Prerolls","rev":"24015","units":"750"},{"brand":"Little Leaf","name":"[100mg] Fast Relief Watermelon Mojito THC:CBD Pectin Gummies","rev":"23400","units":"2550"},{"brand":"Little Leaf","name":"Moonwalkers - Grape N Cream - (5) .6g Prerolls","rev":"23213","units":"771"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  Kodiak (H)  3.5g","rev":"22575","units":"707"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Moonrock Infused Prerolls  Pinkies (S","rev":"18668","units":"1065"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Moonrock Infused Prerolls  Razzle Daz","rev":"16840","units":"957"},{"brand":"Octane","name":"3.5g (H) Octane Zummies","rev":"16480","units":"691"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Snowballz  Kodiak (H)","rev":"14875","units":"477"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Snowballz  Lynwood Le","rev":"14595","units":"460"},{"brand":"Little Leaf","name":"[100mg] (H) Cappuccino Nano-Infused Gummies [10 pcs]","rev":"13182","units":"1353"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Infused Prerolls  Ghost (I)  1.4g","rev":"12922","units":"740"},{"brand":"Octane","name":"3.5g (S) Octane Melonaid","rev":"12154","units":"530"},{"brand":"Little Leaf","name":"[100mg] Fast Charge Mango THC:CBG Pectin Gummies","rev":"11704","units":"1490"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Moonrock Infused Prerolls  Bobby Blue","rev":"11527","units":"941"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Infused Prerolls  Nite Owl (H)  1.4g","rev":"11378","units":"656"},{"brand":"Little Leaf","name":"[100mg] Fast Chill Triple Berry Pectin Gummies","rev":"9337","units":"1025"},{"brand":"The Growfather","name":"Growfather  Disposable Vape  Blueberry Muffin  1g","rev":"6912","units":"270"},{"brand":"The Growfather","name":"Growfather  Disposable Vape  Maui Waui x Tropical Passionfru","rev":"6334","units":"270"},{"brand":"Octane","name":"3.5g (H) Octane Lime OG","rev":"4840","units":"220"},{"brand":"Octane","name":"3.5g (H) Octane Pineapple Fruz","rev":"4785","units":"241"},{"brand":"Octane","name":"3.5g (H) Octane Rainbow Zkittlez","rev":"4696","units":"214"},{"brand":"Octane","name":"3.5g (H) Octane  Alien Cookies","rev":"4113","units":"180"},{"brand":"The Growfather","name":"Growfather  Disposable Vape  Blue Razz Ice  1g","rev":"3492","units":"195"},{"brand":"Octane","name":"3.5g (H) Octane  Grape Gas","rev":"3283","units":"154"}];
+const SEED_SKU=[{"brand":"Little Leaf","name":"1.2g - Granddaddy Purp Berry - Moonrock Infused Preroll [Hig","rev":"412568","units":"26642"},{"brand":"Little Leaf","name":"1.2g - Sour Diesel - Moonrock Infused Preroll [High Potency]","rev":"385782","units":"24680"},{"brand":"Little Leaf","name":"1.2g - Pineapple Express - Moonrock Infused Preroll [High Po","rev":"326900","units":"21117"},{"brand":"Little Leaf","name":"1.2g - Super Lemon Cherry Haze - Moonrock Infused Preroll [H","rev":"300920","units":"19050"},{"brand":"Little Leaf","name":"2g-(S)?Sour Diesel- Cold Pressed - Live Rosin Terpenes- Disp","rev":"300761","units":"6645"},{"brand":"Little Leaf","name":"2g-(I)?Granddaddy Purp Berry- Cryo Liquid Diamond - Disposab","rev":"257417","units":"5720"},{"brand":"Little Leaf","name":"1.2g (H)?White Widow X Strawberry Cough Moonrock Infused Pre","rev":"243020","units":"15875"},{"brand":"Little Leaf","name":"3.5G (H)?Purple Runtz Ground Infused Infused Flower (Max Pot","rev":"220942","units":"5995"},{"brand":"Little Leaf","name":"3.5G (S)?Mango Jack Herer Ground Infused Infused Flower (Max","rev":"214979","units":"5775"},{"brand":"Little Leaf","name":"2g-(H)?Apple Fritter - Cold Pressed - Live Rosin Terpenes - ","rev":"189666","units":"4133"},{"brand":"Little Leaf","name":"2g (S)?Pineapple Express - Cryo Liquid Diamond - Disposable","rev":"175795","units":"3915"},{"brand":"Little Leaf","name":"2g (S/H)?Mango Custard Green Crack - Cryo Liquid Diamond - D","rev":"172144","units":"3853"},{"brand":"Little Leaf","name":"1.2g (S)?Tropical Maui Wowie Moonrock Infused Preroll XL","rev":"140691","units":"9535"},{"brand":"Little Leaf","name":"1g (H)?Strawberry Shortcake x White Widow - Cryo Liquid Diam","rev":"133526","units":"4740"},{"brand":"Little Leaf","name":"1g (S/H)?Tropical Cookies x Orange Creamsicle - Cryo Liquid ","rev":"123850","units":"4337"},{"brand":"Little Leaf","name":"1g (I)?Berry Smash Moonrock Infused Preroll","rev":"113793","units":"9965"},{"brand":"Little Leaf","name":"1g (S)?Strawberry Shortcake Moonrock Infused Preroll","rev":"107585","units":"9680"},{"brand":"Little Leaf","name":"1g (H)?Lush Ice - Cryo Liquid Diamond - Disposable","rev":"102454","units":"3620"},{"brand":"Little Leaf","name":"1.2g (I)?Do Si Dos Moonrock Infused Preroll XL","rev":"99900","units":"6665"},{"brand":"Little Leaf","name":"1.2g (S)?Blue Dream Razz Moonrock Infused Preroll XL","rev":"97057","units":"6519"},{"brand":"Little Leaf","name":"3.5G (H)?White Widow Ground Infused Infused Flower (Hybrid)","rev":"94664","units":"2840"},{"brand":"Little Leaf","name":"1G (I)?Grandaddy Purp Berry- Cryo - Live Rosin Terpene Dispo","rev":"91167","units":"3205"},{"brand":"Little Leaf","name":"1g (S)?Tropical Passionfruit Moonrock Infused Preroll","rev":"83983","units":"7536"},{"brand":"Little Leaf","name":"1g (I/H)?Peaches & Cream Runtz - Cryo Liquid Diamond - Dispo","rev":"75414","units":"2725"},{"brand":"Little Leaf","name":"1g (H)?Watermelon Sorbet - Cryo Liquid Diamond - Disposable","rev":"70257","units":"2885"},{"brand":"Little Leaf","name":"3.5G (S)?Acapulco Ground Infused Infused Flower (Energy)","rev":"69414","units":"2347"},{"brand":"Little Leaf","name":"1g (I/H)?Cherry Gelato - Cryo Liquid Diamond - Disposable","rev":"64636","units":"2330"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  Pinkies (S)  3.5g","rev":"56654","units":"1745"},{"brand":"Little Leaf","name":"[100mg] (I)?Dream Berry Nano-Infused Gummies (THC:CBN) [10 p","rev":"51977","units":"5245"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  2G Double Hitter Wig Splitter  Bobby ","rev":"51309","units":"1307"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Snowballz  Razzle Dazzle (H)  2g","rev":"45134","units":"1273"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Big Homie  Live Resin  OG X Lynwood L","rev":"43531","units":"977"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  2G Double Hitter Wig Splitter  Razzle","rev":"43222","units":"1110"},{"brand":"Little Leaf","name":"[100mg] Smacked Bar - 20pcs (5mg/Pc)?Peanut Butter Cup Choco","rev":"43119","units":"3011"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Snowballz  Pinkies (S)  2g","rev":"42920","units":"1160"},{"brand":"Little Leaf","name":"[100mg] (S)?Tropical Charge Nano-Infused Gummies (THC:CBG) [","rev":"40787","units":"4202"},{"brand":"Little Leaf","name":"[100mg] (H)?Strawberry Nano-Infused Gummies [10 pcs]","rev":"38944","units":"4210"},{"brand":"Little Leaf","name":"Moonwalkers - Strawberries & Bananas - (5) .6g Prerolls","rev":"38063","units":"1190"},{"brand":"Little Leaf","name":"[100mg] Fast Asleep Cherry THC:CBN Pectin Gummies","rev":"35579","units":"4045"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Snowballz  Bobby Blue","rev":"35479","units":"1085"},{"brand":"Little Leaf","name":"1.2g (H)?Frozen Watermelon Sorbet Moonrock Infused Preroll X","rev":"35317","units":"2520"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  OG (I)  3.5g","rev":"34079","units":"1138"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  Bobby Blues (H)  3.5g","rev":"32049","units":"992"},{"brand":"Little Leaf","name":"[100mg] (H)?Green Apple Nano-Infused Gummies [10 pcs]","rev":"31195","units":"3425"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Fuzzy Wuzzys  Razzle ","rev":"29424","units":"915"},{"brand":"Little Leaf","name":"[100mg] Fast Energy Pink Lemonade THC:CBG Pectin Gummies","rev":"28203","units":"3170"},{"brand":"Little Leaf","name":"Moonwalkers - Watermelon Crush - (5) .6g Prerolls","rev":"28025","units":"870"},{"brand":"Little Leaf","name":"[100mg] Fast Relax Grape THC:CBN Pectin Gummies","rev":"26840","units":"2920"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Fuzzy Wuzziez  Pinkie","rev":"26816","units":"852"},{"brand":"Little Leaf","name":"1G (S)?Sour Diesel - Cold Pressed - Live Rosin Terpene Dispo","rev":"25980","units":"1035"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Snowballz  Kodiak (H)  2g","rev":"25000","units":"689"},{"brand":"Little Leaf","name":"[100mg] Smacked Milk Chocolate Crunch Bar 100mg","rev":"24832","units":"1690"},{"brand":"Little Leaf","name":"Moonwalkers - Mango Madness - (5) .6g Prerolls","rev":"24015","units":"750"},{"brand":"Little Leaf","name":"[100mg] Fast Relief Watermelon Mojito THC:CBD Pectin Gummies","rev":"23400","units":"2550"},{"brand":"Little Leaf","name":"Moonwalkers - Grape N Cream - (5) .6g Prerolls","rev":"23213","units":"771"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Fuzzy Wuzziez  Kodiak (H)  3.5g","rev":"22575","units":"707"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Moonrock Infused Prerolls  Pinkies (S","rev":"18668","units":"1065"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Moonrock Infused Prerolls  Razzle Daz","rev":"16840","units":"957"},{"brand":"Octane","name":"3.5g (H)?Octane Zummies","rev":"16480","units":"691"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Snowballz  Kodiak (H)","rev":"14875","units":"477"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Buckshots  Mini Snowballz  Lynwood Le","rev":"14595","units":"460"},{"brand":"Little Leaf","name":"[100mg] (H)?Cappuccino Nano-Infused Gummies [10 pcs]","rev":"13182","units":"1353"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Infused Prerolls  Ghost (I)  1.4g","rev":"12922","units":"740"},{"brand":"Octane","name":"3.5g (S)?Octane Melonaid","rev":"12154","units":"530"},{"brand":"Little Leaf","name":"[100mg] Fast Charge Mango THC:CBG Pectin Gummies","rev":"11704","units":"1490"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Moonrock Infused Prerolls  Bobby Blue","rev":"11527","units":"941"},{"brand":"Dr. Zodiak's Moonrock","name":"Dr. Zodiaks Moonrocks  Infused Prerolls  Nite Owl (H)  1.4g","rev":"11378","units":"656"},{"brand":"Little Leaf","name":"[100mg] Fast Chill Triple Berry Pectin Gummies","rev":"9337","units":"1025"},{"brand":"The Growfather","name":"Growfather  Disposable Vape  Blueberry Muffin  1g","rev":"6912","units":"270"},{"brand":"The Growfather","name":"Growfather  Disposable Vape  Maui Waui x Tropical Passionfru","rev":"6334","units":"270"},{"brand":"Octane","name":"3.5g (H)?Octane Lime OG","rev":"4840","units":"220"},{"brand":"Octane","name":"3.5g (H)?Octane Pineapple Fruz","rev":"4785","units":"241"},{"brand":"Octane","name":"3.5g (H)?Octane Rainbow Zkittlez","rev":"4696","units":"214"},{"brand":"Octane","name":"3.5g (H)?Octane  Alien Cookies","rev":"4113","units":"180"},{"brand":"The Growfather","name":"Growfather  Disposable Vape  Blue Razz Ice  1g","rev":"3492","units":"195"},{"brand":"Octane","name":"3.5g (H)?Octane  Grape Gas","rev":"3283","units":"154"}];
 const SEED_CUST=[
   {name:'OHM THEORY LLC',rev:'284011',orders:'16',last:'05/17/2026',days:'15',aov:'17750.72'},
   {name:'Nirvana',rev:'279597',orders:'18',last:'05/27/2026',days:'5',aov:'15533.22'},
@@ -1574,7 +1574,7 @@ function buildOverview(){
   const invVal=INV.reduce((s,r)=>s+(+r.qty||0)*(+r.price||0),0);
   $('#ov_live').innerHTML=
     `<div class="kpi"><div class="k">Active Batches</div><div class="v">${active}</div></div>`+
-    `<div class="kpi"><div class="k">Items at Reorder</div><div class="v" style="color:${reorder.length?'var(--red)':'var(--green)'}">${reorder.length}</div></div>`+
+    `<div class="kpi"><div class="k">Items at Reorder</div><div class="v" style="color:${reorder.length 'var(--red)':'var(--green)'}">${reorder.length}</div></div>`+
     `<div class="kpi"><div class="k">Planned Units / mo</div><div class="v">${fmt0(totUnits)}</div></div>`+
     `<div class="kpi"><div class="k">Planned COGS / mo</div><div class="v gold">${fmt(totCOGS)}</div></div>`+
     `<div class="kpi"><div class="k">Inventory Value (live)</div><div class="v green">${fmt(invVal)}</div></div>`;
@@ -1630,11 +1630,11 @@ function buildWorkflow(){
     const r=RECIPES.find(x=>x.name===p.product);
     const exp=r r.yieldG:0; const act=+p.final||0;
     const v=exp ((act-exp)/exp*100):0;
-    const vcls=Math.abs(v)<=5 's-ok':(Math.abs(v)<=10?'s-mid':'s-low');
+    const vcls=Math.abs(v)<=5 's-ok':(Math.abs(v)<=10 's-mid':'s-low');
     return {p,exp,act,v,vcls};
   });
   const withR=rows.filter(x=>x.exp);
-  const avgV=withR.length?withR.reduce((s,x)=>s+Math.abs(x.v),0)/withR.length:0;
+  const avgV=withR.length withR.reduce((s,x)=>s+Math.abs(x.v),0)/withR.length:0;
   const labelB=PROD.filter(p=>prodStage(p).cls==='s-ok').length;
   const finalB=PROD.filter(p=>prodStage(p).cls==='s-mid').length;
   const wipB=PROD.filter(p=>prodStage(p).cls==='s-low').length;
@@ -1642,13 +1642,13 @@ function buildWorkflow(){
     `<div class="kpi"><div class="k">WIP (active)</div><div class="v" style="color:var(--red)">${wipB}</div></div>`+
     `<div class="kpi"><div class="k">Final + Label (active)</div><div class="v gold">${finalB}</div></div>`+
     `<div class="kpi"><div class="k">Ready For Sale</div><div class="v green">${labelB}</div></div>`+
-    `<div class="kpi"><div class="k">Avg |Yield Var|</div><div class="v" style="color:${avgV>10 'var(--red)':(avgV>5?'var(--gold)':'var(--green)')}">${avgV.toFixed(1)}%</div></div>`;
+    `<div class="kpi"><div class="k">Avg |Yield Var|</div><div class="v" style="color:${avgV>10 'var(--red)':(avgV>5 'var(--gold)':'var(--green)')}">${avgV.toFixed(1)}%</div></div>`;
   const body=rows.map(x=>{
     if(!x.p.product&&!x.act)return '';
-    const vtxt=(x.v>=0?'+':'')+x.v.toFixed(1)+'%';
+    const vtxt=(x.v>=0 '+':'')+x.v.toFixed(1)+'%';
     const st=prodStage(x.p);
     return `<tr><td>${x.p.date||''}</td><td class="mat">${x.p.product||''}</td><td>${x.p.batch||''}</td>`+
-      `<td class="r dim">${x.exp?fmt0(x.exp)+' g':'--'}</td><td class="r">${x.act?fmt0(x.act)+' g':'--'}</td>`+
+      `<td class="r dim">${x.exp fmt0(x.exp)+' g':'--'}</td><td class="r">${x.act fmt0(x.act)+' g':'--'}</td>`+
       `<td class="r"><span class="status ${x.exp x.vcls:''}">${x.exp vtxt:'no recipe'}</span></td>`+
       `<td class="r dim">${x.p.units||''}</td><td><span class="status ${st.cls}">${st.txt}</span></td></tr>`;
   }).join('');
@@ -1672,18 +1672,18 @@ function buildMargin(){
   const rows=RECIPES.map(r=>{
     const allIn=unitMatCost(r,c)+unitPkgCost(r)+labCost(r,c)+opxCost(r,c);
     const price=+(PRICE[r.id]  0); const u=UNITS[r.id]  0;
-    const roy=DRZ_ROY.has(r.id) price*0.10:(OCT_ROY.has(r.id)?Math.max(0,price-allIn)*0.05:0);
+    const roy=DRZ_ROY.has(r.id)?price*0.10:(OCT_ROY.has(r.id)?Math.max(0,price-allIn)*0.05:0);
     const m=price-allIn-roy; const mp=price m/price*100:0; const gp=m*u;
     if(price){totGP+=gp;totRev+=price*u;n++;}
-    const mcls=mp>=40 's-ok':(mp>=20?'s-mid':'s-low');
+    const mcls=mp>=40 's-ok':(mp>=20 's-mid':'s-low');
     return `<tr><td class="mat">${r.name}</td><td class="dim">${r.cat}</td>`+
       `<td class="r money dim">${fmt(allIn)}</td>`+
       `<td class="r"><input class="ed" type="number" step="0.25" value="${PRICE[r.id]  ''}" data-mg="${r.id}" placeholder="0.00"></td>`+
-      `<td class="r money dim">${roy?fmt(roy):'--'}</td>`+
-      `<td class="r money">${price?fmt(m):'--'}</td>`+
-      `<td class="r"><span class="status ${price mcls:''}">${price?mp.toFixed(0)+'%':'--'}</span></td>`+
+      `<td class="r money dim">${roy fmt(roy):'--'}</td>`+
+      `<td class="r money">${price fmt(m):'--'}</td>`+
+      `<td class="r"><span class="status ${price mcls:''}">${price mp.toFixed(0)+'%':'--'}</span></td>`+
       `<td class="r dim">${fmt0(u)}</td>`+
-      `<td class="r money gold">${price?fmt(gp):'--'}</td></tr>`;
+      `<td class="r money gold">${price fmt(gp):'--'}</td></tr>`;
   }).join('');
   const blended=totRev totGP/totRev*100:0;
   $('#mg_table').innerHTML=`<thead><tr><th>Product</th><th>Category</th><th class="r">All-In COGS</th><th class="r">Sale $/Unit</th><th class="r">Royalty (DRZ 10% . OCT 5%)</th><th class="r">Margin $</th><th class="r">Margin %</th><th class="r">Units/mo</th><th class="r">Monthly GP</th></tr></thead><tbody>${rows}<tr class="tot"><td class="lbl" colspan="8">Total Monthly Gross Profit (priced SKUs, net of royalty)</td><td class="r gold money">${fmt(totGP)}</td></tr></tbody>`;
@@ -1697,13 +1697,13 @@ function buildMargin(){
 
 let flagT,labelqT,reconT,dispT,prioT,remakewkT;
 let FLAG=[
-  {n:'1',sys:'QuickBooks',issue:'A/R $842,383 outstanding (v1 showed $466,611) -- ~90% uncollected',pri:'CRITICAL',owner:'Michael',act:'Immediate collections push'},
+  {n:'1',sys:'QuickBooks',issue:'A/R $842,383 outstanding (v1 showed $466,611)?-- ~90% uncollected',pri:'CRITICAL',owner:'Michael',act:'Immediate collections push'},
   {n:'2',sys:'Metrc',issue:'209 packages TestPassed not in FG -- 13 are label jobs ( 30u, ~$254K shelf value), 196 samples/remnants',pri:'HIGH',owner:'Austin',act:'Label 13 jobs -> FG -> list on Apex (see Label Queue)'},
   {n:'3',sys:'Apex/Distru/Metrc',issue:'Inventory valuation: Apex $4.09M vs v1 $2.19M',pri:'HIGH',owner:'Chris',act:'3-way reconcile (see Reconciliation)'},
   {n:'4',sys:'COGS',issue:'Distillate: assemblies $11/g vs PO $7/g (using $7)',pri:'MED',owner:'Chris',act:'Confirm current landed cost'},
   {n:'5',sys:'COGS',issue:'THCa Isolate confirmed $14/g (Snowballz/Buckshot); PO THCa Acid $16/g is a different form',pri:'LOW',owner:'Chris',act:'Resolved -- isolate $14'},
   {n:'6',sys:'Distru',issue:'280 products missing Cost/Unit . 448 missing External Name',pri:'MED',owner:'Ops',act:'Clean product master'},
-  {n:'7',sys:'Packaging',issue:'Octane 3.5g mylar (Mylar Men) price unconfirmed',pri:'LOW',owner:'Ops',act:'Confirm PO price'},
+  {n:'7',sys:'Packaging',issue:'Octane 3.5g mylar (Mylar Men)?price unconfirmed',pri:'LOW',owner:'Ops',act:'Confirm PO price'},
   {n:'8',sys:'Metrc/Domo',issue:'Test-approved (PASS) batches >30u not labeled / not in Distru FG / not on Apex',pri:'HIGH',owner:'Austin',act:'Label -> move to FG -> list on Apex'},
   {n:'9',sys:'Apex/Distru',issue:'In Distru Finished Goods but missing from Apex = API error',pri:'HIGH',owner:'Chris',act:'Re-sync Apex; investigate API'},
   {n:'10',sys:'Domo',issue:'Products expiring  90d (relabel  2mo); >18mo -> re-assemble',pri:'MED',owner:'Austin',act:'Relabel / cut promo / re-assemble (see Expiration)'},
@@ -1779,7 +1779,7 @@ let ACT=[
   {n:'1',action:'Collect past-due A/R (push top accounts: OHM, Simplypure, Cottonmouth)',impact:'Cash released',amt:'$795,463',owner:'Michael'},
   {n:'2',action:'Review Advertising & Marketing ROI ($95.2K YTD = 3.5% of rev)',impact:'Annual savings',amt:'~$50,000',owner:'Matt / Chris'},
   {n:'3',action:'Renegotiate Professional Fees $44.6K + Accounting $28K',impact:'Annual savings',amt:'~$18,000',owner:'Chris'},
-  {n:'4',action:'Reduce packaging/material COGS (46% of rev) via PO renegotiation',impact:'Annual savings',amt:'~$40,000',owner:'Ops'},
+  {n:'4',action:'Reduce packaging/material COGS (46% of rev)?via PO renegotiation',impact:'Annual savings',amt:'~$40,000',owner:'Ops'},
   {n:'5',action:'Scale Growfather prerolls (top velocity + margin, 62% of revenue)',impact:'EBITDA improvement',amt:'~$38,000',owner:'Chris'}
 ];
 const ACT_COLS=[{h:'#',k:'n'},{h:'Recommended Action',k:'action'},{h:'Type',k:'impact'},{h:'$ Impact',k:'amt',r:1},{h:'Owner',k:'owner'}];
@@ -1816,7 +1816,7 @@ let SCHED=[
   {freq:'Daily',what:'Apex POS orders -> reconcile to Metrc; A/R changes',who:'Chris',why:'Apex not auto-integrated; keeps sell-through + collections live'},
   {freq:'Weekly (Mon)',what:'Distru Sales Orders + SKU qty summary + assemblies',who:'Chris',why:'Refresh sales, forecast, production stages, label queue'},
   {freq:'Weekly',what:'Metrc Packages Inventory + Test Batches export',who:'Chris',why:'Label queue (test-approved  30u) + inventory location'},
-  {freq:'Per pay period',what:'(Gusto is live) confirm labor allocation by dept',who:'Chris',why:'Labor cost/unit + attendance'},
+  {freq:'Per pay period',what:'(Gusto is live)?confirm labor allocation by dept',who:'Chris',why:'Labor cost/unit + attendance'},
   {freq:'Monthly',what:'QuickBooks P&L + Balance Sheet (DATED, not All-Dates)',who:'Bookkeeper',why:'CFO briefing, margins, cost reduction -- source of truth'},
   {freq:'Monthly',what:'Distru Purchase Orders (COGS) + any new vendor invoices',who:'Ops',why:'Verify BOM/recipe costs; vendor spend'},
   {freq:'As needed',what:'New recipes/assemblies, price changes, new SKUs',who:'Chris',why:'Keep BOM + product master current'}
@@ -1878,12 +1878,12 @@ let SYSSOP=[
   {sys:'Metrc',proc:'Assign package tags to finished goods; create Production Batch on each manufacturing run',freq:'Per batch',ref:'NJ Supplemental Guide'},
   {sys:'Metrc',proc:'Submit package for NJ required testing; record TestPassed before sale',freq:'Per batch',ref:'NJ Supplemental Guide'},
   {sys:'Metrc',proc:'Move location In Testing/Stability -> Finished Goods once passed; build transfer manifest to dispensary',freq:'Per batch / per sale',ref:'NJ Supplemental Guide'},
-  {sys:'Distru',proc:'Maintain BOM per product (auto-populates ingredients); create assembly = Initiate (reserve) then Initiate & Complete (send to Metrc)',freq:'Per production run',ref:'Distru -- Bill of Materials'},
+  {sys:'Distru',proc:'Maintain BOM per product (auto-populates ingredients); create assembly = Initiate (reserve)?then Initiate & Complete (send to Metrc)',freq:'Per production run',ref:'Distru -- Bill of Materials'},
   {sys:'Distru',proc:'Build Purchase Order; receive to update Cost Per Unit / COGS (fix the 281 SKUs missing cost)',freq:'Per PO',ref:'Distru Help Center'},
   {sys:'Distru',proc:'Reconcile Distru inventory vs Metrc package counts',freq:'Weekly',ref:'Distru Help Center'},
   {sys:'Apex',proc:'List/maintain products & wholesale pricing; keep on-hand inventory current',freq:'Ongoing',ref:'Apex Academy'},
   {sys:'Apex',proc:'Process buyer orders; reconcile Apex POS -> Metrc daily (manual, not integrated)',freq:'Daily',ref:'Apex Academy'},
-  {sys:'Apex',proc:'Track A/R / collections by account; flag stale (>30 day) balances',freq:'Daily',ref:'Apex Academy'},
+  {sys:'Apex',proc:'Track A/R / collections by account; flag stale (>30 day)?balances',freq:'Daily',ref:'Apex Academy'},
   {sys:'QuickBooks',proc:'Export dated P&L + Balance Sheet monthly for CFO briefing',freq:'Monthly',ref:'QuickBooks'}
 ];
 const SYSSOP_COLS=[{h:'System',k:'sys'},{h:'Procedure',k:'proc'},{h:'Frequency',k:'freq'},{h:'Reference',k:'ref'}];
@@ -1896,15 +1896,15 @@ const STOCKOUT=[{"sku": "GF-WWSC-PR", "name": "1.2g (S/H) White Widow x Strawber
 //     7 d (1 wk, out this week) -> OUT THIS WEEK .   14 d (2 wk) -> CRITICAL .   21 d (3 wk) -> FLAG . > 21 d -> OK
 function planStatus(r){
   const v=(r.status||'').toUpperCase();
-  if(v==='LAUNCH') return {cls:'s-new',txt:'NEW LAUNCH'};
-  if(/\[INACTIVE\]/i.test(r.name||'')) return {cls:'s-mid',txt:'DISCONTINUED'};
-  if(v==='WIP'||String(r.days).toUpperCase()==='WIP') return {cls:'s-mid',txt:'WIP / LABEL'};
-  if(v==='NO HIST'||r.days==='n/a'||r.days===''||r.days==null) return {cls:'s-mid',txt:'NO HISTORY'};
+  if(v==='LAUNCH')?return {cls:'s-new',txt:'NEW LAUNCH'};
+  if(/\[INACTIVE\]/i.test(r.name||''))?return {cls:'s-mid',txt:'DISCONTINUED'};
+  if(v==='WIP'||String(r.days).toUpperCase()==='WIP')?return {cls:'s-mid',txt:'WIP / LABEL'};
+  if(v==='NO HIST'||r.days==='n/a'||r.days===''||r.days==null)?return {cls:'s-mid',txt:'NO HISTORY'};
   const d=pnum(r.days);
-  if(d==null||isNaN(d)) return {cls:'s-mid',txt:(v||'--')};
-  if(d<=7) return {cls:'s-low',txt:'OUT'};
-  if(d<=14) return {cls:'s-low',txt:'CRITICAL'};
-  if(d<=21) return {cls:'s-mid',txt:'FLAG'};
+  if(d==null||isNaN(d))?return {cls:'s-mid',txt:(v||'--')};
+  if(d<=7)?return {cls:'s-low',txt:'OUT'};
+  if(d<=14)?return {cls:'s-low',txt:'CRITICAL'};
+  if(d<=21)?return {cls:'s-mid',txt:'FLAG'};
   return {cls:'s-ok',txt:'OK'};
 }
 function planStage(r){
@@ -1920,11 +1920,11 @@ function stockoutDate(r){
   if(/\[INACTIVE\]/i.test(r.name||'')) return '<span class="dim">--</span>';
   const d=pnum(r.days);
   if(d==null||isNaN(d)) return '<span class="dim">--</span>';
-  if(d<=0) return '<span style="color:var(--red);font-weight:700">NOW</span>';
+  if(d<=0)?return '<span style="color:var(--red);font-weight:700">NOW</span>';
   const dt=new Date(Date.now()+d*86400000);
   const s=String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getDate()).padStart(2,'0');
-  const col=d<=7 'var(--red)':(d<=21?'var(--gold)':'var(--mut)');
-  return `<span style="color:${col};font-weight:${d<=21?'700':'400'}">${s}</span>`;
+  const col=d<=7 'var(--red)':(d<=21 'var(--gold)':'var(--mut)');
+  return `<span style="color:${col};font-weight:${d<=21 '700':'400'}">${s}</span>`;
 }
 const PLAN_COLS=[{h:'Product -- Strain . Weight',k:'name',plain:true,w:300},{h:'Status',status:1},{h:'Out-of-Stock',calc:stockoutDate},{h:'Days Left',k:'days',r:1},{h:'On Hand',k:'oh',r:1},{h:'Units / wk',k:'vel',r:1},{h:'Make (to 1.5-mo)',k:'batch',r:1},{h:'Rev at Risk $',k:'risk',r:1},{h:'SKU',k:'sku',w:110},{h:'Recommended Action',k:'action',w:200}];
 function addPlan(){PLAN.unshift({sku:'',name:'',brand:'',vel:'',oh:'',days:'',wks:'',wkrev:'',risk:'',batch:'',wipin:'',status:'',action:'Monitor'});store.set('plan',PLAN);planT.render();}
@@ -1944,16 +1944,16 @@ let SKM=[
   {code:'GF-PR-120-GDP',official:'1.2g Granddaddy Purp Berry Moonrock Infused Preroll (I)',brand:'Growfather',sub:'Infused Preroll',flavor:'Granddaddy Purp Berry',ihs:'I',wt:'1.2g'},
   {code:'GF-PR-120-PE',official:'1.2g Pineapple Express Moonrock Infused Preroll (S)',brand:'Growfather',sub:'Infused Preroll',flavor:'Pineapple Express',ihs:'S',wt:'1.2g'},
   {code:'GF-PR-120-SourD',official:'1.2g Sour Diesel Moonrock Infused Preroll (H)',brand:'Growfather',sub:'Infused Preroll',flavor:'Sour Diesel',ihs:'H',wt:'1.2g'},
-  {code:'GF-PR-120-WWSC',official:'1.2g (S/H) White Widow x Strawberry Cough Moonrock Preroll',brand:'Growfather',sub:'Infused Preroll',flavor:'White Widow x Strawberry Cough',ihs:'S/H',wt:'1.2g'},
+  {code:'GF-PR-120-WWSC',official:'1.2g (S/H)?White Widow x Strawberry Cough Moonrock Preroll',brand:'Growfather',sub:'Infused Preroll',flavor:'White Widow x Strawberry Cough',ihs:'S/H',wt:'1.2g'},
   {code:'GF-2G-Vape-MCGC',official:'Growfather | Disposable Vape | Mango Custard x Green Crack | 2g',brand:'Growfather',sub:'Disposable Vape',flavor:'Mango Custard x Green Crack',ihs:'H',wt:'2g'},
   {code:'GF-1G-Vape-SourD',official:'Growfather | Disposable Vape | Sour Diesel | 1g',brand:'Growfather',sub:'Disposable Vape',flavor:'Sour Diesel',ihs:'S',wt:'1g'},
   {code:'GF-1G-Vape-Trop',official:'Growfather | Disposable Vape | Tropicana Cookies x Orange Creamsicle | 1g',brand:'Growfather',sub:'Disposable Vape',flavor:'Tropicana Cookies x Orange Creamsicle',ihs:'H',wt:'1g'},
   {code:'GF-GM-Dream',official:'Growfather | Gummies | Dream Berry (THC:CBN) | 100mg',brand:'Growfather',sub:'Gummies',flavor:'Dream Berry',ihs:'--',wt:'100mg'},
   {code:'GF-Choc-PBCup',official:'Growfather | Chocolate | Peanut Butter Cup | 100mg',brand:'Growfather',sub:'Chocolate',flavor:'Peanut Butter Cup',ihs:'--',wt:'100mg'},
-  {code:'OCT-3.5-LimeOG',official:'3.5g (H) Octane Lime OG',brand:'Octane',sub:'Prepackaged Flower',flavor:'Lime OG',ihs:'H',wt:'3.5g'},
-  {code:'OCT-3.5-Zummies',official:'3.5g (H) Octane Zummies',brand:'Octane',sub:'Prepackaged Flower',flavor:'Zummies',ihs:'H',wt:'3.5g'},
-  {code:'MR-PR-BS-1g',official:'1g (I) Berry Smash Moonrock Infused Preroll',brand:'Sugar High',sub:'Infused Preroll',flavor:'Berry Smash',ihs:'I',wt:'1g'},
-  {code:'MR-TP-PR-1g',official:'1g (S) Tropical Passionfruit Moonrock Infused Preroll',brand:'Sugar High',sub:'Infused Preroll',flavor:'Tropical Passionfruit',ihs:'S',wt:'1g'}
+  {code:'OCT-3.5-LimeOG',official:'3.5g (H)?Octane Lime OG',brand:'Octane',sub:'Prepackaged Flower',flavor:'Lime OG',ihs:'H',wt:'3.5g'},
+  {code:'OCT-3.5-Zummies',official:'3.5g (H)?Octane Zummies',brand:'Octane',sub:'Prepackaged Flower',flavor:'Zummies',ihs:'H',wt:'3.5g'},
+  {code:'MR-PR-BS-1g',official:'1g (I)?Berry Smash Moonrock Infused Preroll',brand:'Sugar High',sub:'Infused Preroll',flavor:'Berry Smash',ihs:'I',wt:'1g'},
+  {code:'MR-TP-PR-1g',official:'1g (S)?Tropical Passionfruit Moonrock Infused Preroll',brand:'Sugar High',sub:'Infused Preroll',flavor:'Tropical Passionfruit',ihs:'S',wt:'1g'}
 ];
 const SKM_COLS=[{h:'SKU Code (internal)',k:'code'},{h:'Official Name (Metrc/Distru)',k:'official'},{h:'Brand',k:'brand'},{h:'Subcategory',k:'sub'},{h:'Flavor',k:'flavor'},{h:'IHS',k:'ihs'},{h:'Wt',k:'wt'}];
 function addSkm(){SKM.unshift({code:'',official:'',brand:'',sub:'',flavor:'',ihs:'',wt:''});store.set('skm',SKM);skmT.render();}
@@ -1961,8 +1961,8 @@ function addSkm(){SKM.unshift({code:'',official:'',brand:'',sub:'',flavor:'',ihs
 let chgT;
 let CHG=[
   {n:'1',scope:'Brand name',cur:''Dr.Z' vs 'Dr. Zodiak#As Moonrocks'',issue:'Same brand, two names across Metrc/Distru',fix:'Standardize Distru brand to 'Dr. Zodiak#As Moonrocks' on all SKUs',pri:'HIGH'},
-  {n:'2',scope:'GF 1.2g Preroll',cur:''1.2g - Granddaddy Purp ', '1.2g - Pineapple Express', '1.2g - Sour Diesel'',issue:'Missing IHS tag; dash format inconsistent with '1.2g (S) Blue Dream '',fix:'Reformat to Brand | Subcategory | Flavor | (IHS) | Weight with IHS on every SKU',pri:'HIGH'},
-  {n:'3',scope:'GF Vapes',cur:'Distru 'Growfather | Disposable Vape |  ' vs Metrc '2g-(H) Apple Fritter '',issue:'Distru name   Metrc canonical for vapes',fix:'Align Distru vape names to the Metrc canonical name',pri:'HIGH'},
+  {n:'2',scope:'GF 1.2g Preroll',cur:''1.2g - Granddaddy Purp ', '1.2g - Pineapple Express', '1.2g - Sour Diesel'',issue:'Missing IHS tag; dash format inconsistent with '1.2g (S)?Blue Dream '',fix:'Reformat to Brand | Subcategory | Flavor | (IHS) | Weight with IHS on every SKU',pri:'HIGH'},
+  {n:'3',scope:'GF Vapes',cur:'Distru 'Growfather | Disposable Vape |  ' vs Metrc '2g-(H)?Apple Fritter '',issue:'Distru name   Metrc canonical for vapes',fix:'Align Distru vape names to the Metrc canonical name',pri:'HIGH'},
   {n:'4',scope:'Weight casing',cur:''1G' vs '1g' . '2g-' trailing dash',issue:'Inconsistent weight format',fix:'Lowercase g, no trailing dash (1g, 2g, 3.5g)',pri:'MED'},
   {n:'5',scope:'Apex vs Metrc text',cur:''White Widow x' vs 'White Widow X'; 'Sour Diesel- Co' spacing',issue:'Case/spacing drift between systems',fix:'Match Apex display name to Metrc canonical exactly',pri:'MED'},
   {n:'6',scope:'SKU codes',cur:'GF-WWSC-PR, GF-GDP-MR, DRZ-SNBL-RD-2g, MR-TP-PR',issue:'Do not follow new standard (no weight / no mo-yr / DRZ vs Dr)',fix:'Migrate to standard: GF-PR-120-WWSC, GF-PR-120-GDP, Dr-Snow-Razzle-2g, MR-TP-PR-1g (+mo/yr)',pri:'MED'},
@@ -2060,17 +2060,17 @@ let EXPIRE=[
   {prod:'[100mg] Fast Asleep Cherry Natural Gummies',test:'2025-10-30',exp:'2026-04-30',days:'-31',action:'Extend -> 12mo + relabel'},
   {prod:'[100mg] Fast Charge Mango THCCBG Pectin Gu',test:'2025-11-03',exp:'2026-05-03',days:'-28',action:'Extend -> 12mo + relabel'},
   {prod:'[100mg] 21 THCCBG Tropical Nano-Infused Gu',test:'2025-11-03',exp:'2026-05-03',days:'-28',action:'Extend -> 12mo + relabel'},
-  {prod:'2g (S H) Mango Custard Green Crack - Cryo ',test:'2025-11-03',exp:'2026-05-03',days:'-28',action:'Extend -> 12mo + relabel'},
+  {prod:'2g (S H)?Mango Custard Green Crack - Cryo ',test:'2025-11-03',exp:'2026-05-03',days:'-28',action:'Extend -> 12mo + relabel'},
   {prod:'[100mg] THCCBN Dream Berry Nano-Infused Gu',test:'2025-11-08',exp:'2026-05-08',days:'-23',action:'Extend -> 12mo + relabel'},
   {prod:'[100mg] 20pc Peanut Butter Chocolate Bar',test:'2025-11-08',exp:'2026-05-08',days:'-23',action:'Extend -> 12mo + relabel'},
   {prod:'[100mg] Fast Energy Pink Lemonade THCCBG P',test:'2025-11-17',exp:'2026-05-17',days:'-14',action:'Extend -> 12mo + relabel'},
-  {prod:'1g (S H) Tropical Cookies x Orange Creamsi',test:'2025-11-17',exp:'2026-05-17',days:'-14',action:'Extend -> 12mo + relabel'},
-  {prod:'1g (H) Strawberry Shortcake x White Widow ',test:'2025-11-17',exp:'2026-05-17',days:'-14',action:'Extend -> 12mo + relabel'},
-  {prod:'1.2g (H) White Widow x Strawberry Cough Mo',test:'2025-11-22',exp:'2026-05-22',days:'-9',action:'Extend -> 12mo + relabel'},
+  {prod:'1g (S H)?Tropical Cookies x Orange Creamsi',test:'2025-11-17',exp:'2026-05-17',days:'-14',action:'Extend -> 12mo + relabel'},
+  {prod:'1g (H)?Strawberry Shortcake x White Widow ',test:'2025-11-17',exp:'2026-05-17',days:'-14',action:'Extend -> 12mo + relabel'},
+  {prod:'1.2g (H)?White Widow x Strawberry Cough Mo',test:'2025-11-22',exp:'2026-05-22',days:'-9',action:'Extend -> 12mo + relabel'},
   {prod:'1.2g Granddaddy Purp Berry Moonrock Infuse',test:'2025-11-22',exp:'2026-05-22',days:'-9',action:'Extend -> 12mo + relabel'},
-  {prod:'2G (S) Sour Diesel- Cold Pressed-Live Rosi',test:'2025-11-22',exp:'2026-05-22',days:'-9',action:'Extend -> 12mo + relabel'},
-  {prod:'3.5G (H) White Widow Ground Infused Infuse',test:'2025-11-27',exp:'2026-05-27',days:'-4',action:'Extend -> 12mo + relabel'},
-  {prod:'3.5G (S) Acapulco Ground Infused Infused F',test:'2025-11-27',exp:'2026-05-27',days:'-4',action:'Extend -> 12mo + relabel'},
+  {prod:'2G (S)?Sour Diesel- Cold Pressed-Live Rosi',test:'2025-11-22',exp:'2026-05-22',days:'-9',action:'Extend -> 12mo + relabel'},
+  {prod:'3.5G (H)?White Widow Ground Infused Infuse',test:'2025-11-27',exp:'2026-05-27',days:'-4',action:'Extend -> 12mo + relabel'},
+  {prod:'3.5G (S)?Acapulco Ground Infused Infused F',test:'2025-11-27',exp:'2026-05-27',days:'-4',action:'Extend -> 12mo + relabel'},
 ];
 const EXPIRE_COLS=[{h:'Product (Metrc)',k:'prod'},{h:'Test Date',k:'test'},{h:'Expiry (+6mo)',k:'exp'},{h:'Days',k:'days',r:1},{h:'Action',k:'action'}];
 function addExpire(){EXPIRE.unshift({prod:'',test:'',exp:'',days:'',action:''});store.set('expire',EXPIRE);expireT.render();}
@@ -2079,7 +2079,7 @@ let RCHK=[
   {n:'1',check:'Distru POs   QuickBooks bills/payments (COGS &amp; marketing)',rule:'Every Distru PO has a matching QB bill attached; amounts agree',flag:'Flag POs with no QB bill or amount mismatch',owner:'Chris'},
   {n:'2',check:'Metrc   Distru   Apex cannabis inventory',rule:'Apex carries only Distru Finished-Goods (RFS). Anything in Distru FG missing from Apex = API error',flag:'Flag missing-from-Apex + Metrc Distru qty gaps',owner:'Chris/Austin'},
   {n:'3',check:'Metrc Transfers   Distru Invoices/Sales Orders   Apex Invoice',rule:'All three match per shipment',flag:'Flag any transfer/invoice mismatch',owner:'Chris'},
-  {n:'4',check:'QuickBooks Invoices   Distru Invoices   Apex Invoices ( 1 week)',rule:'Respective invoices in the same ~1-week window match',flag:'Flag discrepancies for the Sales Director (Matt) to correct',owner:'Matt'}
+  {n:'4',check:'QuickBooks Invoices   Distru Invoices   Apex Invoices ( 1 week)',rule:'Respective invoices in the same ~1-week window match',flag:'Flag discrepancies for the Sales Director (Matt)?to correct',owner:'Matt'}
 ];
 const RCHK_COLS=[{h:'#',k:'n'},{h:'Reconciliation Check',k:'check'},{h:'Rule',k:'rule'},{h:'Flag Logic',k:'flag'},{h:'Owner',k:'owner'}];
 function addRchk(){RCHK.unshift({n:'',check:'',rule:'',flag:'',owner:''});store.set('rchk',RCHK);rchkT.render();}
@@ -2163,7 +2163,7 @@ let BOMMAP=[
   {sku:'DRZ-MW4-BB',apex:'(not on Apex)',distint:'Dr. Z | 2.8g | Moonwalkers 4-Pack | Bobb',distext:'Dr. Zodiaks Moonrocks | Moonwalkers | 4-Pack | B',metrc:'Dr. Zodiaks Moonrocks | Moonwalkers | 4-Pack | B'},
   {sku:'DRZ-2G-MR-SB',apex:'(not on Apex)',distint:'Dr. Z | 2g | Moonrock | Silverback (I)',distext:'Dr. Zodiaks Moonrocks | Moonrocks | Silverback (',metrc:'Dr. Zodiaks Moonrocks | Moonrocks | Silverback ('},
   {sku:'DRZ-2G-MR-RD',apex:'(not on Apex)',distint:'Dr. Z | 2g | Moonrock | Razzle Dazzle (H',distext:'Dr. Zodiaks Moonrocks | Moonrocks | Razzle Dazzl',metrc:'Dr. Zodiaks Moonrocks | Moonrocks | Razzle Dazzl'},
-  {sku:'DRZ-2G-MR-PI',apex:'(not on Apex)',distint:'Dr. Z | 2g | Moonrock | Pinkies (S)',distext:'Dr. Zodiaks Moonrocks | Moonrocks | Pinkies (S) ',metrc:'Dr. Zodiaks Moonrocks | Moonrocks | Pinkies (S) '},
+  {sku:'DRZ-2G-MR-PI',apex:'(not on Apex)',distint:'Dr. Z | 2g | Moonrock | Pinkies (S)',distext:'Dr. Zodiaks Moonrocks | Moonrocks | Pinkies (S)?',metrc:'Dr. Zodiaks Moonrocks | Moonrocks | Pinkies (S) '},
   {sku:'DRZ-2G-MR-OG',apex:'(not on Apex)',distint:'Dr. Z | 2g | Moonrock | OG (I)',distext:'Dr. Zodiaks Moonrocks | Moonrocks | OG (I) | 2g',metrc:'Dr. Zodiaks Moonrocks | Moonrocks | OG (I) | 2g'},
   {sku:'DRZ-2G-MR-NO',apex:'(not on Apex)',distint:'Dr. Z | 2g | Moonrock | Nite Owl (H)',distext:'Dr. Zodiaks Moonrocks | Moonrocks | Nite Owl (H)',metrc:'Dr. Zodiaks Moonrocks | Moonrocks | Nite Owl (H)'},
   {sku:'DRZ-2G-MR-LL',apex:'(not on Apex)',distint:'Dr. Z | 2g | Moonrock | Lynwood Lemonade',distext:'Dr. Zodiaks Moonrocks | Moonrocks | Lynwood Lemo',metrc:'Dr. Zodiaks Moonrocks | Moonrocks | Lynwood Lemo'},
@@ -2176,7 +2176,7 @@ let BOMMAP=[
   {sku:'DRZ-1G-CC-RD',apex:'Dr. Zodiaks Moonrocks | Razzle Dazzle Cl',distint:'Dr. Z | 1g | Clear Cartridge | Razzle Da',distext:'Dr. Zodiaks Moonrocks | Razzle Dazzle Clear Cart',metrc:'Dr. Zodiaks Moonrocks | Razzle Dazzle Clear Cart'},
   {sku:'DRZ-1G-CC-LL',apex:'Dr. Zodiaks Moonrocks | Lynwood Lemonade',distint:'Dr. Z | 1g | Clear Cartridge | Lynwood L',distext:'Dr. Zodiaks Moonrocks | Lynwood Lemonade Clear C',metrc:'Dr. Zodiaks Moonrocks | Lynwood Lemonade Clear C'},
   {sku:'DRZ-2G-PS-SBXWC-BH',apex:'(not on Apex)',distint:'Dr. Z | 2g | Purple Switch | SBxWC | Big',distext:'Dr. Zodiaks Moonrocks | Big Homie | Live Resin |',metrc:'Dr. Zodiaks Moonrocks | Big Homie | Live Resin |'},
-  {sku:'OCT GRAPE GAS 3.5',apex:'3.5g (H) Octane | Grape Gas',distint:'3.5g (H) Octane | Grape Gas',distext:'3.5g (H) Octane | Grape Gas',metrc:'3.5g (H) Octane | Grape Gas'},
+  {sku:'OCT GRAPE GAS 3.5',apex:'3.5g (H)?Octane | Grape Gas',distint:'3.5g (H)?Octane | Grape Gas',distext:'3.5g (H)?Octane | Grape Gas',metrc:'3.5g (H) Octane | Grape Gas'},
   {sku:'MR-90ML-LID',apex:'(not on Apex)',distint:'90mL Black Jar Lids',distext:'Moonrock Jar Lids',metrc:'Moonrock Jar Lids'},
   {sku:'WIP RAZZLE OIL',apex:'(not on Apex)',distint:'Razzle Dazzle Distillate',distext:'WIP | DRZ | RAZZLE DAZZLE | DISTILLATE',metrc:'WIP | DRZ | RAZZLE DAZZLE | DISTILLATE'},
   {sku:'PB-Cup-Crushed',apex:'(not on Apex)',distint:'Ingredient | Chocolate | Reeses Chopped',distext:'Chopped REESES PB Cup',metrc:'Chopped REESES PB Cup'},
@@ -2220,7 +2220,7 @@ let BOMMAP=[
   {sku:'DRZ-MIP-NO',apex:'Dr. Zodiaks Moonrocks | Infused Prerolls',distint:'1.4g | Moonrock Infused Prerolls | Nite ',distext:'Dr. Zodiaks Moonrocks | Moonrock Infused Preroll',metrc:'Dr. Zodiaks Moonrocks | Moonrock Infused Preroll'},
   {sku:'DRZ-MIP-OG',apex:'(not on Apex)',distint:'1.4g | Moonrock Infused Prerolls | OG (I',distext:'Dr. Zodiaks Moonrocks | Moonrock Infused Preroll',metrc:'Dr. Zodiaks Moonrocks | Moonrock Infused Preroll'},
   {sku:'DRZ-MIP-SB',apex:'(not on Apex)',distint:'1.4g | Moonrock Infused Prerolls | Silve',distext:'Dr. Zodiaks Moonrocks | Moonrock Infused Preroll',metrc:'Dr. Zodiaks Moonrocks | Moonrock Infused Preroll'},
-  {sku:'WIP LPC ROSIN',apex:'(not on Apex)',distint:'WIP Oil .5g (S/H) London Pound Cake - So',distext:'.5g (S/H) London Pound Cake - Solventless Live R',metrc:'.5g (S/H) London Pound Cake - Solventless Live R'},
+  {sku:'WIP LPC ROSIN',apex:'(not on Apex)',distint:'WIP Oil .5g (S/H)?London Pound Cake - So',distext:'.5g (S/H)?London Pound Cake - Solventless Live R',metrc:'.5g (S/H) London Pound Cake - Solventless Live R'},
   {sku:'WIP DRZ RD INF FL',apex:'(not on Apex)',distint:'WIP |  Razzle Dazzle | THCa Flower',distext:'Razzle Dazzle Snowballz / Buckshotz THCa Flower',metrc:'Razzle Dazzle Snowballz / Buckshotz THCa Flower'},
   {sku:'DRZ-2G-SB-NO',apex:'Dr. Zodiaks Moonrocks | 2g | Snowballz |',distint:'2g | Snowballz | Nite Owl (H)',distext:'Dr. Zodiaks Moonrocks | Snowballz | Nite Owl (H)',metrc:'Dr. Zodiaks Moonrocks | Snowballz | Nite Owl (H)'},
   {sku:'DRZ-2G-SB-OG',apex:'Dr. Zodiaks Moonrocks | Snowballz | OG (',distint:'2g | Snowballz | OG (I)',distext:'Dr. Zodiaks Moonrocks | Snowballz | OG (I) | 2g',metrc:'Dr. Zodiaks Moonrocks | Snowballz | OG (I) | 2g'},
@@ -2281,12 +2281,12 @@ costIds.forEach(id=>$('#'+id).addEventListener('input',()=>{
 
 (async function init(){
   const saved=await store.get('costs',null);
-  if(saved)?costIds.forEach(i=>{ if(saved[i]!=null)$('#'+i).value=saved[i]; });
+  if(saved) costIds.forEach(i=>{ if(saved[i]!=null)$('#'+i).value=saved[i]; });
   PKG_OVR=await store.get('pkg_ovr',{});
   UNITS=await store.get('units',{});
   PROD=await store.get('prod',null)||SEED_PROD;
   // Merge in any seeded assemblies (by Assembly #) not already logged -- keeps the assembly log current without wiping edits
-  SEED_PROD.filter(s=>s.asm_no).forEach(s=>{ if(!PROD.some(p=>p.asm_no===s.asm_no))?PROD.unshift(s); });
+  SEED_PROD.filter(s=>s.asm_no).forEach(s=>{ if(!PROD.some(p=>p.asm_no===s.asm_no)) PROD.unshift(s); });
   store.set('prod',PROD);
   LAB=await store.get('lab',null)||SEED_LAB;
   // If saved labels don't have the new schema fields, reseed
