@@ -1,0 +1,1568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Little Leaf Labs — Admin Panel</title>
+<style>
+:root {
+  --bg:#0e1414;--panel:#16201f;--panel2:#1c2826;--ink:#e8efe9;--muted:#92a39c;
+  --line:#283533;--leaf:#3fae6b;--leaf-d:#2c7d4c;--gold:#d9a441;--red:#e5484d;
+  --orange:#f5a524;--blue:#4a9ed9;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+
+/* LOGIN */
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:40px 36px;width:360px;text-align:center}
+.login-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,var(--leaf),var(--leaf-d));display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 18px}
+.login-box h1{font-size:20px;margin-bottom:4px}
+.login-box p{color:var(--muted);font-size:13px;margin-bottom:28px}
+.field{text-align:left;margin-bottom:16px}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.8px}
+.field input,.field select{width:100%;background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:11px 14px;color:var(--ink);font-size:14px;outline:none;transition:border .2s}
+.field input:focus,.field select:focus{border-color:var(--leaf)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:11px 22px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s,transform .1s}
+.btn:active{transform:scale(.97)}
+.btn-primary{background:var(--leaf);color:#0e1414;width:100%}
+.btn-primary:hover{opacity:.88}
+.btn-danger{background:rgba(229,72,77,.15);color:var(--red);border:1px solid rgba(229,72,77,.3)}
+.btn-ghost{background:var(--panel2);color:var(--ink);border:1px solid var(--line)}
+.btn-ghost:hover{border-color:var(--leaf);color:var(--leaf)}
+.btn-sm{padding:7px 14px;font-size:12px}
+.error-msg{background:rgba(229,72,77,.12);border:1px solid rgba(229,72,77,.3);border-radius:8px;padding:10px 14px;color:#ff7378;font-size:13px;margin-bottom:16px;display:none}
+.lock-msg{background:rgba(245,165,36,.12);border:1px solid rgba(245,165,36,.3);border-radius:8px;padding:10px 14px;color:var(--orange);font-size:13px;margin-bottom:16px;display:none}
+
+/* APP */
+#app{display:none}
+.topbar{background:var(--panel);border-bottom:1px solid var(--line);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:60px;position:sticky;top:0;z-index:100}
+.topbar-brand{display:flex;align-items:center;gap:12px}
+.topbar-logo{width:36px;height:36px;border-radius:9px;background:linear-gradient(135deg,var(--leaf),var(--leaf-d));display:flex;align-items:center;justify-content:center;font-size:18px}
+.topbar-title{font-size:16px;font-weight:600}
+.topbar-right{display:flex;align-items:center;gap:14px}
+.user-badge{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:5px 14px;font-size:13px;color:var(--muted)}
+.user-badge span{color:var(--leaf);font-weight:600}
+.nav{display:flex;gap:4px;background:var(--panel2);border-bottom:1px solid var(--line);padding:0 28px}
+.nav-btn{padding:14px 18px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border:none;background:none;border-bottom:2px solid transparent;transition:all .15s}
+.nav-btn:hover{color:var(--ink)}
+.nav-btn.active{color:var(--leaf);border-bottom-color:var(--leaf)}
+.content{max-width:1100px;margin:0 auto;padding:32px 28px 60px}
+.section{display:none}
+.section.active{display:block}
+
+/* CARDS */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px;margin-bottom:20px}
+.card h2{font-size:16px;font-weight:600;margin-bottom:6px}
+.card .sub{color:var(--muted);font-size:13px;margin-bottom:20px}
+
+/* UPLOAD */
+.upload-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin-bottom:24px}
+.upload-zone{background:var(--panel2);border:2px dashed var(--line);border-radius:12px;padding:22px;transition:border-color .2s;cursor:pointer;position:relative}
+.upload-zone:hover,.upload-zone.dragover{border-color:var(--leaf)}
+.upload-zone.has-files{border-color:rgba(63,174,107,.5);border-style:solid}
+.upload-zone-title{font-size:14px;font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.upload-zone-sub{font-size:12px;color:var(--muted);margin-bottom:14px}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.file-list{margin-top:12px;display:flex;flex-direction:column;gap:6px}
+.file-item{display:flex;align-items:center;justify-content:space-between;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:8px 12px;font-size:12px}
+.file-item-name{color:var(--ink);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-item-status{margin-left:8px;font-size:11px;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap}
+.status-pending{background:rgba(217,164,65,.15);color:var(--gold)}
+.status-uploading{background:rgba(74,158,217,.15);color:var(--blue)}
+.status-done{background:rgba(63,174,107,.15);color:var(--leaf)}
+.status-error{background:rgba(229,72,77,.15);color:var(--red)}
+.remove-file{background:none;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:0 4px;margin-left:6px}
+.remove-file:hover{color:var(--red)}
+
+/* PROCESS */
+.process-area{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;text-align:center;margin-top:8px}
+.process-area h3{font-size:17px;margin-bottom:8px}
+.process-area p{color:var(--muted);font-size:13px;margin-bottom:20px}
+.btn-process{background:linear-gradient(135deg,var(--leaf),var(--leaf-d));color:#0e1414;padding:15px 40px;font-size:16px;font-weight:700;border-radius:12px;border:none;cursor:pointer;transition:opacity .15s,transform .1s;width:100%;max-width:400px}
+.btn-process:hover:not(:disabled){opacity:.88}
+.btn-process:disabled{opacity:.4;cursor:not-allowed}
+.progress-wrap{display:none;margin-top:18px}
+.progress-bar-bg{background:var(--panel2);border-radius:8px;height:10px;overflow:hidden;margin-bottom:8px}
+.progress-bar{height:100%;background:linear-gradient(90deg,var(--leaf),var(--leaf-d));border-radius:8px;transition:width .3s;width:0%}
+.progress-label{font-size:13px;color:var(--muted)}
+.success-banner{display:none;background:rgba(63,174,107,.12);border:1px solid rgba(63,174,107,.35);border-radius:10px;padding:16px 20px;margin-top:16px;text-align:left}
+.success-banner h4{color:var(--leaf);font-size:15px;margin-bottom:6px}
+.success-banner p{font-size:13px;color:var(--muted)}
+.dashboard-links{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.dash-link{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 14px;font-size:13px;color:var(--blue);text-decoration:none;display:flex;align-items:center;gap:6px}
+.dash-link:hover{border-color:var(--blue)}
+.last-updated{display:inline-flex;align-items:center;gap:6px;background:rgba(63,174,107,.1);border:1px solid rgba(63,174,107,.25);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--leaf);margin-bottom:20px}
+
+/* USERS */
+.users-table{width:100%;border-collapse:collapse;font-size:14px}
+.users-table th{text-align:left;padding:10px 14px;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.8px;border-bottom:1px solid var(--line);font-weight:600}
+.users-table td{padding:12px 14px;border-bottom:1px solid var(--line)}
+.users-table tr:last-child td{border-bottom:none}
+.role-badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:11px;font-weight:700}
+.role-super{background:rgba(217,164,65,.15);color:var(--gold)}
+.role-admin{background:rgba(63,174,107,.12);color:var(--leaf)}
+.add-user-form{background:var(--panel2);border-radius:10px;padding:18px 20px;margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end}
+.add-user-form label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+.add-user-form input{width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);font-size:13px;outline:none}
+.add-user-form input:focus{border-color:var(--leaf)}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
+.setting-card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px 24px}
+.setting-card h3{font-size:15px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+
+/* HISTORY */
+.history-table{width:100%;border-collapse:collapse;font-size:13px}
+.history-table th{text-align:left;padding:8px 12px;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.7px;border-bottom:1px solid var(--line)}
+.history-table td{padding:10px 12px;border-bottom:1px solid var(--line)}
+.history-table tr:last-child td{border-bottom:none}
+.cat-badge{display:inline-block;padding:2px 8px;border-radius:6px;font-size:11px;font-weight:600;background:rgba(74,158,217,.12);color:var(--blue)}
+
+/* FILE MANAGER */
+.fm-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.fm-tab{padding:7px 16px;border-radius:8px;font-size:13px;cursor:pointer;border:1px solid var(--line);background:var(--panel2);color:var(--muted);transition:all .15s}
+.fm-tab.active{background:rgba(63,174,107,.12);border-color:rgba(63,174,107,.4);color:var(--leaf)}
+.fm-file-list{display:flex;flex-direction:column;gap:8px}
+.fm-file{display:flex;align-items:center;justify-content:space-between;background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:12px 16px}
+.fm-file-info{flex:1}
+.fm-file-name{font-size:14px;font-weight:500}
+.fm-file-meta{font-size:12px;color:var(--muted);margin-top:2px}
+.fm-actions{display:flex;gap:8px}
+
+/* TOAST */
+#toast{position:fixed;bottom:28px;right:28px;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 18px;font-size:13px;z-index:9999;opacity:0;transform:translateY(10px);transition:all .25s;max-width:320px}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.success{border-color:rgba(63,174,107,.5);color:var(--leaf)}
+#toast.error{border-color:rgba(229,72,77,.5);color:#ff7378}
+
+/* CONFIRM */
+#confirm-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:9000;align-items:center;justify-content:center}
+#confirm-modal.show{display:flex}
+.confirm-box{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:28px 30px;width:360px}
+.confirm-box h3{font-size:17px;margin-bottom:10px}
+.confirm-box p{color:var(--muted);font-size:13px;margin-bottom:22px}
+.confirm-actions{display:flex;gap:10px;justify-content:flex-end}
+
+/* DEPLOY STATUS */
+.deploy-status{background:var(--panel2);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-top:12px;font-size:13px;display:none}
+.deploy-status.show{display:block}
+.deploy-item{display:flex;align-items:center;gap:8px;padding:4px 0;color:var(--muted)}
+.deploy-item.done{color:var(--leaf)}
+.deploy-item.error{color:var(--red)}
+.deploy-item.active{color:var(--blue)}
+</style>
+</head>
+<body>
+
+<!-- ============================================================ -->
+<!-- CONFIGURATION — UPDATE THESE VALUES                         -->
+<!-- ============================================================ -->
+<script>
+const CONFIG = {
+  // GitHub Settings -- token entered in Settings tab, never stored here
+  GITHUB_TOKEN:  localStorage.getItem("lll_gh_token") || "",
+  GITHUB_OWNER:  "abhishekidhate1998",
+  GITHUB_REPO:   "lll-dashboards",
+  GITHUB_BRANCH: "main",
+
+  // Apps Script URL -- for uploading files to Drive and reading from Drive
+  // Enter this in Settings tab after deploying Apps Script
+  SCRIPT_URL: localStorage.getItem("lll_script_url") || "",
+
+  // Google Drive Folder IDs
+  DRIVE_FOLDERS: {
+    quickbooks:  "1IW0EKcj2WRKySuZIp54eY_DUKw_XeLrt",
+    distru:      "1NwIIcPV2IYhIYkv4zP-QaBonGypytKh3",
+    apex:        "1MOgKzkM6hjg-opu_npmsVK2HucKDjiNU",
+    metrc:       "1VU4sJR3Jnb9lZ1sUjGRXn43Yr10BlNu9",
+    lit_alerts:  "1T9RnEoB1nxZH91A8ZVJp8zXhhxu-b0Zq"
+  },
+
+  // Dashboard files on GitHub
+  DASHBOARDS: [
+    {file:"master_dashboard.html",         label:"Master Dashboard",  key:"master_dashboard"},
+    {file:"weekly_exec.html",              label:"Weekly Exec",       key:"weekly_exec"},
+    {file:"retail_intel.html",             label:"Retail Intel",      key:"retail_intel"},
+    {file:"weekly_refresh.html",           label:"Weekly Refresh",    key:"weekly_refresh"},
+    {file:"sales_dashboard.html",          label:"Sales Dashboard",   key:"sales_dashboard"},
+    {file:"sales_action_form.html",        label:"Action Form",       key:"sales_action_form"},
+    {file:"lit_sales_command_center.html", label:"Command Center",    key:"lit_sales_command_center"}
+  ]
+};
+</script>
+
+<!-- ============================================================ -->
+<!-- USERS — Super Admin Abhishek, default password Abhishek     -->
+<!-- ============================================================ -->
+<script>
+function loadUsers() {
+  const stored = localStorage.getItem("lll_users");
+  if (stored) return JSON.parse(stored);
+  const defaults = {
+    "Abhishek": { password: "Abhishek", role: "superadmin", created: new Date().toISOString() }
+  };
+  localStorage.setItem("lll_users", JSON.stringify(defaults));
+  return defaults;
+}
+function saveUsers(u) { localStorage.setItem("lll_users", JSON.stringify(u)); }
+
+function loadViewerPassword() {
+  return localStorage.getItem("lll_viewer_password") || "viewer123";
+}
+function saveViewerPassword(p) { localStorage.setItem("lll_viewer_password", p); }
+</script>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">🌿</div>
+    <h1>Little Leaf Labs</h1>
+    <p>Admin Panel — Enter your credentials</p>
+    <div class="error-msg" id="login-error">Incorrect username or password.</div>
+    <div class="lock-msg" id="login-lock">Too many attempts. Please wait <span id="lock-countdown">15:00</span></div>
+    <div class="field"><label>Username</label><input type="text" id="login-user" placeholder="Username"></div>
+    <div class="field"><label>Password</label><input type="password" id="login-pass" placeholder="Password"></div>
+    <button class="btn btn-primary" onclick="doLogin()">Login</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">🌿</div>
+      <div class="topbar-title">Little Leaf Labs — Admin</div>
+    </div>
+    <div class="topbar-right">
+      <div class="user-badge">Logged in as: <span id="current-user-display">—</span></div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="nav">
+    <button class="nav-btn active" onclick="showSection('upload',this)">📤 Upload Data</button>
+    <button class="nav-btn" onclick="showSection('files',this)">📁 File Manager</button>
+    <button class="nav-btn" id="users-nav-btn" onclick="showSection('users',this)">👥 Users</button>
+    <button class="nav-btn" onclick="showSection('history',this)">📋 History</button>
+    <button class="nav-btn" onclick="showSection('settings',this)">⚙️ Settings</button>
+  </div>
+
+  <div class="content">
+
+    <!-- UPLOAD SECTION -->
+    <div class="section active" id="section-upload">
+      <div id="last-updated-badge" class="last-updated" style="display:none">
+        ✅ Last updated: <span id="last-updated-time">—</span>
+      </div>
+      <div class="card">
+        <h2>Upload Source Files</h2>
+        <div class="sub">Drop files into the correct category. When ready click Process & Deploy to update all dashboards on GitHub.</div>
+        <div class="upload-grid" id="upload-grid"></div>
+      </div>
+      <div class="process-area">
+        <h3>Ready to Update Dashboards?</h3>
+        <p id="process-status-text">Upload files above then click the button to process data and deploy all dashboards to GitHub.</p>
+        <button class="btn-process" id="process-btn" onclick="processAndDeploy()" disabled>
+          🚀 Process &amp; Deploy All Dashboards
+        </button>
+        <div class="progress-wrap" id="progress-wrap">
+          <div class="progress-bar-bg"><div class="progress-bar" id="progress-bar"></div></div>
+          <div class="progress-label" id="progress-label">Starting...</div>
+        </div>
+        <div class="deploy-status" id="deploy-status"></div>
+        <div class="success-banner" id="success-banner">
+          <h4>✅ All dashboards deployed to GitHub!</h4>
+          <p id="success-time">Processed on —</p>
+          <div class="dashboard-links" id="success-dashboard-links"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FILE MANAGER -->
+    <div class="section" id="section-files">
+      <div class="card">
+        <h2>File Manager — Google Drive</h2>
+        <div class="sub">View and manage CSV files stored in your Google Drive folders.</div>
+        <div class="fm-tabs" id="fm-tabs"></div>
+        <div class="fm-file-list" id="fm-file-list">
+          <div style="color:var(--muted);font-size:13px">Select a category above to view files.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USERS SECTION -->
+    <div class="section" id="section-users">
+      <div class="card">
+        <h2>User Management</h2>
+        <div class="sub">Super Admin can add or remove admin users and manage the viewer password.</div>
+        <table class="users-table">
+          <thead><tr><th>Username</th><th>Role</th><th>Password</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="users-tbody"></tbody>
+        </table>
+        <div class="add-user-form" id="add-user-form" style="display:none">
+          <div><label>Username</label><input type="text" id="new-username" placeholder="e.g. suwarna"></div>
+          <div><label>Password</label><input type="password" id="new-password" placeholder="Default: user"></div>
+          <div><label>Role</label>
+            <select id="new-role" style="width:100%;background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;color:var(--ink);font-size:13px;outline:none">
+              <option value="admin">Admin</option>
+              <option value="superadmin">Super Admin</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="white-space:nowrap" onclick="addUser()">+ Add User</button>
+        </div>
+      </div>
+
+      <!-- VIEWER PASSWORD -->
+      <div class="card">
+        <h2>Dashboard Viewer Password</h2>
+        <div class="sub">Anyone with this password can view all dashboards. Change it to revoke access.</div>
+        <div style="display:flex;gap:12px;align-items:end;flex-wrap:wrap">
+          <div class="field" style="flex:1;margin:0">
+            <label>Current Viewer Password</label>
+            <input type="text" id="viewer-pass-display" readonly style="background:var(--panel2)">
+          </div>
+          <div class="field" style="flex:1;margin:0">
+            <label>New Viewer Password</label>
+            <input type="password" id="new-viewer-pass" placeholder="New password">
+          </div>
+          <button class="btn btn-primary btn-sm" style="white-space:nowrap;margin-bottom:0" onclick="changeViewerPassword()">Update Viewer Password</button>
+        </div>
+        <p style="font-size:12px;color:var(--muted);margin-top:12px">⚠️ After changing — redeploy dashboards so they use the new password. Click Process & Deploy to update.</p>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="section" id="section-history">
+      <div class="card">
+        <h2>Activity History</h2>
+        <div class="sub">Complete log of all uploads and deployments.</div>
+        <table class="history-table">
+          <thead><tr><th>Date & Time</th><th>User</th><th>Action</th><th>Details</th></tr></thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+        <div id="history-empty" style="text-align:center;color:var(--muted);font-size:13px;padding:30px 0;display:none">No history yet.</div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="section" id="section-settings">
+      <div class="settings-grid">
+
+        <div class="setting-card">
+          <h3>🔑 Change My Password</h3>
+          <div class="field"><label>Current Password</label><input type="password" id="cur-pass" placeholder="Current password"></div>
+          <div class="field"><label>New Password</label><input type="password" id="new-pass" placeholder="New password"></div>
+          <div class="field"><label>Confirm New Password</label><input type="password" id="conf-pass" placeholder="Confirm new password"></div>
+          <div class="error-msg" id="pass-error" style="display:none"></div>
+          <button class="btn btn-primary" style="width:100%" onclick="changePassword()">Update Password</button>
+        </div>
+
+        <div id="gh-config-card" style="display:none"><div class="setting-card">
+          <h3>🐙 GitHub Configuration</h3>
+          <div class="field"><label>GitHub Token</label>
+            <input type="password" id="gh-token-input" placeholder="PASTE_YOUR_GITHUB_TOKEN_HERE">
+          </div>
+          <div class="field"><label>GitHub Username</label>
+            <input type="text" id="gh-owner-input" placeholder="your-github-username">
+          </div>
+          <div class="field"><label>Repository Name</label>
+            <input type="text" id="gh-repo-input" value="lll-dashboards">
+          </div>
+          <button class="btn btn-primary" style="width:100%;margin-bottom:8px" onclick="saveGitHubConfig()">Save GitHub Config</button>
+          <button class="btn btn-ghost" style="width:100%" onclick="testGitHub()">Test Connection</button>
+        </div>
+
+        <div class="setting-card">
+          <h3>🔗 Dashboard Links</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Your GitHub Pages dashboard links. Share with your team.</p>
+          <div id="dashboard-links-list"></div>
+        </div></div>
+
+        <div class="setting-card">
+          <h3>🗑️ Clear Data</h3>
+          <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Clear local session data. Does not affect Google Drive or GitHub.</p>
+          <button class="btn btn-danger btn-sm" onclick="clearHistory()">Clear Upload History</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast"></div>
+<div id="confirm-modal">
+  <div class="confirm-box">
+    <h3 id="confirm-title">Are you sure?</h3>
+    <p id="confirm-msg">This action cannot be undone.</p>
+    <div class="confirm-actions">
+      <button class="btn btn-ghost" onclick="closeConfirm()">Cancel</button>
+      <button class="btn btn-danger" id="confirm-ok-btn">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+let currentUser = null;
+let failedAttempts = 0;
+let lockUntil = 0;
+let pendingFiles = {};
+let uploadHistory = JSON.parse(localStorage.getItem("lll_history") || "[]");
+
+const CATEGORIES = [
+  { key: "quickbooks", label: "QuickBooks",  icon: " ", desc: "P&L, Balance Sheet, Aging reports" },
+  { key: "distru",     label: "Distru ERP",  icon: " ", desc: "Sales orders, batches, packages" },
+  { key: "apex",       label: "Apex CRM",    icon: " ", desc: "Buyer performance, inventory, orders" },
+  { key: "metrc",      label: "Metrc",        icon: "  ", desc: "Packages, transfers, lab reports" },
+  { key: "lit_alerts", label: "Lit Alerts",   icon: " ", desc: "Brand analytics, menu snapshot" }
+];
+
+// ============================================================
+// LOGIN
+// ============================================================
+document.getElementById("login-pass").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+document.getElementById("login-user").addEventListener("keydown", e => { if(e.key==="Enter") doLogin(); });
+
+function doLogin() {
+  const now = Date.now();
+  if (now < lockUntil) { showLockMsg(); return; }
+  const username = document.getElementById("login-user").value.trim();
+  const password = document.getElementById("login-pass").value;
+  const users = loadUsers();
+  const user = users[username];
+  if (user && user.password === password) {
+    failedAttempts = 0;
+    currentUser = { username, role: user.role };
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app").style.display = "block";
+    document.getElementById("current-user-display").textContent = username;
+    if (user.role !== "superadmin") document.getElementById("users-nav-btn").style.display = "none";
+    initApp();
+  } else {
+    failedAttempts++;
+    if (failedAttempts >= 3) {
+      lockUntil = Date.now() + 15*60*1000;
+      showLockMsg();
+    } else {
+      document.getElementById("login-error").style.display = "block";
+    }
+  }
+}
+
+function showLockMsg() {
+  document.getElementById("login-error").style.display = "none";
+  document.getElementById("login-lock").style.display = "block";
+  const tick = setInterval(() => {
+    const rem = Math.max(0, lockUntil - Date.now());
+    if (rem <= 0) { clearInterval(tick); document.getElementById("login-lock").style.display = "none"; failedAttempts = 0; return; }
+    const m = Math.floor(rem/60000), s = Math.floor((rem%60000)/1000);
+    document.getElementById("lock-countdown").textContent = `${m}:${String(s).padStart(2,"0")}`;
+  }, 1000);
+}
+
+function doLogout() {
+  currentUser = null;
+  document.getElementById("app").style.display = "none";
+  document.getElementById("login-screen").style.display = "flex";
+  document.getElementById("login-user").value = "";
+  document.getElementById("login-pass").value = "";
+}
+
+// ============================================================
+// INIT
+// ============================================================
+function initApp() {
+  buildUploadGrid();
+  buildFmTabs();
+  renderUsersTable();
+  renderHistory();
+  updateLastUpdatedBadge();
+  buildDashboardLinksList();
+  // Load saved GitHub config
+  const savedToken = localStorage.getItem("lll_gh_token");
+  const savedOwner = localStorage.getItem("lll_gh_owner");
+  const savedRepo  = localStorage.getItem("lll_gh_repo");
+  if (savedToken) document.getElementById("gh-token-input").value = savedToken;
+  if (savedOwner) document.getElementById("gh-owner-input").value = savedOwner;
+  if (savedRepo)  document.getElementById("gh-repo-input").value  = savedRepo;
+  // Show viewer password
+  document.getElementById("viewer-pass-display").value = loadViewerPassword();
+  // Restore Apps Script URL
+  const savedScriptUrl = localStorage.getItem("lll_script_url");
+  if (savedScriptUrl) {
+    CONFIG.SCRIPT_URL = savedScriptUrl;
+    const display = document.getElementById("script-url-display");
+    if (display) display.textContent = savedScriptUrl.substring(0, 60) + "...";
+  }
+  const scriptInput = document.getElementById("script-url-input");
+  if (scriptInput && savedScriptUrl) scriptInput.placeholder = savedScriptUrl.substring(0, 50) + "...";
+
+  // Show GitHub config only for superadmin
+  const ghCard = document.getElementById("gh-config-card");
+  if (ghCard) ghCard.style.display = currentUser.role === "superadmin"?"block":"none";
+}
+
+function getGitHubConfig() {
+  const token = localStorage.getItem("lll_gh_token") || CONFIG.GITHUB_TOKEN;
+  const owner = localStorage.getItem("lll_gh_owner") || CONFIG.GITHUB_OWNER;
+  const repo  = localStorage.getItem("lll_gh_repo")  || CONFIG.GITHUB_REPO;
+  return { token, owner, repo, branch: CONFIG.GITHUB_BRANCH };
+}
+
+function saveGitHubConfig() {
+  const token = document.getElementById("gh-token-input").value.trim();
+  const owner = document.getElementById("gh-owner-input").value.trim();
+  const repo  = document.getElementById("gh-repo-input").value.trim();
+  if (!token || !owner || !repo) { toast("Please fill in all GitHub fields.", "error"); return; }
+  localStorage.setItem("lll_gh_token", token);
+  localStorage.setItem("lll_gh_owner", owner);
+  localStorage.setItem("lll_gh_repo",  repo);
+  buildDashboardLinksList();
+  toast("GitHub config saved!", "success");
+}
+
+
+function saveScriptUrl() {
+  const url = document.getElementById("script-url-input");
+  if (!url || !url.value.trim()) { toast("Please enter your Apps Script URL.", "error"); return; }
+  const val = url.value.trim();
+  if (!val.includes("script.google.com")) { toast("That does not look like an Apps Script URL.", "error"); return; }
+  localStorage.setItem("lll_script_url", val);
+  CONFIG.SCRIPT_URL = val;
+  const display = document.getElementById("script-url-display");
+  if (display) display.textContent = val.substring(0, 60) + "...";
+  url.value = "";
+  toast("Apps Script URL saved!", "success");
+}
+
+async function testConnection() {
+  const url = CONFIG.SCRIPT_URL;
+  if (!url) { toast("Apps Script URL not configured.", "error"); return; }
+  try {
+    const res = await fetch(url, {
+      method: "POST",
+      body: JSON.stringify({ action: "ping" })
+    });
+    const data = await res.json();
+    if (data.success) toast("Connected to Apps Script!", "success");
+    else toast("Error: " + (data.error || "unknown"), "error");
+  } catch(e) {
+    toast("Connection failed: " + e.message, "error");
+  }
+}
+
+async function testGitHub() {
+  const { token, owner, repo } = getGitHubConfig();
+  if (token.startsWith("PASTE")) { toast("GitHub token not configured.", "error"); return; }
+  try {
+    const res = await fetch(`https://api.github.com/repos/${owner}/${repo}`, {
+      headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      toast(`  Connected to ${data.full_name}`, "success");
+    } else {
+      const err = await res.json();
+      toast(`GitHub error: ${err.message}`, "error");
+    }
+  } catch(e) { toast("Connection failed: " + e.message, "error"); }
+}
+
+function buildDashboardLinksList() {
+  const { owner, repo } = getGitHubConfig();
+  const base = `https://${owner}.github.io/${repo}`;
+  const container = document.getElementById("dashboard-links-list");
+  container.innerHTML = "";
+  const allDash = [{ file: "admin.html", label: "   Admin Panel", key: "admin" }, ...CONFIG.DASHBOARDS];
+  allDash.forEach(d => {
+    const url = `${base}/${d.file}`;
+    const div = document.createElement("div");
+    div.style.marginBottom = "10px";
+    div.innerHTML = `
+      <div style="font-size:12px;color:var(--muted);margin-bottom:5px">${d.label}</div>
+      <div style="display:flex;gap:8px">
+        <input type="text" value="${url}" readonly style="flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 12px;color:var(--muted);font-size:11px;outline:none" id="link-${d.key}">
+        <button class="btn btn-ghost btn-sm" onclick="copyLink('link-${d.key}')">Copy</button>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function copyLink(inputId) {
+  const el = document.getElementById(inputId);
+  if (!el) return;
+  navigator.clipboard.writeText(el.value).then(() => toast("Link copied!", "success"));
+}
+
+// ============================================================
+// UPLOAD GRID
+// ============================================================
+function buildUploadGrid() {
+  const grid = document.getElementById("upload-grid");
+  grid.innerHTML = "";
+  CATEGORIES.forEach(cat => {
+    pendingFiles[cat.key] = pendingFiles[cat.key] || [];
+    const zone = document.createElement("div");
+    zone.className = "upload-zone";
+    zone.id = "zone-" + cat.key;
+    zone.innerHTML = `
+      <div class="upload-zone-title">
+        <span>${cat.icon}</span> ${cat.label}
+        <span id="zone-count-${cat.key}" style="margin-left:auto;font-size:11px;color:var(--leaf);font-weight:700;display:none"></span>
+      </div>
+      <div class="upload-zone-sub">${cat.desc}</div>
+      <div style="display:flex;align-items:center;gap:10px">
+        <button class="btn btn-ghost btn-sm" style="pointer-events:none">+ Add Files</button>
+        <span style="font-size:12px;color:var(--muted)">or drag & drop</span>
+      </div>
+      <input type="file" multiple accept=".csv,.xlsx,.xls,.pdf"
+        onchange="filesSelected('${cat.key}', this.files)">
+      <div class="file-list" id="file-list-${cat.key}"></div>`;
+    grid.appendChild(zone);
+  });
+}
+
+function filesSelected(category, files) {
+  Array.from(files).forEach(file => {
+    if (!pendingFiles[category].find(f => f.file.name === file.name)) {
+      pendingFiles[category].push({ file, status: "pending", content: null });
+    }
+  });
+  renderFileList(category);
+  updateProcessBtn();
+}
+
+function renderFileList(category) {
+  const list = document.getElementById("file-list-" + category);
+  const files = pendingFiles[category] || [];
+  list.innerHTML = "";
+  const zone = document.getElementById("zone-" + category);
+  const counter = document.getElementById("zone-count-" + category);
+  if (files.length > 0) { zone.classList.add("has-files"); counter.style.display="inline"; counter.textContent=files.length+" file"+(files.length>1 "s":""); }
+  else { zone.classList.remove("has-files"); counter.style.display="none"; }
+  files.forEach((f, i) => {
+    const statusLabels = { pending:"Pending", uploading:"Uploading...", done:"  Ready", error:"Error" };
+    const statusClass  = { pending:"status-pending", uploading:"status-uploading", done:"status-done", error:"status-error" };
+    const item = document.createElement("div");
+    item.className = "file-item";
+    item.innerHTML = `
+      <span class="file-item-name" title="${f.file.name}">${f.file.name}</span>
+      <span class="file-item-status ${statusClass[f.status]}" id="fstatus-${category}-${i}">${statusLabels[f.status]}</span>
+      <button class="remove-file" onclick="removeFile('${category}',${i})"> </button>`;
+    list.appendChild(item);
+  });
+}
+
+function removeFile(category, index) {
+  pendingFiles[category].splice(index, 1);
+  renderFileList(category);
+  updateProcessBtn();
+}
+
+function updateProcessBtn() {
+  const total = Object.values(pendingFiles).reduce((s,arr) => s+arr.length, 0);
+  const btn = document.getElementById("process-btn");
+  const txt = document.getElementById("process-status-text");
+  btn.disabled = total === 0;
+  txt.textContent = total > 0
+      `${total} file(s) ready. Click below to process and deploy all dashboards.`
+    : "Upload files above then click the button to process data and deploy all dashboards to GitHub.";
+}
+
+// ============================================================
+// READ FILE AS TEXT
+// ============================================================
+function readFileText(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = e => resolve(e.target.result);
+    reader.onerror = () => resolve("");
+    reader.readAsText(file);
+  });
+}
+
+// ============================================================
+// UPLOAD FILE TO GOOGLE DRIVE (public folders)
+// ============================================================
+async function uploadFileToDrive(category, fileObj) {
+  fileObj.status = "uploading";
+  renderFileList(category);
+  try {
+    // Read file content for processing
+    fileObj.content = await readFileText(fileObj.file);
+    fileObj.status = "done";
+    logHistory(currentUser.username, "File Ready", `${fileObj.file.name} (${category})`);
+  } catch(e) {
+    fileObj.status = "error";
+  }
+  renderFileList(category);
+  return fileObj.status === "done";
+}
+
+// ============================================================
+// DEPLOY FILE TO GITHUB
+// ============================================================
+async function deployToGitHub(fileName, content) {
+  const { token, owner, repo, branch } = getGitHubConfig();
+  if (token.startsWith("PASTE")) throw new Error("GitHub token not configured");
+
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${fileName}`;
+  const headers = {
+    Authorization: `token ${token}`,
+    Accept: "application/vnd.github.v3+json",
+    "Content-Type": "application/json"
+  };
+
+  // Check if file exists to get its SHA (needed for update)
+  let sha = null;
+  try {
+    const check = await fetch(apiUrl, { headers });
+    if (check.ok) {
+      const existing = await check.json();
+      sha = existing.sha;
+    }
+  } catch(e) {}
+
+  // Encode content to base64
+  const encoded = btoa(unescape(encodeURIComponent(content)));
+
+  const body = {
+    message: `Update ${fileName} - ${new Date().toLocaleString()}`,
+    content: encoded,
+    branch: branch
+  };
+  if (sha) body.sha = sha;
+
+  const res = await fetch(apiUrl, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify(body)
+  });
+
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.message || `GitHub API error: ${res.status}`);
+  }
+  return await res.json();
+}
+
+// ============================================================
+// PROCESS AND DEPLOY
+// ============================================================
+
+async function processAndDeploy() {
+  const btn = document.getElementById("proc-btn");
+  btn.disabled = true;
+  document.getElementById("prog-wrap").style.display    = "block";
+  document.getElementById("success-wrap").style.display = "none";
+  document.getElementById("prog-steps").innerHTML       = "";
+
+  function step(t,c){
+    const d=document.createElement("div");
+    d.className="ps "+(c||"active");
+    d.textContent=(c==="done"?"OK  ":c==="fail"?"FAIL":"... ")+" "+t;
+    document.getElementById("prog-steps").appendChild(d);
+    return d;
+  }
+  function upd(el,t,c){el.className="ps "+c;el.textContent=(c==="done"?"OK  ":c==="fail"?"FAIL":"... ")+" "+t;}
+
+  // Step 1: Read Drive files
+  setProgress(5,"Reading CSV files from Drive...");
+  const s1=step("Reading CSV files from Google Drive...");
+  let files={};
+  try{
+    const r=await api({action:"readAllFiles"});
+    if(!r.success) throw new Error(r.error||"Failed to read files");
+    files=r.files||{};
+    if(!r.totalFiles) throw new Error("No CSV files found. Upload files to Google Drive first.");
+    upd(s1,"Read "+r.totalFiles+" files from "+Object.keys(files).length+" folders","done");
+  }catch(e){upd(s1,e.message,"fail");toast(e.message,"err");btn.disabled=false;return;}
+
+  // Step 2: Process data
+  setProgress(20,"Processing data...");
+  const s2=step("Processing all data sources...");
+  let qb={},apex={},distru={},metrc={},lit={};
+  const warns=[];
+  try{qb    =await readQBData(files);   }catch(e){warns.push("QuickBooks: "+e.message);}
+  try{apex  =await readApexData(files); }catch(e){warns.push("Apex: "+e.message);}
+  try{distru=await readDistruData(files);}catch(e){warns.push("Distru: "+e.message);}
+  try{metrc =await readMetrcData(files);}catch(e){warns.push("Metrc: "+e.message);}
+  try{lit   =await readLitData(files);  }catch(e){warns.push("Lit: "+e.message);}
+  if(warns.length){upd(s2,"Processed with "+warns.length+" warnings","done");warns.forEach(w=>toast(w,"err"));}
+  else upd(s2,"All data sources processed","done");
+
+  const now=new Date();
+  const timeStr=now.toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
+
+  // Step 3: Fetch portal template from GitHub
+  setProgress(40,"Fetching portal template...");
+  const s3=step("Fetching portal.html from GitHub...");
+  let portalHtml;
+  try{
+    const url="https://raw.githubusercontent.com/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/main/portal.html?t="+Date.now();
+    const res=await fetch(url);
+    if(!res.ok) throw new Error("HTTP "+res.status+" — upload portal.html to GitHub first");
+    portalHtml=await res.text();
+    if(portalHtml.length<50000) throw new Error("portal.html too small ("+Math.round(portalHtml.length/1024)+"KB). Upload the full portal.html to GitHub first.");
+    upd(s3,"Fetched portal.html ("+Math.round(portalHtml.length/1024)+"KB)","done");
+  }catch(e){upd(s3,e.message,"fail");toast(e.message,"err");btn.disabled=false;return;}
+
+  // Step 4: Inject data into portal
+  setProgress(60,"Injecting data into portal...");
+  const s4=step("Injecting all data into portal...");
+  try{
+    portalHtml=buildMasterDashboard(portalHtml,qb,apex,distru,metrc,lit,timeStr);
+    portalHtml=buildWeeklyExec(portalHtml,qb,apex,metrc,lit,timeStr);
+    portalHtml=buildRetailIntel(portalHtml,apex,lit,timeStr);
+    portalHtml=buildWeeklyRefresh(portalHtml,qb,apex,metrc,timeStr);
+    portalHtml=buildSalesDashboard(portalHtml,lit,timeStr);
+    portalHtml=buildSalesActionForm(portalHtml,apex,timeStr);
+    portalHtml=buildLitCommandCenter(portalHtml,lit,apex,timeStr);
+    upd(s4,"Data injected — portal is "+Math.round(portalHtml.length/1024)+"KB","done");
+  }catch(e){upd(s4,"Inject failed: "+e.message,"fail");toast(e.message,"err");btn.disabled=false;return;}
+
+  // Step 5: Deploy portal.html
+  setProgress(80,"Deploying portal.html...");
+  const s5=step("Deploying portal.html to GitHub...");
+  try{
+    const r=await api({action:"deployDashboards",set:1,dashboardContent:{"portal.html":portalHtml},lastUpdated:now.toISOString()});
+    if(r.failed&&r.failed.length) throw new Error(r.failed.join(", "));
+    upd(s5,"portal.html deployed","done");
+  }catch(e){upd(s5,"Deploy failed: "+e.message,"fail");toast(e.message,"err");btn.disabled=false;return;}
+
+  setProgress(100,"Complete!");
+  document.getElementById("success-wrap").style.display="block";
+  document.getElementById("success-time").textContent="Deployed: "+timeStr+" | Live in 1-2 minutes";
+  document.getElementById("upd-time").textContent=timeStr;
+  document.getElementById("upd-badge").style.display="flex";
+
+  const lDiv=document.getElementById("success-links");
+  lDiv.innerHTML="";
+  const a=document.createElement("a");
+  a.className="dl-a";
+  a.href="https://"+GITHUB_OWNER+".github.io/"+GITHUB_REPO+"/portal.html";
+  a.target="_blank";a.textContent="Open Portal ->";
+  lDiv.appendChild(a);
+
+  btn.disabled=false;
+  toast("Portal deployed!","ok");
+}
+
+function setProgress(pct, label) {
+  const bar = document.getElementById("prog-bar");
+  const lbl = document.getElementById("prog-label");
+  if (bar) bar.style.width = pct + "%";
+  if (lbl) lbl.textContent = label;
+}
+
+function readFileAsBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = e => resolve(e.target.result.split(",")[1]);
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
+function readFileText(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = e => resolve(e.target.result);
+    reader.onerror = () => reject(new Error("Failed to read file"));
+    reader.readAsText(file);
+  });
+}
+
+function setProgress(pct, label) {
+  document.getElementById("progress-bar").style.width = pct + "%";
+  document.getElementById("progress-label").textContent = label;
+}
+
+function addDeployStatus(key, cls, text) {
+  const div = document.getElementById("deploy-status");
+  const item = document.createElement("div");
+  item.className = `deploy-item ${cls}`;
+  item.id = `deploy-${key}`;
+  item.textContent = text;
+  div.appendChild(item);
+}
+
+function updateDeployStatus(key, cls, text) {
+  const item = document.getElementById(`deploy-${key}`);
+  if (item) { item.className = `deploy-item ${cls}`; item.textContent = text; }
+}
+
+// ============================================================
+// FETCH DASHBOARD FROM GITHUB
+// ============================================================
+async function fetchDashboardFromGitHub(fileName) {
+  const { token, owner, repo, branch } = getGitHubConfig();
+  try {
+    const res = await fetch(
+      `https://api.github.com/repos/${owner}/${repo}/contents/${fileName} ref=${branch}`,
+      { headers: { Authorization: `token ${token}`, Accept: "application/vnd.github.v3+json" } }
+    );
+    if (res.ok) {
+      const data = await res.json();
+      return decodeURIComponent(escape(atob(data.content.replace(/\n/g, ""))));
+    }
+  } catch(e) {}
+  // Fallback: return stored HTML
+  return storedDashboards[fileName] || "";
+}
+
+// Store dashboard HTML in memory for processing
+const storedDashboards = {};
+
+// ============================================================
+// VIEWER PASSWORD PROTECTION
+// Wraps dashboard HTML with password screen
+// ============================================================
+function addViewerPasswordProtection(html, password) {
+  // Remove existing password protection if any
+  html = html.replace(/<!-- VIEWER_PASSWORD_START -->[\s\S]* <!-- VIEWER_PASSWORD_END -->/g, "");
+
+  const passwordScript = `<!-- VIEWER_PASSWORD_START -->
+<scr`+`ipt>
+(function(){
+  var PASS = "${password}";
+  var KEY  = "lll_viewer_auth";
+  var EXPIRY_DAYS = 30;
+  function checkAuth(){
+    var stored = localStorage.getItem(KEY);
+    if(!stored) return false;
+    var data = JSON.parse(stored);
+    if(Date.now() > data.expiry){ localStorage.removeItem(KEY); return false; }
+    return data.password === PASS;
+  }
+  function showPasswordScreen(){
+    var overlay = document.createElement("div");
+    overlay.id = "lll-auth-overlay";
+    overlay.style.cssText = "position:fixed;inset:0;background:#0e1414;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,sans-serif";
+    overlay.innerHTML = '<div style="background:#16201f;border:1px solid #283533;border-radius:18px;padding:40px 36px;width:340px;text-align:center">'
+      + '<div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#3fae6b,#2c7d4c);display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 18px"> </div>'
+      + '<h2 style="color:#e8efe9;font-size:20px;margin-bottom:6px">Little Leaf Labs</h2>'
+      + '<p style="color:#92a39c;font-size:13px;margin-bottom:28px">Enter password to view dashboard</p>'
+      + '<input id="lll-pass-input" type="password" placeholder="Password" style="width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:11px 14px;color:#e8efe9;font-size:14px;outline:none;margin-bottom:16px;box-sizing:border-box">'
+      + '<div id="lll-pass-error" style="color:#ff7378;font-size:13px;margin-bottom:12px;display:none">Incorrect password</div>'
+      + '<button onclick="lllCheckPass()" style="width:100%;background:#3fae6b;color:#0e1414;padding:11px;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;border:none">Enter</button>'
+      + '</div>';
+    document.body.appendChild(overlay);
+    document.getElementById("lll-pass-input").addEventListener("keydown", function(e){ if(e.key==="Enter") lllCheckPass(); });
+    setTimeout(function(){ document.getElementById("lll-pass-input").focus(); }, 100);
+  }
+  window.lllCheckPass = function(){
+    var input = document.getElementById("lll-pass-input").value;
+    if(input === PASS){
+      var expiry = Date.now() + EXPIRY_DAYS * 24 * 60 * 60 * 1000;
+      localStorage.setItem(KEY, JSON.stringify({ password: PASS, expiry: expiry }));
+      document.getElementById("lll-auth-overlay").remove();
+    } else {
+      document.getElementById("lll-pass-error").style.display = "block";
+      document.getElementById("lll-pass-input").value = "";
+      document.getElementById("lll-pass-input").focus();
+    }
+  };
+  if(!checkAuth()) {
+    if(document.readyState === "loading"){
+      document.addEventListener("DOMContentLoaded", showPasswordScreen);
+    } else {
+      showPasswordScreen();
+    }
+  }
+})();
+<" + "/script>
+<!-- VIEWER_PASSWORD_END -->`;
+
+  // Inject right after <head> or at start of body
+  if (html.includes("<head>")) {
+    html = html.replace("<head>", "<head>" + passwordScript);
+  } else if (html.includes("<body>")) {
+    html = html.replace("<body>", "<body>" + passwordScript);
+  } else {
+    html = passwordScript + html;
+  }
+  return html;
+}
+
+// ============================================================
+// VIEWER PASSWORD MANAGEMENT
+// ============================================================
+function changeViewerPassword() {
+  const newPass = document.getElementById("new-viewer-pass").value.trim();
+  if (!newPass || newPass.length < 4) { toast("Password must be at least 4 characters.", "error"); return; }
+  saveViewerPassword(newPass);
+  document.getElementById("viewer-pass-display").value = newPass;
+  document.getElementById("new-viewer-pass").value = "";
+  toast("Viewer password updated! Click Process & Deploy to apply to all dashboards.", "success");
+}
+
+// ============================================================
+// FILE MANAGER -- reads from Google Drive public folders
+// ============================================================
+function buildFmTabs() {
+  const tabs = document.getElementById("fm-tabs");
+  if (!tabs) return;
+  tabs.innerHTML = "";
+  const cats = [
+    { key: "quickbooks", label: "QuickBooks",  icon: "" },
+    { key: "distru",     label: "Distru",       icon: "" },
+    { key: "apex",       label: "Apex CRM",     icon: "" },
+    { key: "metrc",      label: "Metrc",         icon: "" },
+    { key: "lit_alerts", label: "Lit Alerts",   icon: "" }
+  ];
+  cats.forEach((cat, i) => {
+    const btn = document.createElement("button");
+    btn.className = "fm-tab" + (i === 0?" active":"");
+    btn.textContent = cat.label;
+    btn.onclick = () => {
+      document.querySelectorAll(".fm-tab").forEach(t => t.classList.remove("active"));
+      btn.classList.add("active");
+      loadDriveFiles(cat.key);
+    };
+    tabs.appendChild(btn);
+  });
+  loadDriveFiles("quickbooks");
+}
+
+async function loadDriveFiles(category) {
+  const list = document.getElementById("fm-list");
+  list.innerHTML = "<p style='color:var(--muted);font-size:13px'>Loading from Google Drive...</p>";
+
+  const scriptUrl = CONFIG.SCRIPT_URL;
+  if (!scriptUrl) {
+    list.innerHTML = "<p style='color:var(--muted);font-size:13px'>Apps Script URL not configured. Go to Settings tab.</p>";
+    return;
+  }
+
+  try {
+    const res = await fetch(scriptUrl, {
+      method: "POST",
+      body: JSON.stringify({ action: "listFiles", category: category })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+
+    if (!data.files || data.files.length === 0) {
+      list.innerHTML = "<p style='color:var(--muted);font-size:13px'>No files in this folder yet.</p>";
+      return;
+    }
+
+    list.innerHTML = "";
+    data.files.forEach(f => {
+      const div = document.createElement("div");
+      div.className = "fm-file";
+      const kb = Math.round(f.size / 1024);
+      const date = new Date(f.modified).toLocaleDateString();
+      div.innerHTML = `
+        <div class="fm-file-info">
+          <div class="fm-file-name">${f.name}</div>
+          <div class="fm-file-meta">${kb}KB &nbsp; &nbsp; Modified: ${date}</div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-danger btn-sm" onclick="deleteDriveFile('${f.id}','${f.name}','${category}')">Delete</button>
+        </div>`;
+      list.appendChild(div);
+    });
+  } catch(e) {
+    list.innerHTML = "<p style='color:var(--red);font-size:13px'>Error: " + e.message + "</p>";
+  }
+}
+
+async function deleteDriveFile(fileId, fileName, category) {
+  showConfirm("Delete File", "Delete " + fileName + " from Google Drive ", async () => {
+    const scriptUrl = CONFIG.SCRIPT_URL;
+    if (!scriptUrl) { toast("Apps Script URL not configured.", "error"); return; }
+    try {
+      const res = await fetch(scriptUrl, {
+        method: "POST",
+        body: JSON.stringify({ action: "deleteFile", fileId: fileId })
+      });
+      const data = await res.json();
+      if (data.success) {
+        toast(fileName + " deleted from Drive.", "success");
+        logHistory(currentUser.username, "Delete", fileName + " from " + category);
+        loadDriveFiles(category);
+      } else {
+        toast("Delete failed: " + data.error, "error");
+      }
+    } catch(e) {
+      toast("Error: " + e.message, "error");
+    }
+  });
+}
+
+// ============================================================
+// USER MANAGEMENT
+// ============================================================
+function renderUsersTable() {
+  const users = loadUsers();
+  const tbody = document.getElementById("users-tbody");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  const isSuperAdmin = currentUser && currentUser.role === "superadmin";
+
+  Object.entries(users).forEach(([username, u]) => {
+    const isSelf = username === currentUser.username;
+    const canDelete = isSuperAdmin && !isSelf;
+    const tr = document.createElement("tr");
+
+    // Password cell - show for superadmin, hidden for others
+    const passCell = isSuperAdmin
+        `<td>
+          <span class="pass-hidden" id="pass-${username}" style="font-family:monospace;font-size:13px">********</span>
+          <button class="btn btn-ghost btn-sm" style="padding:3px 8px;margin-left:6px;font-size:11px"
+            onclick="togglePass('${username}','${u.password}')">Show</button>
+         </td>`
+      : `<td style="color:var(--muted);font-size:13px">********</td>`;
+
+    tr.innerHTML = `
+      <td style="font-weight:500">${username} ${isSelf   '<span style="color:var(--muted);font-size:11px">(you)</span>' : ""}</td>
+      <td><span class="role-badge ${u.role === "superadmin"?"role-super":"role-admin"}">${u.role === "superadmin"?"Super Admin":"Admin"}</span></td>
+      ${passCell}
+      <td style="color:var(--muted);font-size:12px">${u.created?new Date(u.created).toLocaleDateString() : "-"}</td>
+      <td>${canDelete   `<button class="btn btn-danger btn-sm" onclick="removeUser('${username}')">Remove</button>` : "-"}</td>`;
+    tbody.appendChild(tr);
+  });
+
+  // Show/hide add user form for superadmin only
+  const addForm = document.getElementById("add-user-form");
+  if (addForm) addForm.style.display = isSuperAdmin?"grid":"none";
+}
+
+function togglePass(username, password) {
+  const el = document.getElementById("pass-" + username);
+  if (!el) return;
+  const btn = el.nextElementSibling;
+  if (el.textContent === "********") {
+    el.textContent = password;
+    if (btn) btn.textContent = "Hide";
+  } else {
+    el.textContent = "********";
+    if (btn) btn.textContent = "Show";
+  }
+}
+
+function addUser() {
+  if (currentUser.role !== "superadmin") { toast("Only Super Admin can add users.", "error"); return; }
+  const username = document.getElementById("new-username").value.trim();
+  const password = document.getElementById("new-password").value || "user";
+  const role = document.getElementById("new-role").value;
+  if (!username) { toast("Username required.", "error"); return; }
+  const users = loadUsers();
+  if (users[username]) { toast("Username already exists.", "error"); return; }
+  users[username] = { password, role, created: new Date().toISOString() };
+  saveUsers(users);
+  document.getElementById("new-username").value = "";
+  document.getElementById("new-password").value = "";
+  renderUsersTable();
+  logHistory(currentUser.username, "User Added", `${username} (${role})`);
+  toast(`User ${username} added.`, "success");
+}
+
+function removeUser(username) {
+  showConfirm("Remove User", `Remove "${username}"  They will lose access immediately.`, () => {
+    const users = loadUsers();
+    delete users[username];
+    saveUsers(users);
+    renderUsersTable();
+    logHistory(currentUser.username, "User Removed", username);
+    toast("User removed.", "success");
+  });
+}
+
+// ============================================================
+// SETTINGS
+// ============================================================
+function changePassword() {
+  const cur = document.getElementById("cur-pass").value;
+  const nw  = document.getElementById("new-pass").value;
+  const cf  = document.getElementById("conf-pass").value;
+  const err = document.getElementById("pass-error");
+  err.style.display = "none";
+  const users = loadUsers();
+  const user = users[currentUser.username];
+  if (!user || user.password !== cur) { err.textContent = "Current password incorrect."; err.style.display = "block"; return; }
+  if (!nw || nw.length < 4) { err.textContent = "New password must be at least 4 characters."; err.style.display = "block"; return; }
+  if (nw !== cf) { err.textContent = "Passwords do not match."; err.style.display = "block"; return; }
+  users[currentUser.username].password = nw;
+  saveUsers(users);
+  document.getElementById("cur-pass").value = "";
+  document.getElementById("new-pass").value = "";
+  document.getElementById("conf-pass").value = "";
+  toast("Password updated!", "success");
+}
+
+function clearHistory() {
+  showConfirm("Clear History", "Clear all activity history ", () => {
+    uploadHistory = [];
+    localStorage.setItem("lll_history", "[]");
+    renderHistory();
+    toast("History cleared.", "success");
+  });
+}
+
+// ============================================================
+// HISTORY
+// ============================================================
+function logHistory(user, action, details) {
+  uploadHistory.unshift({ time: new Date().toISOString(), user, action, details });
+  if (uploadHistory.length > 200) uploadHistory = uploadHistory.slice(0, 200);
+  localStorage.setItem("lll_history", JSON.stringify(uploadHistory));
+}
+
+function renderHistory() {
+  const tbody = document.getElementById("history-tbody");
+  const empty = document.getElementById("history-empty");
+  tbody.innerHTML = "";
+  if (!uploadHistory.length) { empty.style.display = "block"; return; }
+  empty.style.display = "none";
+  uploadHistory.slice(0, 50).forEach(h => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td style="color:var(--muted);font-size:12px;white-space:nowrap">${new Date(h.time).toLocaleString()}</td>
+      <td style="font-weight:500">${h.user}</td>
+      <td><span class="cat-badge">${h.action}</span></td>
+      <td style="color:var(--muted);font-size:13px">${h.details}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateLastUpdatedBadge() {
+  const t = localStorage.getItem("lll_last_updated");
+  const badge = document.getElementById("last-updated-badge");
+  if (t) { document.getElementById("last-updated-time").textContent = t; badge.style.display = "inline-flex"; }
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(name, btn) {
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(b => b.classList.remove("active"));
+  document.getElementById("section-" + name).classList.add("active");
+  btn.classList.add("active");
+  if (name === "files") buildFmTabs();
+  if (name === "users") renderUsersTable();
+  if (name === "history") renderHistory();
+  if (name === "settings") buildDashboardLinksList();
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function toast(msg, type="success") {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.className = "show " + type;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ""; }, 4000);
+}
+
+// ============================================================
+// CONFIRM MODAL
+// ============================================================
+let confirmCallback = null;
+function showConfirm(title, msg, cb) {
+  document.getElementById("confirm-title").textContent = title;
+  document.getElementById("confirm-msg").textContent = msg;
+  document.getElementById("confirm-modal").classList.add("show");
+  confirmCallback = cb;
+}
+function closeConfirm() { document.getElementById("confirm-modal").classList.remove("show"); confirmCallback = null; }
+document.getElementById("confirm-ok-btn").onclick = () => { closeConfirm(); if(confirmCallback) confirmCallback(); };
+
+// ============================================================
+// getDashHTML helper -- returns stored or empty HTML
+// ============================================================
+function getDashHTML(fileName) {
+  return storedDashboards[fileName] || "<!DOCTYPE html><html><head></head><body></body></html>";
+}
+</script>
+
+<!-- PROCESSOR SCRIPT — all data processing functions -->
+<script>
+// ---- UTILITIES ----
+function num(s){ if(!s)return 0; return parseFloat(String(s).replace(/[$,%]/g,"").replace(/,/g,"").trim())||0; }
+function fmt(n,d=0){ return Number(n).toLocaleString("en-US",{minimumFractionDigits:d,maximumFractionDigits:d}); }
+function fmtM(n){ return "$"+(n/1e6).toFixed(2)+"M"; }
+function fmtK(n){ return "$"+Math.round(n/1000)+"K"; }
+function fmtD(n){ return "$"+fmt(Math.round(n)); }
+
+// ---- CSV PARSER ----
+function parseCSV(text) {
+  const lines = text.trim().split(/\r \n/);
+  if (!lines.length) return [];
+  const headers = lines[0].split(",").map(h => h.replace(/^"|"$/g,"").trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = smartSplit(lines[i]);
+    if (vals.length < 2) continue;
+    const obj = {};
+    headers.forEach((h,j) => { obj[h] = (vals[j]||"").replace(/^"|"$/g,"").trim(); });
+    rows.push(obj);
+  }
+  return rows;
+}
+
+function smartSplit(line) {
+  const result = []; let cur = "", inQ = false;
+  for (let i = 0; i < line.length; i++) {
+    const c = line[i];
+    if (c==='"') { inQ=!inQ; }
+    else if (c===","&&!inQ) { result.push(cur); cur=""; }
+    else { cur+=c; }
+  }
+  result.push(cur);
+  return result;
+}
+
+// ---- INJECT VARIABLE ----
+function injectVar(html, varPattern, newValue) {
+  const re = new RegExp(varPattern + "\\s*=\\s*([\\[\\{])");
+  const match = re.exec(html);
+  if (!match) return { html, success: false };
+  const startPos = match.index + match[0].length - 1;
+  const openChar = match[1], closeChar = openChar==="[" "]":"}";
+  let depth=0, endPos=startPos;
+  for (let i=startPos; i<html.length; i++) {
+    if (html[i]===openChar) depth++;
+    else if (html[i]===closeChar) { depth--; if(depth===0){ endPos=i+1; break; } }
+  }
+  return { html: html.slice(0,startPos)+newValue+html.slice(endPos), success:true };
+}
+
+function injectLastUpdated(html, timeStr) {
+  const banner = `<!-- LAST_UPDATED_START --><div class="last-updated-banner" id="last-updated-banner" style="display:flex">  Last updated: <span id="last-updated-ts">${timeStr}</span></div><!-- LAST_UPDATED_END -->`;
+  if (html.includes("LAST_UPDATED_START")) {
+    return html.replace(/<!-- LAST_UPDATED_START -->[\s\S]* <!-- LAST_UPDATED_END -->/, banner);
+  }
+  return html.replace("<body>", "<body>" + banner);
+}
+
+// ---- FILE FINDER ----
+function findFile(files, category, keywords) {
+  const catFiles = files[category] || [];
+  for (const kw of keywords) {
+    const found = catFiles.find(f => f.name.toLowerCase().replace(/[^a-z0-9]/g,"").includes(kw.replace(/[^a-z0-9]/g,"")));
+    if (found) return found;
+  }
+  return catFiles[0] || null;
+}
+
+// ---- DATA READERS ----
+async function readQBData(files) {
+  const qb = { rev:0, gp:0, cogs:0, net:0, gp_pct:0, cash:0, ar:0, ap:0 };
+  const plFile = findFile(files, "quickbooks", ["profit","loss","p&l","pl"]);
+  if (plFile) {
+    const rows = parseCSV(plFile.content);
+    for (const r of rows) {
+      const k = (r[Object.keys(r)[0]]||"").toLowerCase().trim();
+      const v = Math.abs(num(r[Object.keys(r)[Object.keys(r).length-1]]));
+      if (k==="total for income") qb.rev=v;
+      else if (k==="gross profit") qb.gp=v;
+      else if (k==="total for cost of goods sold") qb.cogs=v;
+      else if (k==="net income") qb.net=v;
+    }
+    qb.gp_pct = qb.rev?Math.round(100*qb.gp/qb.rev) : 0;
+  }
+  const bsFile = findFile(files, "quickbooks", ["balance","sheet","bs"]);
+  if (bsFile) {
+    const rows = parseCSV(bsFile.content);
+    for (const r of rows) {
+      const k = (r[Object.keys(r)[0]]||"").toLowerCase().trim();
+      const v = Math.abs(num(r[Object.keys(r)[Object.keys(r).length-1]]));
+      if (k==="total for bank accounts") qb.cash=v;
+      else if (k.includes("accounts receivable")&&!qb.ar) qb.ar=v;
+      else if (k.includes("accounts payable")&&!qb.ap) qb.ap=v;
+    }
+  }
+  return qb;
+}
+
+async function readApexData(files) {
+  const apex = { buyers:[], products:[], inventory:[], contacts:[], total_units:0, total_val:0, lapsed:[], contactIndex:{}, skuTable:[] };
+  const buyerFile = findFile(files, "apex", ["buyer_perf","buyer performance","buyer_performance"]);
+  if (buyerFile) apex.buyers = parseCSV(buyerFile.content);
+  const prodFile = findFile(files, "apex", ["product_perf","product performance","product_performance"]);
+  if (prodFile) apex.products = parseCSV(prodFile.content);
+  const invFile = findFile(files, "apex", ["inventory_report","inventory report"]);
+  if (invFile) apex.inventory = parseCSV(invFile.content);
+  const contactFile = findFile(files, "apex", ["buyer contact","contact export","contact_export"]);
+  if (contactFile) apex.contacts = parseCSV(contactFile.content);
+
+  apex.total_units = apex.inventory.reduce((s,r) => s+num(r["Product Total Quantity"]||0),0);
+  apex.total_val   = apex.inventory.reduce((s,r) => s+num(r["Product Total Value"]||0),0);
+  apex.lapsed = apex.buyers.filter(b=>num(b["Days Since Last Order"]||0)>=45&&num(b["Total Value of Orders"]||0)>0)
+    .map(b=>({name:(b["Buyer"]||"").trim(),days:Math.round(num(b["Days Since Last Order"]||0)),rev:num(b["Total Value of Orders"]||0),aov:num(b["Average Order Size"]||0)}))
+    .sort((a,b)=>b.rev-a.rev);
+  for (const c of apex.contacts) {
+    const key=(c["buyer name (location)"]||c["Buyer"]||"").toLowerCase().replace(/[^a-z0-9]/g,"");
+    if (key&&!apex.contactIndex[key]) apex.contactIndex[key]={contact:c["contact_name"]||"",email:c["email"]||"",phone:c["primary_phone"]||""};
+  }
+  const invByName={};
+  for (const r of apex.inventory) { const n=(r["Product Name"]||"").trim(); if(n) invByName[n]=num(r["Product Total Quantity"]||0); }
+  for (const p of apex.products) {
+    const name=(p["Name"]||"").trim();
+    const qtyInRange=num(p["Quantity In Range"]||0);
+    const weeklyVel=Math.round((qtyInRange/12)*10)/10;
+    let onHand=invByName[name]||0;
+    if (!onHand) for(const[iname,qty]of Object.entries(invByName)){if(name.slice(0,20).toLowerCase().includes(iname.slice(0,20).toLowerCase())||iname.slice(0,20).toLowerCase().includes(name.slice(0,20).toLowerCase())){onHand=qty;break;}}
+    const weeksLeft=weeklyVel>0 Math.round((onHand/weeklyVel)*10)/10:99;
+    let status="OK";
+    if(weeksLeft<=1)status="CRITICAL"; else if(weeksLeft<=2)status="CRITICAL"; else if(weeksLeft<=3)status="RED"; else if(weeksLeft<=4)status="ORANGE";
+    if(weeksLeft<=4&&weeklyVel>0) apex.skuTable.push({name,on_hand:Math.round(onHand),weekly_vel:weeklyVel,weeks_left:weeksLeft,status});
+  }
+  apex.skuTable.sort((a,b)=>a.weeks_left-b.weeks_left);
+  return apex;
+}
+
+async function readDistruData(files) {
+  const distru={orders:[],monthly:{},total_orders:0};
+  const orderFile=findFile(files,"distru",["sales-orders","sales_orders","distru-sales"]);
+  if(orderFile){
+    distru.orders=parseCSV(orderFile.content).filter(r=>["Completed","Delivered","Paid"].includes(r["Status"]||""));
+    for(const row of distru.orders){
+      const d=(row["Order Date"]||"").slice(0,7);
+      if(!d)continue;
+      if(!distru.monthly[d])distru.monthly[d]={rev:0,orders:0};
+      distru.monthly[d].rev+=num(row["Total ($)"]||0);
+      distru.monthly[d].orders++;
+    }
+  }
+  distru.total_orders=distru.orders.length;
+  return distru;
+}
+
+async function readMetrcData(files) {
+  const metrc={packages:[],labStatus:{},locations:{},prod_stages:{}};
+  const pkgFile=findFile(files,"metrc",["packages","inventory","packagesinventory"]);
+  if(pkgFile){
+    metrc.packages=parseCSV(pkgFile.content);
+    for(const p of metrc.packages){
+      const lab=(p["Lab Testing"]||"").trim(),loc=(p["Location"]||"").trim();
+      metrc.labStatus[lab]=(metrc.labStatus[lab]||0)+1;
+      metrc.locations[loc]=(metrc.locations[loc]||0)+1;
+    }
+  }
+  metrc.prod_stages={
+    newly_received:(metrc.locations["DISTRU NEWLY RECEIVED"]||0)+(metrc.locations["NEWLY RECEIVED"]||0),
+    in_testing:metrc.locations["DISTRU IN TESTING"]||0,
+    stability:metrc.locations["DISTRU STABILITY TESTING"]||0,
+    awaiting:(metrc.locations["AWAITING RELEASE"]||0)+(metrc.locations["DISTRU AWAITING RELEASE"]||0),
+    finished:metrc.locations["DISTRU FINISHED GOODS"]||0,
+    test_passed:(metrc.labStatus["TestPassed"]||0)+(metrc.labStatus["RetestPassed"]||0),
+    submitted:(metrc.labStatus["SubmittedForTesting"]||0)+(metrc.labStatus["TestingInProgress"]||0),
+    not_submitted:metrc.labStatus["NotSubmitted"]||0,
+    failed:metrc.labStatus["TestFailed"]||0
+  };
+  return metrc;
+}
+
+async function readLitData(files) {
+  const lit={brands:[],dispensaries:[],categories:[],daily:[],menu:[],total_doors:0,oos:0,on_shelf:0,marketData:{}};
+  const brandFile=findFile(files,"lit_alerts",["brandsanalytics","brands_analytics","overallbrands"]);
+  if(brandFile)lit.brands=parseCSV(brandFile.content);
+  const dispFile=findFile(files,"lit_alerts",["dispensariesanalytics","dispensary_analytics","overalldispensaries"]);
+  if(dispFile)lit.dispensaries=parseCSV(dispFile.content);
+  const catFile=findFile(files,"lit_alerts",["categoriesanalytics","category_analytics","overallcategories"]);
+  if(catFile)lit.categories=parseCSV(catFile.content);
+  const dailyFile=findFile(files,"lit_alerts",["dailysummary","daily_summary","overalldaily"]);
+  if(dailyFile)lit.daily=parseCSV(dailyFile.content);
+  const menuFile=findFile(files,"lit_alerts",["chris.littleleaflabs","menu_snapshot","littleleaflabs_0"]);
+  if(menuFile)lit.menu=parseCSV(menuFile.content);
+
+  lit.total_doors=new Set(lit.menu.map(r=>r["Dispensary"]||"")).size;
+  lit.oos=lit.menu.filter(r=>(r["Available "]||"").toLowerCase()==="no").length;
+  lit.on_shelf=lit.menu.filter(r=>(r["Available "]||"").toLowerCase()==="yes").length;
+
+  const LLB=["The Growfather","Dr. Zodiak","Dr. Zodiak's Moonrock","Little Leaf","Octane","Sugar High","Illadelph","Puff To The Moon"];
+  const brandsArr=lit.brands.map((r,i)=>({rank:i+1,brand:(r["Brand"]||"").trim(),units:Math.round(num(r["Est. Units"]||0)),avgPrice:Math.round(num(r["Est. Avg Price"]||0)*100)/100,value:Math.round(num(r["Est. Total Value"]||0)*100)/100,unitShare:Math.round(num(r["Market Share % (Units)"]||0)*10)/10,valueShare:Math.round(num(r["Market Share % (Value)"]||0)*10)/10,ll:LLB.find(lb=>(r["Brand"]||"").toLowerCase().includes(lb.toLowerCase()))||null})).sort((a,b)=>b.units-a.units).map((b,i)=>({...b,rank:i+1}));
+  const dispsArr=lit.dispensaries.map((r,i)=>({rank:i+1,dispensary:(r["Dispensary"]||"").trim(),units:Math.round(num(r["Est. Units"]||0)),value:Math.round(num(r["Est. Total Value"]||0)*100)/100,unitShare:Math.round(num(r["Market Share % (Units)"]||0)*10)/10,valueShare:Math.round(num(r["Market Share % (Value)"]||0)*10)/10})).sort((a,b)=>b.units-a.units).map((d,i)=>({...d,rank:i+1}));
+  const catsArr=lit.categories.map(r=>{const key=Object.keys(r)[0];return{category:(r[key]||r["Category"]||"").trim(),units:Math.round(num(r["Est. Units"]||0)),value:Math.round(num(r["Est. Total Value"]||0)*100)/100,unitShare:Math.round(num(r["Market Share % (Units)"]||0)*10)/10,valueShare:Math.round(num(r["Market Share % (Value)"]||0)*10)/10};}).sort((a,b)=>b.units-a.units);
+  const dailyArr=lit.daily.map(r=>{const key=Object.keys(r)[0];return{date:r[key]||"",units:Math.round(num(r["Est. Units"]||0)),value:Math.round(num(r["Est. Total Value"]||0)*100)/100};});
+  const totalUnits=brandsArr.reduce((s,b)=>s+b.units,0),totalVal=brandsArr.reduce((s,b)=>s+b.value,0);
+  lit.marketData={meta:{period:"Jan 1 - May 31, 2026",days:151,totalBrands:brandsArr.length,totalDispensaries:dispsArr.length,marketUnits:totalUnits,marketValue:totalVal},brands:brandsArr,dispensaries:dispsArr,categories:catsArr,daily:dailyArr};
+  return lit;
+}
+
+// ---- DASHBOARD BUILDERS ----
+function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
+  let h=html;
+  h=h.replace(/\$2,753,930/g,fmtD(qb.rev));
+  h=h.replace(/\$4,586,456/g,fmtD(qb.rev));
+  h=h.replace(/GP \d+%/g,`GP ${qb.gp_pct}%`);
+  h=h.replace(/\$1,487,822/g,fmtD(qb.gp));
+  h=h.replace(/\$1,463,252/g,fmtD(qb.gp));
+  h=h.replace(/\$872,176/g,fmtD(qb.cash));
+  h=h.replace(/\$795,463/g,fmtD(qb.ar));
+  h=h.replace(/157,957|160,967/g,fmt(apex.total_units));
+  h=h.replace(/\$3,789,942|\$4,086,944/g,fmtD(apex.total_val));
+  h=injectLastUpdated(h,timeStr);
+  return h;
+}
+
+function buildRetailIntel(html, apex, lit, timeStr) {
+  let h=html;
+  const D={market:lit.marketData,lapsed:apex.lapsed.slice(0,30).map(l=>({name:l.name,days:l.days,rev:Math.round(l.rev)})),shelf:{doors:lit.total_doors,oos:lit.oos,on_shelf:lit.on_shelf,total:lit.on_shelf+lit.oos}};
+  const r=injectVar(h,"const D",JSON.stringify(D)); if(r.success)h=r.html;
+  h=injectLastUpdated(h,timeStr); return h;
+}
+
+function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
+  let h=html;
+  const custArr=apex.buyers.filter(b=>num(b["Total Value of Orders"]||0)>0).map(b=>({name:(b["Buyer"]||"").replace(/'/g,"\\'"),rev:String(Math.round(num(b["Total Value of Orders"]||0))),orders:b["Total Number of Orders"]||"0",last:b["Last Order Date"]||"",days:b["Days Since Last Order"]||"0",aov:String(Math.round(num(b["Average Order Size"]||0)))})).sort((a,b)=>num(b.rev)-num(a.rev));
+  const seedCust="["+custArr.map(c=>`{name:'${c.name}',rev:'${c.rev}',orders:'${c.orders}',last:'${c.last}',days:'${c.days}',aov:'${c.aov}'}`).join(",")+"]";
+  const r1=injectVar(h,"SEED_CUST",seedCust); if(r1.success)h=r1.html;
+  const LLB=["The Growfather","Dr. Zodiak","Little Leaf","Octane","Sugar High","Illadelph"];
+  const skuArr=apex.products.map(p=>{const name=(p["Name"]||"").trim();const brand=LLB.find(lb=>name.toLowerCase().includes(lb.toLowerCase()))||"Little Leaf";return{brand,name:name.slice(0,60),rev:String(Math.round(num(p["Total Value"]||0))),units:String(Math.round(num(p["Total Quantity"]||0)))};}).sort((a,b)=>num(b.rev)-num(a.rev));
+  const r2=injectVar(h,"SEED_SKU",JSON.stringify(skuArr)); if(r2.success)h=r2.html;
+  const salesArr=Object.entries(distru.monthly).sort(([a],[b])=>a.localeCompare(b)).filter(([,v])=>v.rev>0).map(([m,v])=>`{m:'${m}',rev:'${Math.round(v.rev)}',units:'${v.orders}'}`);
+  const r3=injectVar(h,"SEED_SALES","["+salesArr.join(",")+"]"); if(r3.success)h=r3.html;
+  const totalRev=Object.values(distru.monthly).reduce((s,v)=>s+v.rev,0);
+  const ytdRev=Object.entries(distru.monthly).filter(([m])=>m.startsWith("2026")).reduce((s,[,v])=>s+v.rev,0);
+  const foundStr=`{rev:'${(totalRev/1e6).toFixed(2)}',ytd:'${(ytdRev/1e6).toFixed(2)}',orders:${distru.total_orders},batches:207,apexInv:'${(apex.total_val/1e6).toFixed(2)}',apexUnits:${Math.round(apex.total_units)},ar:'${fmt(Math.round(qb.ar))}',readyLabel:${metrc.prod_stages.finished},brands:5,missName:448,missCost:280}`;
+  const r4=injectVar(h,"FOUND",foundStr); if(r4.success)h=r4.html;
+  h=injectLastUpdated(h,timeStr); return h;
+}
+
+function buildWeeklyRefresh(html, qb, apex, metrc, timeStr) {
+  let h=html;
+  h=h.replace(/\$2\.75M|\$4\.59M/g,fmtM(qb.rev));
+  h=h.replace(/\$2,753,930|\$4,586,456/g,fmtD(qb.rev));
+  h=h.replace(/\$872K/g,fmtK(qb.cash));
+  h=h.replace(/\$872,176/g,fmtD(qb.cash));
+  h=h.replace(/\$795K/g,fmtK(qb.ar));
+  h=h.replace(/\$795,463/g,fmtD(qb.ar));
+  h=h.replace(/157,957|160,967/g,fmt(Math.round(apex.total_units)));
+  const lapsedCount=apex.lapsed.length;
+  const activeCount=apex.buyers.filter(b=>num(b["Total Value of Orders"]||0)>0).length;
+  h=h.replace(/\d+ of \d+ accounts/g,`${lapsedCount} of ${activeCount} accounts`);
+  h=injectLastUpdated(h,timeStr); return h;
+}
+
+function buildSalesDashboard(html, lit, timeStr) {
+  let h=html;
+  const r=injectVar(h,"const D",JSON.stringify(lit.marketData)); if(r.success)h=r.html;
+  h=injectLastUpdated(h,timeStr); return h;
+}
+
+function buildSalesActionForm(html, apex, timeStr) {
+  let h=html;
+  const actionData=apex.buyers.filter(b=>num(b["Days Since Last Order"]||0)>=21&&num(b["Total Value of Orders"]||0)>0).map(b=>{const name=(b["Buyer"]||"").trim();const key=name.toLowerCase().replace(/[^a-z0-9]/g,"");const contact=apex.contactIndex[key]||{};const days=Math.round(num(b["Days Since Last Order"]||0));const aov=Math.round(num(b["Average Order Size"]||0));return{name,type:days>=45 "Lapsed":"Reorder",contact:contact.contact||"",phone:contact.phone||"",email:contact.email||"",days,metric:`Avg order $${fmt(aov)}`,channel:"",subject:`Restock time -- ${name}`,body:`Hi ${contact.contact||"there"}, checking in on restocking Little Leaf products. Your last order was ${days} days ago. What do you need  - Matt`};}).sort((a,b)=>b.days-a.days).slice(0,50);
+  const r=injectVar(h,"DATA",JSON.stringify(actionData)); if(r.success)h=r.html;
+  h=injectLastUpdated(h,timeStr); return h;
+}
+
+function buildLitCommandCenter(html, lit, apex, timeStr) {
+  let h=html;
+  const r=injectVar(h,"const MKT",JSON.stringify(lit.marketData)); if(r.success)h=r.html;
+  h=injectLastUpdated(h,timeStr); return h;
+}
+</script>
+</body>
+</html>
