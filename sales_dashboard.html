@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><!-- LLL_VIEWER_START --><script>(function(){var SU='https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec';var SK='lll_vs';function tok(){try{var d=JSON.parse(sessionStorage.getItem(SK)||'{}');return d.token||null;}catch(e){return null;}}function call(params,cb){var p=btoa(unescape(encodeURIComponent(JSON.stringify(params))));fetch(SU+'?p='+encodeURIComponent(p),{method:'GET'}).then(function(r){return r.json();}).then(cb).catch(function(){cb({success:false,error:'Connection error'});});}function showLogin(){var o=document.createElement('div');o.id='_lll_ov';o.style='position:fixed;inset:0;background:#0e1414;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif';o.innerHTML='<div style="background:#16201f;border:1px solid #283533;border-radius:18px;padding:40px 36px;width:340px;max-width:90vw;text-align:center"><div style="font-size:36px;margin-bottom:14px">&#127807;</div><h2 style="color:#e8efe9;font-size:20px;font-weight:700;margin-bottom:6px">Little Leaf Labs</h2><p style="color:#92a39c;font-size:13px;margin-bottom:24px">Enter your credentials to continue</p><input id="_lll_u" type="text" placeholder="Username" style="width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 14px;color:#e8efe9;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box"><input id="_lll_p" type="password" placeholder="Password" style="width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 14px;color:#e8efe9;font-size:14px;outline:none;margin-bottom:12px;box-sizing:border-box"><div id="_lll_e" style="color:#ff7378;font-size:12px;min-height:18px;margin-bottom:10px"></div><button id="_lll_b" style="width:100%;background:#3fae6b;color:#0e1414;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none">Sign In</button></div>';document.body.appendChild(o);function go(){var u=document.getElementById('_lll_u').value.trim();var p=document.getElementById('_lll_p').value;var e=document.getElementById('_lll_e');if(!u||!p){e.textContent='Please enter username and password.';return;}document.getElementById('_lll_b').disabled=true;e.textContent='Verifying...';call({action:'viewerLogin',username:u,password:p},function(d){if(d.success){sessionStorage.setItem(SK,JSON.stringify({token:d.token,username:d.username}));document.getElementById('_lll_ov').remove();}else{e.textContent=d.error||'Incorrect credentials';document.getElementById('_lll_p').value='';document.getElementById('_lll_b').disabled=false;}});}document.getElementById('_lll_b').addEventListener('click',go);document.getElementById('_lll_p').addEventListener('keydown',function(e){if(e.key==='Enter')go();});document.getElementById('_lll_u').addEventListener('keydown',function(e){if(e.key==='Enter')go();});setTimeout(function(){var i=document.getElementById('_lll_u');if(i)i.focus();},100);}var t=tok();if(!t){if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}}else{call({action:'verifyToken',token:t,role:'viewer'},function(d){if(!d.success){sessionStorage.removeItem(SK);if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}}});}})();</script><!-- LLL_VIEWER_END -->
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Little Leaf — Sales & Market Traction Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+ --green:#2e7d32; --green-d:#1b5e20; --green-l:#66bb6a; --leaf:#43a047;
+ --bg:#f4f6f4; --card:#ffffff; --ink:#1c2620; --muted:#6b7c70; --line:#e3e8e3;
+ --up:#2e9e5b; --down:#d64545; --flat:#b8860b; --accent:#0f6e4f;
+ --shadow:0 1px 3px rgba(20,40,25,.08),0 1px 2px rgba(20,40,25,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--ink);line-height:1.45;-webkit-font-smoothing:antialiased}
+.app{display:flex;min-height:100vh}
+.side{width:230px;background:linear-gradient(180deg,var(--green-d),var(--green));color:#eaf3ea;position:fixed;height:100vh;padding:22px 0;overflow-y:auto;z-index:20}
+.brand{padding:0 22px 18px;border-bottom:1px solid rgba(255,255,255,.13);margin-bottom:14px}
+.brand .logo{display:flex;align-items:center;gap:9px;font-size:18px;font-weight:800;letter-spacing:.2px}
+.brand .leaf{font-size:22px}
+.brand .sub{font-size:11px;opacity:.8;margin-top:4px;font-weight:500}
+.nav a{display:flex;align-items:center;gap:11px;color:#d8e8d8;text-decoration:none;padding:11px 22px;font-size:13.5px;font-weight:500;border-left:3px solid transparent;cursor:pointer;transition:.15s}
+.nav a:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav a.active{background:rgba(255,255,255,.14);color:#fff;border-left-color:var(--green-l);font-weight:700}
+.nav .ico{width:18px;text-align:center;font-size:15px}
+.side .foot{padding:16px 22px;font-size:10.5px;opacity:.6;margin-top:10px}
+.main{margin-left:230px;flex:1;padding:26px 34px 60px;max-width:1500px}
+.pagehead{display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:14px;margin-bottom:20px}
+.pagehead h1{font-size:23px;font-weight:800;color:var(--green-d)}
+.pagehead p{color:var(--muted);font-size:13px;margin-top:3px;max-width:760px}
+.period{background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px 13px;font-size:12px;color:var(--muted);box-shadow:var(--shadow);white-space:nowrap}
+.period b{color:var(--green-d)}
+.sec{display:none}
+.sec.show{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1100px){.g4{grid-template-columns:repeat(2,1fr)}.g3{grid-template-columns:1fr}.g2{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+.kpi .lbl{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);font-weight:700}
+.kpi .val{font-size:27px;font-weight:800;color:var(--ink);margin-top:7px;line-height:1.1}
+.kpi .sub{font-size:12px;color:var(--muted);margin-top:5px}
+.kpi .pill{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:8px}
+.up{color:var(--up);background:#e6f6ec}.down{color:var(--down);background:#fbe9e9}.flat{color:var(--flat);background:#fcf4e0}
+.card h3{font-size:14px;font-weight:700;color:var(--green-d);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.card .hint{font-size:11.5px;color:var(--muted);margin-bottom:14px}
+.chartbox{position:relative;height:300px}
+.chartbox.tall{height:360px}
+.brandcard{border-left:4px solid var(--leaf);position:relative;overflow:hidden}
+.brandcard .bn{font-size:16px;font-weight:800;color:var(--green-d)}
+.brandcard .rk{font-size:11.5px;color:var(--muted);font-weight:600}
+.brandcard .row{display:flex;justify-content:space-between;font-size:12.5px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.brandcard .row:last-child{border:0}
+.brandcard .row span:last-child{font-weight:700}
+.status{display:inline-block;font-size:11px;font-weight:800;padding:3px 10px;border-radius:20px;letter-spacing:.3px}
+.s-strong{background:#e6f6ec;color:var(--up)}.s-mid{background:#fcf4e0;color:var(--flat)}.s-weak{background:#fbe9e9;color:var(--down)}.s-na{background:#eef0ee;color:var(--muted)}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:9px 11px;border-bottom:1px solid var(--line)}
+th{background:#f7faf7;color:var(--green-d);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.5px;cursor:pointer;user-select:none;position:sticky;top:0}
+th:hover{background:#eef5ee}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+tr.ll{background:#f0f9f1}
+tr.ll td:first-child{font-weight:800;color:var(--green-d)}
+tr:hover{background:#fafdfa}
+.tablewrap{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.tools input,.tools select{padding:8px 12px;border:1px solid var(--line);border-radius:8px;font-size:13px;font-family:inherit;background:#fff}
+.tools input{flex:1;min-width:200px}
+.chip{font-size:11px;font-weight:700;padding:5px 11px;border-radius:20px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--muted)}
+.chip.on{background:var(--green);color:#fff;border-color:var(--green)}
+.tag{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#e6f6ec;color:var(--green-d);margin-left:6px}
+.note{background:#fff8e6;border:1px solid #f0e0a8;border-radius:10px;padding:14px 16px;font-size:12.5px;color:#6b5a16;margin-bottom:18px}
+.note b{color:#7a6410}
+.note ul{margin:8px 0 0 18px}.note li{margin:3px 0}
+.banner{background:linear-gradient(100deg,var(--green-d),var(--leaf));color:#fff;border-radius:14px;padding:22px 26px;margin-bottom:20px;box-shadow:var(--shadow)}
+.banner h2{font-size:18px;font-weight:800;margin-bottom:6px}
+.banner p{font-size:13px;opacity:.92;max-width:820px}
+.legend{font-size:11px;color:var(--muted);margin-top:10px}
+.bar-mini{height:7px;border-radius:4px;background:#eef0ee;overflow:hidden;margin-top:5px}
+.bar-mini>i{display:block;height:100%;background:var(--leaf)}
+.subhead{font-size:13px;font-weight:800;color:var(--green-d);margin:24px 0 12px;text-transform:uppercase;letter-spacing:.5px}
+.opp{font-weight:800}
+.score{display:inline-block;min-width:34px;text-align:center;padding:2px 7px;border-radius:6px;font-weight:800;font-size:11.5px;color:#fff}
+footer{margin-left:230px;padding:18px 34px;color:var(--muted);font-size:11px;border-top:1px solid var(--line)}
+
+.last-updated-banner{background:rgba(63,174,107,.08);border-bottom:1px solid rgba(63,174,107,.2);padding:7px 22px;font-size:12px;color:#3fae6b;display:flex;align-items:center;gap:6px;position:sticky;top:0;z-index:200}
+</style>
+</head>
+<body><!-- LAST_UPDATED_START --><div class="last-updated-banner" id="last-updated-banner" style="display:none">🕐 Last updated: <span id="last-updated-ts">—</span></div><!-- LAST_UPDATED_END -->
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  try{var t=localStorage.getItem("lll_last_updated");if(t){var el=document.getElementById("last-updated-ts");var banner=document.getElementById("last-updated-banner");if(el)el.textContent=t;if(banner)banner.style.display="flex";}}catch(e){}
+});
+</script>
+
+<div class="app">
+ <aside class="side">
+  <div class="brand">
+   <div class="logo"><span class="leaf">&#127811;</span> Little Leaf</div>
+   <div class="sub">Sales &amp; Market Traction</div>
+  </div>
+  <nav class="nav" id="nav">
+   <a data-sec="exec" class="active"><span class="ico">&#9632;</span> Executive Overview</a>
+   <a data-sec="brand"><span class="ico">&#127793;</span> Brand Health &amp; Traction</a>
+   <a data-sec="compete"><span class="ico">&#9650;</span> Competitive Ranking</a>
+   <a data-sec="cat"><span class="ico">&#9707;</span> Category Share</a>
+   <a data-sec="disp"><span class="ico">&#9673;</span> Account / Store Landscape</a>
+   <a data-sec="action"><span class="ico">&#9733;</span> Action Center</a>
+   <a data-sec="notes"><span class="ico">&#9432;</span> Data &amp; Roadmap</a>
+  </nav>
+  <div class="foot">Source: Lit Alerts market exports<br/>Generated for Chris &amp; Sales Director</div>
+ </aside>
+ <main class="main">
+  <div class="pagehead">
+   <div><h1 id="ptitle">Executive Overview</h1><p id="psub"></p></div>
+   <div class="period">Period: <b id="pperiod"></b> &middot; <span id="pscope"></span></div>
+  </div>
+
+  <!-- EXEC -->
+  <section class="sec show" id="sec-exec">
+   <div class="banner">
+    <h2>Are our brands gaining or losing shelf space?</h2>
+    <p id="execlede"></p>
+   </div>
+   <div class="grid g4" id="execKpis"></div>
+   <div class="grid g2" style="margin-top:16px">
+    <div class="card"><h3>NJ Market Daily Value Trend</h3><div class="hint">Estimated retail sell-through across all tracked NJ dispensaries</div><div class="chartbox"><canvas id="cTrend"></canvas></div></div>
+    <div class="card"><h3>Little Leaf Brands — Market Position</h3><div class="hint">Estimated value &amp; unit market share (% of entire NJ market)</div><div class="chartbox"><canvas id="cLLpos"></canvas></div></div>
+   </div>
+   <div class="subhead">Little Leaf Brand Scorecards</div>
+   <div class="grid g3" id="execBrandCards"></div>
+  </section>
+
+  <!-- BRAND HEALTH -->
+  <section class="sec" id="sec-brand">
+   <div class="note" id="brandNote"></div>
+   <div class="card" style="margin-bottom:16px">
+    <h3>Brand Health &amp; Market Traction</h3>
+    <div class="hint">Each Little Leaf brand's standing across the entire New Jersey market (657 tracked brands). Status reflects market rank tier; distribution growth (stores added/lost) activates when period-over-period &amp; internal data is connected.</div>
+    <div class="tablewrap"><table id="tBrandHealth"></table></div>
+   </div>
+   <div class="grid g2">
+    <div class="card"><h3>Where Growfather Ranks</h3><div class="hint">Growfather vs the 10 brands directly around it in market value</div><div class="chartbox"><canvas id="cGFrank"></canvas></div></div>
+    <div class="card"><h3>Little Leaf Value vs Avg Price</h3><div class="hint">Bubble size = units. Premium positioning vs volume</div><div class="chartbox"><canvas id="cLLbubble"></canvas></div></div>
+   </div>
+  </section>
+
+  <!-- COMPETE -->
+  <section class="sec" id="sec-compete">
+   <div class="tools">
+    <input id="brandSearch" placeholder="Search any of 657 brands..."/>
+    <span class="chip on" data-bf="all">All brands</span>
+    <span class="chip" data-bf="ll">Little Leaf only</span>
+    <span class="chip" data-bf="top50">Top 50</span>
+   </div>
+   <div class="card"><div class="tablewrap"><table id="tBrands"></table></div></div>
+  </section>
+
+  <!-- CATEGORY -->
+  <section class="sec" id="sec-cat">
+   <div class="grid g2">
+    <div class="card"><h3>Category Mix by Value</h3><div class="hint">Where the NJ market's dollars are</div><div class="chartbox tall"><canvas id="cCatVal"></canvas></div></div>
+    <div class="card"><h3>Category Mix by Units</h3><div class="hint">Where the volume is</div><div class="chartbox tall"><canvas id="cCatUnit"></canvas></div></div>
+   </div>
+   <div class="card" style="margin-top:16px">
+    <h3>Category Detail &amp; Little Leaf Play</h3>
+    <div class="hint">Little Leaf's known focus areas mapped to market size &mdash; biggest categories where we compete signal the largest white-space.</div>
+    <div class="tablewrap"><table id="tCat"></table></div>
+   </div>
+  </section>
+
+  <!-- DISPENSARIES -->
+  <section class="sec" id="sec-disp">
+   <div class="note">These 294 dispensaries are the full NJ retail universe ranked by estimated sell-through. The largest stores represent where the volume &mdash; and the biggest distribution opportunity &mdash; lives. This is your prospecting and account-targeting universe. Per-store Little Leaf placement activates when internal order data is connected.</div>
+   <div class="tools">
+    <input id="dispSearch" placeholder="Search dispensaries..."/>
+    <span class="chip on" data-df="all">All</span>
+    <span class="chip" data-df="top25">Top 25 by volume</span>
+   </div>
+   <div class="grid g2" style="margin-bottom:16px">
+    <div class="card"><h3>Top 15 Dispensaries by Value</h3><div class="chartbox tall"><canvas id="cDisp"></canvas></div></div>
+    <div class="card"><h3>Market Concentration</h3><div class="hint">How much of the market the top stores represent</div><div class="chartbox tall"><canvas id="cDispConc"></canvas></div></div>
+   </div>
+   <div class="card"><div class="tablewrap"><table id="tDisp"></table></div></div>
+  </section>
+
+  <!-- ACTION -->
+  <section class="sec" id="sec-action">
+   <div class="banner"><h2>Weekly Sales Action Center</h2><p>Prioritized target list built from market data. Once internal orders, A/R, and per-account history are connected, this auto-populates "Recover / Grow / New Target" with owners, expected revenue, and follow-up dates every Monday.</p></div>
+   <div class="grid g2">
+    <div class="card"><h3>&#9733; Top 25 Target Accounts</h3><div class="hint">Highest-volume NJ stores &mdash; ranked opportunity for Little Leaf placement &amp; expansion</div><div class="tablewrap" style="max-height:480px"><table id="tTargets"></table></div></div>
+    <div class="card"><h3>&#127793; Brand Push Priorities</h3><div class="hint">Where to point marketing dollars based on current traction</div><div id="pushList"></div></div>
+   </div>
+  </section>
+
+  <!-- NOTES -->
+  <section class="sec" id="sec-notes">
+   <div class="card">
+    <h3>What this dashboard is built on</h3>
+    <div class="hint">Transparency on data sources and how to unlock the full spec.</div>
+    <p style="font-size:13px;margin:6px 0 14px">This dashboard runs on your <b>Lit Alerts market-intelligence exports</b> (Jan 1 &ndash; May 31, 2026): estimated units, price, value, and market share for the entire New Jersey market, sliced by brand, category, dispensary, and day. That makes the <b>Brand Health &amp; Market Traction</b> view &mdash; your #1 priority &mdash; fully live today: you can see exactly where Growfather, Octane, and Dr.&nbsp;Zodiak stand against 657 competing brands.</p>
+    <div class="grid g2">
+     <div>
+      <div class="subhead" style="margin-top:0">&#10003; Live now (from Lit Alerts)</div>
+      <ul style="font-size:12.5px;margin-left:18px;line-height:1.9">
+       <li>Brand market share, units, value &amp; competitive rank</li>
+       <li>Category share &amp; market structure</li>
+       <li>Dispensary / account landscape &amp; targeting</li>
+       <li>Market daily trend (30/60-day)</li>
+       <li>Premium vs volume positioning</li>
+      </ul>
+     </div>
+     <div>
+      <div class="subhead" style="margin-top:0">&#9888; Needs internal data to activate</div>
+      <ul style="font-size:12.5px;margin-left:18px;line-height:1.9">
+       <li>Stores Added / Lost &amp; Net Store Growth (needs period-over-period)</li>
+       <li>Account revenue, A/R balance, gross profit (Back Office)</li>
+       <li>Days since last order, repeat-order rate (orders data)</li>
+       <li>Revenue vs goal, sales-by-rep (CRM / sales log)</li>
+       <li>Promotion ROI, forecast demand (promo &amp; inventory feeds)</li>
+      </ul>
+     </div>
+    </div>
+    <div class="note" style="margin:18px 0 0">
+     <b>Two data notes:</b>
+     <ul>
+      <li>Sugar High and Moonrock had <b>no measurable sales in the NJ market export</b> for this period &mdash; likely pre-launch or tracked under a different name. They'll appear automatically once they show market activity.</li>
+      <li>A reliable 90-day trend needs 180 days of history; this export covers 151 days, so only <b>30- and 60-day</b> trends are shown. The full 90-day view unlocks once a longer export window is available.</li>
+     </ul>
+    </div>
+   </div>
+  </section>
+ </main>
+</div>
+<footer>Little Leaf Sales &amp; Market Traction Dashboard &middot; Built from Lit Alerts exports &middot; Estimated market values are modeled sell-through, not internal booked revenue.</footer>
+<script>
+const D={"meta":{"period":"Jan 1 - May 31, 2026","days":151,"totalBrands":170,"totalDispensaries":141,"marketUnits":60997,"marketValue":1140754.85},"brands":[{"rank":1,"brand":"Savvy (Verano)","units":10822,"avgPrice":24.07,"value":260453.19,"unitShare":17.7,"valueShare":22.8,"ll":null},{"rank":2,"brand":"Zen Leaf","units":8688,"avgPrice":25.02,"value":217347.68,"unitShare":14.2,"valueShare":19.1,"ll":null},{"rank":3,"brand":"RAW","units":7532,"avgPrice":3.64,"value":27429.32,"unitShare":12.3,"valueShare":2.4,"ll":null},{"rank":4,"brand":"Verano","units":6580,"avgPrice":21.15,"value":139146.22,"unitShare":10.8,"valueShare":12.2,"ll":null},{"rank":5,"brand":"Blazy Susan","units":2958,"avgPrice":5.57,"value":16484.0,"unitShare":4.8,"valueShare":1.4,"ll":null},{"rank":6,"brand":"Curaleaf","units":2699,"avgPrice":12.5,"value":33737.5,"unitShare":4.4,"valueShare":3.0,"ll":null},{"rank":7,"brand":"LuvBuds","units":2318,"avgPrice":7.15,"value":16562.16,"unitShare":3.8,"valueShare":1.5,"ll":null},{"rank":8,"brand":"BIC Lighters","units":2193,"avgPrice":2.64,"value":5791.33,"unitShare":3.6,"valueShare":0.5,"ll":null},{"rank":9,"brand":"Puffco","units":1145,"avgPrice":135.9,"value":155604.8,"unitShare":1.9,"valueShare":13.6,"ll":null},{"rank":10,"brand":"All That Chocolate","units":1087,"avgPrice":12.21,"value":13277.6,"unitShare":1.8,"valueShare":1.2,"ll":null},{"rank":11,"brand":"Vibes","units":1072,"avgPrice":4.53,"value":4853.49,"unitShare":1.8,"valueShare":0.4,"ll":null},{"rank":12,"brand":"GRAV Labs","units":986,"avgPrice":22.42,"value":22106.64,"unitShare":1.6,"valueShare":1.9,"ll":null},{"rank":13,"brand":"Elevated Herb","units":830,"avgPrice":21.86,"value":18142.0,"unitShare":1.4,"valueShare":1.6,"ll":null},{"rank":14,"brand":"Elements","units":773,"avgPrice":2.48,"value":1916.35,"unitShare":1.3,"valueShare":0.2,"ll":null},{"rank":15,"brand":"Rythm (GTI)","units":770,"avgPrice":26.46,"value":20373.35,"unitShare":1.3,"valueShare":1.8,"ll":null},{"rank":16,"brand":"Human Grade","units":639,"avgPrice":11.54,"value":7376.74,"unitShare":1.0,"valueShare":0.6,"ll":null},{"rank":17,"brand":"Fernway","units":595,"avgPrice":18.08,"value":10758.3,"unitShare":1.0,"valueShare":0.9,"ll":null},{"rank":18,"brand":"Yocan","units":492,"avgPrice":13.15,"value":6470.39,"unitShare":0.8,"valueShare":0.6,"ll":null},{"rank":19,"brand":"MJ Arsenal","units":445,"avgPrice":32.06,"value":14266.4,"unitShare":0.7,"valueShare":1.3,"ll":null},{"rank":20,"brand":"Cartisan Vape","units":427,"avgPrice":16.79,"value":7170.4,"unitShare":0.7,"valueShare":0.6,"ll":null},{"rank":21,"brand":"Zig Zag","units":426,"avgPrice":2.51,"value":1069.69,"unitShare":0.7,"valueShare":0.1,"ll":null},{"rank":22,"brand":"Clipper Lighters","units":382,"avgPrice":2.5,"value":955.54,"unitShare":0.6,"valueShare":0.1,"ll":null},{"rank":23,"brand":"SirEEL","units":367,"avgPrice":16.81,"value":6168.59,"unitShare":0.6,"valueShare":0.5,"ll":null},{"rank":24,"brand":"The Clear","units":307,"avgPrice":9.65,"value":2962.5,"unitShare":0.5,"valueShare":0.3,"ll":null},{"rank":25,"brand":"Airo Brands","units":295,"avgPrice":21.2,"value":6253.07,"unitShare":0.5,"valueShare":0.5,"ll":null},{"rank":26,"brand":"Rove","units":253,"avgPrice":20.08,"value":5079.78,"unitShare":0.4,"valueShare":0.4,"ll":null},{"rank":27,"brand":"Beboe (GTI)","units":205,"avgPrice":33.4,"value":6846.77,"unitShare":0.3,"valueShare":0.6,"ll":null},{"rank":28,"brand":"Dogwalkers (GTI)","units":204,"avgPrice":29.03,"value":5921.41,"unitShare":0.3,"valueShare":0.5,"ll":null},{"rank":29,"brand":"ZZZ's Rolling Paper","units":192,"avgPrice":8.79,"value":1686.78,"unitShare":0.3,"valueShare":0.1,"ll":null},{"rank":30,"brand":"Bob Marley","units":190,"avgPrice":2.19,"value":416.67,"unitShare":0.3,"valueShare":0.0,"ll":null},{"rank":31,"brand":"Ooze","units":186,"avgPrice":19.58,"value":3641.95,"unitShare":0.3,"valueShare":0.3,"ll":null},{"rank":32,"brand":"Flower Mill","units":170,"avgPrice":30.34,"value":5157.3,"unitShare":0.3,"valueShare":0.5,"ll":null},{"rank":33,"brand":"Wulf","units":168,"avgPrice":25.33,"value":4255.0,"unitShare":0.3,"valueShare":0.4,"ll":null},{"rank":34,"brand":"King Palm","units":166,"avgPrice":3.57,"value":593.35,"unitShare":0.3,"valueShare":0.1,"ll":null},{"rank":35,"brand":"Revelry","units":161,"avgPrice":51.49,"value":8289.2,"unitShare":0.3,"valueShare":0.7,"ll":null},{"rank":36,"brand":"Illicit","units":159,"avgPrice":25.21,"value":4008.7,"unitShare":0.3,"valueShare":0.4,"ll":null},{"rank":37,"brand":"Juicy Jay's","units":156,"avgPrice":2.43,"value":379.7,"unitShare":0.3,"valueShare":0.0,"ll":null},{"rank":38,"brand":"Northeast Alternatives","units":140,"avgPrice":24.21,"value":3390.0,"unitShare":0.2,"valueShare":0.3,"ll":null},{"rank":39,"brand":"Bearded Glass","units":126,"avgPrice":9.39,"value":1182.55,"unitShare":0.2,"valueShare":0.1,"ll":null},{"rank":40,"brand":"OCB","units":117,"avgPrice":3.59,"value":420.41,"unitShare":0.2,"valueShare":0.0,"ll":null},{"rank":41,"brand":"Lookah","units":115,"avgPrice":39.51,"value":4543.41,"unitShare":0.2,"valueShare":0.4,"ll":null},{"rank":42,"brand":"Shipwreck'd","units":111,"avgPrice":25.33,"value":2811.5,"unitShare":0.2,"valueShare":0.2,"ll":null},{"rank":43,"brand":"Best Budz","units":106,"avgPrice":12.44,"value":1318.88,"unitShare":0.2,"valueShare":0.1,"ll":null},{"rank":44,"brand":"High Rollers Dispensary","units":105,"avgPrice":24.57,"value":2580.0,"unitShare":0.2,"valueShare":0.2,"ll":null},{"rank":45,"brand":"CCell","units":103,"avgPrice":15.08,"value":1553.35,"unitShare":0.2,"valueShare":0.1,"ll":null},{"rank":46,"brand":"Bamb\u00fa","units":100,"avgPrice":3.94,"value":394.48,"unitShare":0.2,"valueShare":0.0,"ll":null},{"rank":47,"brand":"Boundless Technology","units":98,"avgPrice":25.9,"value":2537.89,"unitShare":0.2,"valueShare":0.2,"ll":null},{"rank":48,"brand":"High Hemp","units":97,"avgPrice":2.19,"value":212.83,"unitShare":0.2,"valueShare":0.0,"ll":null},{"rank":49,"brand":"Fresh","units":94,"avgPrice":20.29,"value":1906.9,"unitShare":0.2,"valueShare":0.2,"ll":null},{"rank":50,"brand":"Medusa","units":93,"avgPrice":8.09,"value":752.8,"unitShare":0.2,"valueShare":0.1,"ll":null},{"rank":51,"brand":"Timeless","units":92,"avgPrice":9.57,"value":880.38,"unitShare":0.2,"valueShare":0.1,"ll":null},{"rank":52,"brand":"Ongrok","units":88,"avgPrice":29.49,"value":2595.3,"unitShare":0.1,"valueShare":0.2,"ll":null},{"rank":53,"brand":"Heavy Hitters","units":88,"avgPrice":16.62,"value":1462.66,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":54,"brand":"Neon","units":86,"avgPrice":2.28,"value":196.2,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":55,"brand":"Breakwater","units":81,"avgPrice":25.56,"value":2070.0,"unitShare":0.1,"valueShare":0.2,"ll":null},{"rank":56,"brand":"Futurola","units":80,"avgPrice":3.11,"value":248.4,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":57,"brand":"Cookies","units":77,"avgPrice":44.75,"value":3445.5,"unitShare":0.1,"valueShare":0.3,"ll":null},{"rank":58,"brand":"Hemper","units":77,"avgPrice":45.82,"value":3528.52,"unitShare":0.1,"valueShare":0.3,"ll":null},{"rank":59,"brand":"Kind Tree (TerrAscend)","units":76,"avgPrice":5.08,"value":386.0,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":60,"brand":"Randy's","units":72,"avgPrice":7.03,"value":506.42,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":61,"brand":"Honeybee Herb","units":69,"avgPrice":5.61,"value":387.4,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":62,"brand":"Blue Oak","units":66,"avgPrice":10.78,"value":711.6,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":63,"brand":"Roots","units":63,"avgPrice":35.71,"value":2249.93,"unitShare":0.1,"valueShare":0.2,"ll":null},{"rank":64,"brand":"Flower by Edie Parker","units":59,"avgPrice":31.86,"value":1880.0,"unitShare":0.1,"valueShare":0.2,"ll":null},{"rank":65,"brand":"Billionaire","units":57,"avgPrice":2.18,"value":124.3,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":66,"brand":"GROOVE","units":56,"avgPrice":10.3,"value":576.8,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":67,"brand":"Buy Weed From Women","units":54,"avgPrice":46.23,"value":2496.35,"unitShare":0.1,"valueShare":0.2,"ll":null},{"rank":68,"brand":"Tyson 2.0","units":49,"avgPrice":16.28,"value":797.5,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":69,"brand":"Boveda","units":48,"avgPrice":6.29,"value":301.9,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":70,"brand":"Silver Screens","units":47,"avgPrice":2.84,"value":133.5,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":71,"brand":"Eyce","units":46,"avgPrice":15.76,"value":724.77,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":72,"brand":"Bodega Boyz","units":46,"avgPrice":1.95,"value":89.6,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":73,"brand":"Select (Curaleaf)","units":46,"avgPrice":15.87,"value":730.0,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":74,"brand":"Pop Cones","units":41,"avgPrice":4.9,"value":201.0,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":75,"brand":"Joy Stick","units":38,"avgPrice":13.0,"value":493.9,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":76,"brand":"Brass Knuckles","units":35,"avgPrice":10.0,"value":350.0,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":77,"brand":"Focus V","units":35,"avgPrice":46.78,"value":1637.45,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":78,"brand":"Rogue Paq","units":34,"avgPrice":10.88,"value":369.98,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":79,"brand":"Pulsar","units":33,"avgPrice":38.41,"value":1267.4,"unitShare":0.1,"valueShare":0.1,"ll":null},{"rank":80,"brand":"Dream Edibles","units":32,"avgPrice":2.0,"value":64.0,"unitShare":0.1,"valueShare":0.0,"ll":null},{"rank":81,"brand":"Special Blue","units":30,"avgPrice":9.68,"value":290.3,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":82,"brand":"BYC","units":30,"avgPrice":12.11,"value":363.25,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":83,"brand":"MPX (iAnthus)","units":29,"avgPrice":6.0,"value":174.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":84,"brand":"Nova Farms","units":29,"avgPrice":49.31,"value":1429.85,"unitShare":0.0,"valueShare":0.1,"ll":null},{"rank":85,"brand":"Maven","units":27,"avgPrice":6.68,"value":180.3,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":86,"brand":"Pax","units":26,"avgPrice":175.48,"value":4562.37,"unitShare":0.0,"valueShare":0.4,"ll":null},{"rank":87,"brand":"Altius","units":26,"avgPrice":26.73,"value":694.9,"unitShare":0.0,"valueShare":0.1,"ll":null},{"rank":88,"brand":"LIVE","units":24,"avgPrice":2.68,"value":64.21,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":89,"brand":"Agri-Kind","units":22,"avgPrice":23.23,"value":511.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":90,"brand":"Dr. Dabber","units":22,"avgPrice":35.65,"value":784.25,"unitShare":0.0,"valueShare":0.1,"ll":null},{"rank":91,"brand":"Kind Pen","units":21,"avgPrice":9.17,"value":192.5,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":92,"brand":"Green Lightning","units":21,"avgPrice":14.99,"value":314.79,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":93,"brand":"High Mountain Imports","units":21,"avgPrice":22.57,"value":474.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":94,"brand":"Generic","units":20,"avgPrice":2.88,"value":57.5,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":95,"brand":"Brute's Roots","units":20,"avgPrice":25.0,"value":500.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":96,"brand":"DOGG LBS","units":18,"avgPrice":2.92,"value":52.5,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":97,"brand":"Blink","units":17,"avgPrice":25.05,"value":425.78,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":98,"brand":"METAL","units":16,"avgPrice":18.81,"value":301.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":99,"brand":"Futurola x Tyson 2.0","units":15,"avgPrice":4.93,"value":74.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":100,"brand":"Chromium Crusher","units":15,"avgPrice":25.6,"value":384.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":101,"brand":"Zooted","units":14,"avgPrice":7.43,"value":104.05,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":102,"brand":"Grateful Dead","units":14,"avgPrice":33.93,"value":475.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":103,"brand":"A21","units":12,"avgPrice":14.35,"value":172.24,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":104,"brand":"Dip Devices","units":12,"avgPrice":10.0,"value":120.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":105,"brand":"Jersey Sauce Boss","units":12,"avgPrice":15.25,"value":183.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":106,"brand":"Hempire","units":12,"avgPrice":2.78,"value":33.3,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":107,"brand":"Releaf","units":11,"avgPrice":11.82,"value":130.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":108,"brand":"JoyLeaf","units":11,"avgPrice":39.09,"value":430.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":109,"brand":"Atlantic Farms","units":11,"avgPrice":33.0,"value":363.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":110,"brand":"Formula 710","units":11,"avgPrice":14.3,"value":157.3,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":111,"brand":"Blue Collar Cannabis","units":10,"avgPrice":32.5,"value":325.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":112,"brand":"Road Trip","units":10,"avgPrice":2.63,"value":26.25,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":113,"brand":"Sackville & Co.","units":10,"avgPrice":8.0,"value":80.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":114,"brand":"Tsunami","units":9,"avgPrice":25.0,"value":225.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":115,"brand":"incredibles (GTI)","units":8,"avgPrice":5.5,"value":44.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":116,"brand":"Cheech Glass","units":8,"avgPrice":23.48,"value":187.85,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":117,"brand":"CannaVibes","units":8,"avgPrice":64.5,"value":516.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":118,"brand":"Colors","units":7,"avgPrice":2.0,"value":14.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":119,"brand":"Loud Labs","units":7,"avgPrice":16.0,"value":112.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":120,"brand":"NEVAEH VERDE","units":7,"avgPrice":34.29,"value":240.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":121,"brand":"HER Highness","units":7,"avgPrice":35.86,"value":251.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":122,"brand":"St\u00fcndenglass","units":6,"avgPrice":566.32,"value":3397.9,"unitShare":0.0,"valueShare":0.3,"ll":null},{"rank":123,"brand":"Cloud 9","units":6,"avgPrice":35.0,"value":210.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":124,"brand":"Theory Wellness","units":6,"avgPrice":36.67,"value":220.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":125,"brand":"High Grade","units":6,"avgPrice":22.71,"value":136.25,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":126,"brand":"Day Savers","units":5,"avgPrice":18.0,"value":90.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":127,"brand":"White Rhino","units":5,"avgPrice":1.84,"value":9.2,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":128,"brand":"Lily Extracts","units":5,"avgPrice":30.0,"value":150.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":129,"brand":"Str8","units":5,"avgPrice":19.75,"value":98.75,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":130,"brand":"Luxe","units":5,"avgPrice":2.0,"value":10.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":131,"brand":"Scorch Torch","units":5,"avgPrice":18.39,"value":91.96,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":132,"brand":"Highly Elevated","units":4,"avgPrice":62.25,"value":249.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":133,"brand":"Simply Pure Trenton","units":4,"avgPrice":38.5,"value":154.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":134,"brand":"Hamsa Edibles","units":4,"avgPrice":3.5,"value":14.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":135,"brand":"Hamilton Farms","units":4,"avgPrice":20.5,"value":82.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":136,"brand":"Fashion Craft","units":4,"avgPrice":15.0,"value":60.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":137,"brand":"CRAFTY PIXIE CREATIONS","units":4,"avgPrice":20.63,"value":82.5,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":138,"brand":"Bella + Canvas","units":4,"avgPrice":28.0,"value":112.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":139,"brand":"Panda Farms","units":3,"avgPrice":22.5,"value":67.5,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":140,"brand":"aLeaf","units":3,"avgPrice":73.33,"value":220.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":141,"brand":"Happy Kit","units":3,"avgPrice":23.33,"value":70.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":142,"brand":"DynaVap","units":3,"avgPrice":10.0,"value":30.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":143,"brand":"DAZED","units":3,"avgPrice":66.67,"value":200.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":144,"brand":"&Shine (GTI)","units":3,"avgPrice":20.67,"value":62.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":145,"brand":"X-VAPE","units":2,"avgPrice":60.0,"value":120.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":146,"brand":"Backwoods","units":2,"avgPrice":52.0,"value":104.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":147,"brand":"Cheech & Chong's Cannabis","units":2,"avgPrice":128.5,"value":256.99,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":148,"brand":"DAVID DUTCH DESIGNS","units":2,"avgPrice":11.25,"value":22.5,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":149,"brand":"Elevated by the Cannabosslady","units":2,"avgPrice":48.88,"value":97.76,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":150,"brand":"CannaDevices","units":2,"avgPrice":40.25,"value":80.5,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":151,"brand":"Carti9","units":2,"avgPrice":70.0,"value":140.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":152,"brand":"Zen","units":1,"avgPrice":70.0,"value":70.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":153,"brand":"Packwraps","units":1,"avgPrice":8.0,"value":8.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":154,"brand":"Storz & Bickel","units":1,"avgPrice":449.99,"value":449.99,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":155,"brand":"024","units":1,"avgPrice":34.0,"value":34.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":156,"brand":"Jetty","units":1,"avgPrice":11.0,"value":11.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":157,"brand":"Sticky Fish","units":1,"avgPrice":18.41,"value":18.41,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":158,"brand":"High 5","units":1,"avgPrice":25.0,"value":25.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":159,"brand":"LIT Farms (Ayr Wellness)","units":1,"avgPrice":12.53,"value":12.53,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":160,"brand":"Kingpin","units":1,"avgPrice":2.0,"value":2.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":161,"brand":"Liberty","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":162,"brand":"Yo Dabba Dabba","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":163,"brand":"Good Green (GTI)","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":164,"brand":"SweetSpot","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":165,"brand":"illadelph","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":"Illadelph"},{"rank":166,"brand":"Stache","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":167,"brand":"Zippo","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":168,"brand":"Revelry Supply","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":169,"brand":"Zenco","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null},{"rank":170,"brand":"NEU","units":0,"avgPrice":0.0,"value":0.0,"unitShare":0.0,"valueShare":0.0,"ll":null}],"dispensaries":[{"rank":1,"dispensary":"Curaleaf - Bellmawr","units":84934,"value":2699479.5,"unitShare":42.1,"valueShare":41.0},{"rank":2,"dispensary":"Curaleaf - Bordentown","units":24244,"value":1327997.0,"unitShare":12.0,"valueShare":20.2},{"rank":3,"dispensary":"Zen Leaf - Lawrence","units":21538,"value":513272.2,"unitShare":10.7,"valueShare":7.8},{"rank":4,"dispensary":"Curaleaf - Edgewater Park","units":20653,"value":1196852.0,"unitShare":10.2,"valueShare":18.2},{"rank":5,"dispensary":"Elevated Herb","units":5313,"value":104596.71,"unitShare":2.6,"valueShare":1.6},{"rank":6,"dispensary":"Zen Leaf - Mt. Holly","units":3882,"value":89965.75,"unitShare":1.9,"valueShare":1.4},{"rank":7,"dispensary":"New Era Dispensary","units":3565,"value":31338.6,"unitShare":1.8,"valueShare":0.5},{"rank":8,"dispensary":"Jersey Joint Dispensary","units":3483,"value":51724.27,"unitShare":1.7,"valueShare":0.8},{"rank":9,"dispensary":"HudHaus","units":3177,"value":16391.31,"unitShare":1.6,"valueShare":0.2},{"rank":10,"dispensary":"Mountain Dispensary","units":1794,"value":21448.81,"unitShare":0.9,"valueShare":0.3},{"rank":11,"dispensary":"A21 Dispensary","units":1687,"value":32878.18,"unitShare":0.8,"valueShare":0.5},{"rank":12,"dispensary":"Theo","units":1615,"value":45837.1,"unitShare":0.8,"valueShare":0.7},{"rank":13,"dispensary":"Somerset Green","units":1422,"value":7104.25,"unitShare":0.7,"valueShare":0.1},{"rank":14,"dispensary":"GW Leaf Dispensary","units":1376,"value":8458.49,"unitShare":0.7,"valueShare":0.1},{"rank":15,"dispensary":"Xena","units":1365,"value":18284.0,"unitShare":0.7,"valueShare":0.3},{"rank":16,"dispensary":"Kind Kush","units":1200,"value":30066.1,"unitShare":0.6,"valueShare":0.5},{"rank":17,"dispensary":"Nirvana Dispensary","units":959,"value":30616.46,"unitShare":0.5,"valueShare":0.5},{"rank":18,"dispensary":"Blue Oak","units":925,"value":7655.5,"unitShare":0.5,"valueShare":0.1},{"rank":19,"dispensary":"Camden Apothecary","units":901,"value":9186.5,"unitShare":0.4,"valueShare":0.1},{"rank":20,"dispensary":"Earth & Ivy - Lake Hurst","units":853,"value":9074.07,"unitShare":0.4,"valueShare":0.1},{"rank":21,"dispensary":"Med Leaf - Egg Harbor City","units":808,"value":11223.99,"unitShare":0.4,"valueShare":0.2},{"rank":22,"dispensary":"Monteverde NJ","units":806,"value":9428.04,"unitShare":0.4,"valueShare":0.1},{"rank":23,"dispensary":"Best Buds NJ","units":770,"value":8411.86,"unitShare":0.4,"valueShare":0.1},{"rank":24,"dispensary":"Uma Flowers - Morristown","units":754,"value":17385.0,"unitShare":0.4,"valueShare":0.3},{"rank":25,"dispensary":"BCaf","units":734,"value":10465.4,"unitShare":0.4,"valueShare":0.2},{"rank":26,"dispensary":"Greenlight Apothecary","units":712,"value":19167.65,"unitShare":0.4,"valueShare":0.3},{"rank":27,"dispensary":"Earth and Ivy - New Brunswick","units":708,"value":5385.66,"unitShare":0.4,"valueShare":0.1},{"rank":28,"dispensary":"Canopy Crossroad","units":657,"value":15773.5,"unitShare":0.3,"valueShare":0.2},{"rank":29,"dispensary":"Zen Leaf - Elizabeth","units":656,"value":13387.07,"unitShare":0.3,"valueShare":0.2},{"rank":30,"dispensary":"Releaf - Newton","units":639,"value":6791.55,"unitShare":0.3,"valueShare":0.1},{"rank":31,"dispensary":"RISE - Paterson","units":534,"value":15174.0,"unitShare":0.3,"valueShare":0.2},{"rank":32,"dispensary":"RISE - Bloomfield","units":505,"value":15703.05,"unitShare":0.3,"valueShare":0.2},{"rank":33,"dispensary":"G2 Dispensary","units":493,"value":5732.63,"unitShare":0.2,"valueShare":0.1},{"rank":34,"dispensary":"Nevaeh Verde","units":400,"value":3138.0,"unitShare":0.2,"valueShare":0.0},{"rank":35,"dispensary":"Sea & Leaf","units":395,"value":6488.33,"unitShare":0.2,"valueShare":0.1},{"rank":36,"dispensary":"Cloud Nine Dispensary","units":389,"value":3364.16,"unitShare":0.2,"valueShare":0.1},{"rank":37,"dispensary":"Cannabis Clubhouse","units":382,"value":12981.74,"unitShare":0.2,"valueShare":0.2},{"rank":38,"dispensary":"Sussex Farms","units":368,"value":4581.95,"unitShare":0.2,"valueShare":0.1},{"rank":39,"dispensary":"Carry On Cannabis - Williamstown","units":364,"value":1867.95,"unitShare":0.2,"valueShare":0.0},{"rank":40,"dispensary":"Indigo","units":315,"value":6677.5,"unitShare":0.2,"valueShare":0.1},{"rank":41,"dispensary":"Breakwater Treatment & Wellness - Cranbury","units":309,"value":7890.0,"unitShare":0.2,"valueShare":0.1},{"rank":42,"dispensary":"Elevated by the CannaBoss Lady","units":305,"value":3918.43,"unitShare":0.2,"valueShare":0.1},{"rank":43,"dispensary":"Red Oak Absecon","units":302,"value":9528.75,"unitShare":0.1,"valueShare":0.1},{"rank":44,"dispensary":"New Frontier Solutions","units":231,"value":1833.4,"unitShare":0.1,"valueShare":0.0},{"rank":45,"dispensary":"Downtown FLWR","units":214,"value":5703.29,"unitShare":0.1,"valueShare":0.1},{"rank":46,"dispensary":"The Social Leaf","units":174,"value":3490.3,"unitShare":0.1,"valueShare":0.1},{"rank":47,"dispensary":"BluLight Cannabis - Woodbury Heights","units":163,"value":4387.58,"unitShare":0.1,"valueShare":0.1},{"rank":48,"dispensary":"The Other Side Dispensary","units":162,"value":5093.2,"unitShare":0.1,"valueShare":0.1},{"rank":49,"dispensary":"Northeast Alternatives - Hamilton","units":140,"value":3390.0,"unitShare":0.1,"valueShare":0.1},{"rank":50,"dispensary":"CannaBoy Treehouse","units":139,"value":1533.61,"unitShare":0.1,"valueShare":0.0},{"rank":51,"dispensary":"Castaway Cannabis","units":135,"value":3735.0,"unitShare":0.1,"valueShare":0.1},{"rank":52,"dispensary":"The Cannabis Place - Jersey City","units":133,"value":1133.0,"unitShare":0.1,"valueShare":0.0},{"rank":53,"dispensary":"High Rollers","units":127,"value":3091.0,"unitShare":0.1,"valueShare":0.0},{"rank":54,"dispensary":"Breakwater Treatment & Wellness - Roselle Park","units":115,"value":2875.0,"unitShare":0.1,"valueShare":0.0},{"rank":55,"dispensary":"HoneyGrove","units":112,"value":5186.0,"unitShare":0.1,"valueShare":0.1},{"rank":56,"dispensary":"Quality Cannabliss","units":112,"value":1289.41,"unitShare":0.1,"valueShare":0.0},{"rank":57,"dispensary":"Shipwreck'd","units":111,"value":2811.5,"unitShare":0.1,"valueShare":0.0},{"rank":58,"dispensary":"BluLight Cannabis - Gloucester City","units":110,"value":3312.25,"unitShare":0.1,"valueShare":0.1},{"rank":59,"dispensary":"Hashery - Hackensack","units":109,"value":2684.19,"unitShare":0.1,"valueShare":0.0},{"rank":60,"dispensary":"Premo","units":104,"value":6039.0,"unitShare":0.1,"valueShare":0.1},{"rank":61,"dispensary":"Fresh - Eatontown","units":102,"value":1934.7,"unitShare":0.1,"valueShare":0.0},{"rank":62,"dispensary":"Valley Wellness","units":93,"value":2819.0,"unitShare":0.0,"valueShare":0.0},{"rank":63,"dispensary":"The Station Hoboken","units":92,"value":2013.93,"unitShare":0.0,"valueShare":0.0},{"rank":64,"dispensary":"Roots NJ - Rec Menu Only","units":85,"value":2836.89,"unitShare":0.0,"valueShare":0.0},{"rank":65,"dispensary":"CannaVibes Dispensary","units":78,"value":2118.0,"unitShare":0.0,"valueShare":0.0},{"rank":66,"dispensary":"MMD NJ","units":78,"value":553.97,"unitShare":0.0,"valueShare":0.0},{"rank":67,"dispensary":"RISE - Paramus (MED)","units":76,"value":1915.48,"unitShare":0.0,"valueShare":0.0},{"rank":68,"dispensary":"Brotherly Bud","units":66,"value":1575.44,"unitShare":0.0,"valueShare":0.0},{"rank":69,"dispensary":"Illicit Gardens - Secaucus","units":66,"value":1827.0,"unitShare":0.0,"valueShare":0.0},{"rank":70,"dispensary":"Hudsonica","units":64,"value":2170.0,"unitShare":0.0,"valueShare":0.0},{"rank":71,"dispensary":"Loud House","units":64,"value":273.92,"unitShare":0.0,"valueShare":0.0},{"rank":72,"dispensary":"Dank Poet Dispensary","units":61,"value":2115.0,"unitShare":0.0,"valueShare":0.0},{"rank":73,"dispensary":"HoneyStash","units":59,"value":3795.0,"unitShare":0.0,"valueShare":0.1},{"rank":74,"dispensary":"Union Chill","units":58,"value":1612.5,"unitShare":0.0,"valueShare":0.0},{"rank":75,"dispensary":"Nar Cannabis - Mount Laurel","units":58,"value":1400.5,"unitShare":0.0,"valueShare":0.0},{"rank":76,"dispensary":"Aunt Mary's","units":56,"value":1788.6,"unitShare":0.0,"valueShare":0.0},{"rank":77,"dispensary":"Pure Blossom","units":52,"value":1855.45,"unitShare":0.0,"valueShare":0.0},{"rank":78,"dispensary":"Fresh - Elizabeth","units":51,"value":1095.9,"unitShare":0.0,"valueShare":0.0},{"rank":79,"dispensary":"Cookies - Harrison","units":48,"value":2732.5,"unitShare":0.0,"valueShare":0.0},{"rank":80,"dispensary":"Molly Ann Farms","units":44,"value":1796.68,"unitShare":0.0,"valueShare":0.0},{"rank":81,"dispensary":"Jersey Roots Dispensary","units":40,"value":1306.3,"unitShare":0.0,"valueShare":0.0},{"rank":82,"dispensary":"Spot 23","units":32,"value":862.0,"unitShare":0.0,"valueShare":0.0},{"rank":83,"dispensary":"Ginger Hale","units":32,"value":866.25,"unitShare":0.0,"valueShare":0.0},{"rank":84,"dispensary":"Nova Farms - Woodbury","units":30,"value":1448.26,"unitShare":0.0,"valueShare":0.0},{"rank":85,"dispensary":"Shore House Canna","units":29,"value":690.0,"unitShare":0.0,"valueShare":0.0},{"rank":86,"dispensary":"Altius Dispensary Glassboro","units":26,"value":694.9,"unitShare":0.0,"valueShare":0.0},{"rank":87,"dispensary":"Daylite Cannabis","units":25,"value":471.0,"unitShare":0.0,"valueShare":0.0},{"rank":88,"dispensary":"Scarlet Reserve Room","units":24,"value":722.25,"unitShare":0.0,"valueShare":0.0},{"rank":89,"dispensary":"La Vida Gardens","units":24,"value":694.75,"unitShare":0.0,"valueShare":0.0},{"rank":90,"dispensary":"Nature's Motivation","units":23,"value":575.0,"unitShare":0.0,"valueShare":0.0},{"rank":91,"dispensary":"Green Lightning Cannabis","units":21,"value":314.79,"unitShare":0.0,"valueShare":0.0},{"rank":92,"dispensary":"Brute's Roots - Egg Harbor","units":20,"value":500.0,"unitShare":0.0,"valueShare":0.0},{"rank":93,"dispensary":"Island Vibez","units":19,"value":720.0,"unitShare":0.0,"valueShare":0.0},{"rank":94,"dispensary":"Joyleaf","units":19,"value":660.0,"unitShare":0.0,"valueShare":0.0},{"rank":95,"dispensary":"Bridge City Collective - Somerset","units":17,"value":380.0,"unitShare":0.0,"valueShare":0.0},{"rank":96,"dispensary":"Cuzzie's Dispensary","units":16,"value":537.0,"unitShare":0.0,"valueShare":0.0},{"rank":97,"dispensary":"The Honorable Plant","units":16,"value":475.58,"unitShare":0.0,"valueShare":0.0},{"rank":98,"dispensary":"Nile Cannabis","units":15,"value":344.85,"unitShare":0.0,"valueShare":0.0},{"rank":99,"dispensary":"MPX NJ - Gloucester","units":15,"value":90.0,"unitShare":0.0,"valueShare":0.0},{"rank":100,"dispensary":"MPX NJ - Atlantic City","units":14,"value":84.0,"unitShare":0.0,"valueShare":0.0},{"rank":101,"dispensary":"Zen Leaf - Neptune Township","units":14,"value":322.07,"unitShare":0.0,"valueShare":0.0},{"rank":102,"dispensary":"Casa Verde Wellness","units":12,"value":266.5,"unitShare":0.0,"valueShare":0.0},{"rank":103,"dispensary":"Wildflower Market","units":12,"value":398.75,"unitShare":0.0,"valueShare":0.0},{"rank":104,"dispensary":"Doobiez","units":12,"value":200.0,"unitShare":0.0,"valueShare":0.0},{"rank":105,"dispensary":"Atlantic Flower","units":11,"value":363.0,"unitShare":0.0,"valueShare":0.0},{"rank":106,"dispensary":"Beyond Hello - Little Ferry","units":11,"value":328.75,"unitShare":0.0,"valueShare":0.0},{"rank":107,"dispensary":"West Orange Wellness","units":11,"value":268.0,"unitShare":0.0,"valueShare":0.0},{"rank":108,"dispensary":"Nightjar - Bloomfield","units":9,"value":185.0,"unitShare":0.0,"valueShare":0.0},{"rank":109,"dispensary":"Simply Pure - Trenton","units":8,"value":339.0,"unitShare":0.0,"valueShare":0.0},{"rank":110,"dispensary":"Bakin' Bad","units":8,"value":400.0,"unitShare":0.0,"valueShare":0.0},{"rank":111,"dispensary":"Fire and Oak Mount - Holly Dispensary","units":8,"value":45.0,"unitShare":0.0,"valueShare":0.0},{"rank":112,"dispensary":"Got Your Six of New Jersey","units":8,"value":208.0,"unitShare":0.0,"valueShare":0.0},{"rank":113,"dispensary":"(Removed)Fire & Oak Mount Holly Dispensary","units":8,"value":45.0,"unitShare":0.0,"valueShare":0.0},{"rank":114,"dispensary":"Plantabis","units":7,"value":189.6,"unitShare":0.0,"valueShare":0.0},{"rank":115,"dispensary":"Cottonmouth Dispensary","units":7,"value":255.0,"unitShare":0.0,"valueShare":0.0},{"rank":116,"dispensary":"PPP Dispensary","units":6,"value":155.0,"unitShare":0.0,"valueShare":0.0},{"rank":117,"dispensary":"Village - HBK","units":6,"value":454.0,"unitShare":0.0,"valueShare":0.0},{"rank":118,"dispensary":"Enlighten Health and Wellness, LLC","units":6,"value":138.3,"unitShare":0.0,"valueShare":0.0},{"rank":119,"dispensary":"Theory Wellness - Trenton","units":6,"value":220.0,"unitShare":0.0,"valueShare":0.0},{"rank":120,"dispensary":"Eastern Green Dispensary","units":5,"value":26.6,"unitShare":0.0,"valueShare":0.0},{"rank":121,"dispensary":"Public Cannabis - Absecon","units":5,"value":125.0,"unitShare":0.0,"valueShare":0.0},{"rank":122,"dispensary":"East Coasting - Eatontown","units":4,"value":170.96,"unitShare":0.0,"valueShare":0.0},{"rank":123,"dispensary":"Highway 90","units":4,"value":94.99,"unitShare":0.0,"valueShare":0.0},{"rank":124,"dispensary":"Legacy to Lifted","units":4,"value":100.0,"unitShare":0.0,"valueShare":0.0},{"rank":125,"dispensary":"Anja","units":4,"value":90.0,"unitShare":0.0,"valueShare":0.0},{"rank":126,"dispensary":"One Green Leaf","units":4,"value":61.0,"unitShare":0.0,"valueShare":0.0},{"rank":127,"dispensary":"Do-Canna","units":3,"value":76.0,"unitShare":0.0,"valueShare":0.0},{"rank":128,"dispensary":"Mass Grown","units":3,"value":64.99,"unitShare":0.0,"valueShare":0.0},{"rank":129,"dispensary":"Dazed - Somerset","units":3,"value":200.0,"unitShare":0.0,"valueShare":0.0},{"rank":130,"dispensary":"AYR - Union","units":2,"value":120.0,"unitShare":0.0,"valueShare":0.0},{"rank":131,"dispensary":"Cream","units":2,"value":59.0,"unitShare":0.0,"valueShare":0.0},{"rank":132,"dispensary":"AYR - Woodbridge","units":2,"value":90.0,"unitShare":0.0,"valueShare":0.0},{"rank":133,"dispensary":"Unity Rd (New Jersey)","units":1,"value":25.0,"unitShare":0.0,"valueShare":0.0},{"rank":134,"dispensary":"The Dispensary of Union NJ","units":1,"value":20.0,"unitShare":0.0,"valueShare":0.0},{"rank":135,"dispensary":"Plantopia","units":1,"value":15.0,"unitShare":0.0,"valueShare":0.0},{"rank":136,"dispensary":"Beyond Bleaf","units":0,"value":0.0,"unitShare":0.0,"valueShare":0.0},{"rank":137,"dispensary":"Flower Bomb","units":0,"value":0.0,"unitShare":0.0,"valueShare":0.0},{"rank":138,"dispensary":"MPX NJ - Pennsauken","units":0,"value":0.0,"unitShare":0.0,"valueShare":0.0},{"rank":139,"dispensary":"Honey Buzz Farms","units":0,"value":0.0,"unitShare":0.0,"valueShare":0.0},{"rank":140,"dispensary":"Far & Dotter - Pemberton","units":0,"value":0.0,"unitShare":0.0,"valueShare":0.0},{"rank":141,"dispensary":"Liberty Cannabis - North Brunswick","units":0,"value":0.0,"unitShare":0.0,"valueShare":0.0}],"categories":[{"category":"Rolling Papers","units":1244,"value":3771.56,"unitShare":32.5,"valueShare":10.8},{"category":"ROLLING PAPERS","units":1028,"value":4624.81,"unitShare":26.9,"valueShare":13.2},{"category":"OTHER","units":358,"value":5530.1,"unitShare":9.4,"valueShare":15.8},{"category":"","units":264,"value":4399.04,"unitShare":6.9,"valueShare":12.6},{"category":"Battery","units":217,"value":3550.94,"unitShare":5.7,"valueShare":10.2},{"category":"BATTERY","units":191,"value":2686.1,"unitShare":5.0,"valueShare":7.7},{"category":"Merchandise / Devices","units":93,"value":862.0,"unitShare":2.4,"valueShare":2.5},{"category":"ACCESSORY","units":81,"value":1924.5,"unitShare":2.1,"valueShare":5.5},{"category":"Hat","units":65,"value":1535.42,"unitShare":1.7,"valueShare":4.4},{"category":"Other","units":63,"value":274.4,"unitShare":1.6,"valueShare":0.8},{"category":"Accessory","units":45,"value":457.39,"unitShare":1.2,"valueShare":1.3},{"category":"APPAREL","units":42,"value":1458.0,"unitShare":1.1,"valueShare":4.2},{"category":"Beanie","units":39,"value":911.04,"unitShare":1.0,"valueShare":2.6},{"category":"VAPORIZER","units":25,"value":513.0,"unitShare":0.7,"valueShare":1.5},{"category":"Merchandise","units":18,"value":306.0,"unitShare":0.5,"valueShare":0.9},{"category":"T SHIRT","units":14,"value":490.0,"unitShare":0.4,"valueShare":1.4},{"category":"PIPE","units":13,"value":261.0,"unitShare":0.3,"valueShare":0.7},{"category":"Apparel","units":9,"value":207.5,"unitShare":0.2,"valueShare":0.6},{"category":"T-shirts","units":7,"value":140.0,"unitShare":0.2,"valueShare":0.4},{"category":"BONG","units":3,"value":64.0,"unitShare":0.1,"valueShare":0.2},{"category":"Merchandise / Accessories","units":3,"value":9.0,"unitShare":0.1,"valueShare":0.0},{"category":"Dab Rig","units":2,"value":678.0,"unitShare":0.1,"valueShare":1.9},{"category":"Grinder","units":2,"value":80.0,"unitShare":0.1,"valueShare":0.2},{"category":"Pipe","units":1,"value":95.0,"unitShare":0.0,"valueShare":0.3},{"category":"Merchandise / Glass","units":1,"value":95.0,"unitShare":0.0,"valueShare":0.3},{"category":"NON-CANNABIS","units":0,"value":0.0,"unitShare":0.0,"valueShare":0.0}],"daily":[{"date":"01/01/2026","units":2315,"value":79905.09},{"date":"01/02/2026","units":2508,"value":86694.33},{"date":"01/03/2026","units":2267,"value":80711.84},{"date":"01/04/2026","units":2232,"value":79991.87},{"date":"01/05/2026","units":2282,"value":80853.03},{"date":"01/06/2026","units":2228,"value":79167.18},{"date":"01/07/2026","units":2322,"value":83000.27},{"date":"01/08/2026","units":2461,"value":84257.13},{"date":"01/09/2026","units":2428,"value":84298.75},{"date":"01/10/2026","units":2260,"value":78922.97},{"date":"01/11/2026","units":2365,"value":82339.37},{"date":"01/12/2026","units":2331,"value":83077.81},{"date":"01/13/2026","units":2236,"value":77687.66},{"date":"01/14/2026","units":2616,"value":88056.91},{"date":"01/15/2026","units":2166,"value":76847.65},{"date":"01/16/2026","units":2293,"value":80672.4},{"date":"01/17/2026","units":2366,"value":82276.97},{"date":"01/18/2026","units":2309,"value":80919.38},{"date":"01/19/2026","units":2274,"value":77302.14},{"date":"01/20/2026","units":2217,"value":77872.57},{"date":"01/21/2026","units":1884,"value":66816.8},{"date":"01/22/2026","units":2176,"value":74635.01},{"date":"01/23/2026","units":2422,"value":80168.62},{"date":"01/24/2026","units":2361,"value":77783.8},{"date":"01/25/2026","units":2000,"value":72761.75},{"date":"01/26/2026","units":2194,"value":77651.03},{"date":"01/27/2026","units":2251,"value":79468.84},{"date":"01/28/2026","units":2068,"value":69136.09},{"date":"01/29/2026","units":2472,"value":85387.16},{"date":"01/30/2026","units":2379,"value":77110.86},{"date":"01/31/2026","units":2320,"value":78518.63},{"date":"02/01/2026","units":2255,"value":80587.2},{"date":"02/02/2026","units":2254,"value":78229.15},{"date":"02/03/2026","units":2279,"value":79905.91},{"date":"02/04/2026","units":2355,"value":81338.61},{"date":"02/05/2026","units":2351,"value":80788.89},{"date":"02/06/2026","units":2392,"value":82151.52},{"date":"02/07/2026","units":2199,"value":77137.23},{"date":"02/08/2026","units":2308,"value":80790.9},{"date":"02/09/2026","units":2215,"value":78568.63},{"date":"02/10/2026","units":2510,"value":85492.05},{"date":"02/11/2026","units":2268,"value":79577.02},{"date":"02/12/2026","units":2350,"value":82237.63},{"date":"02/13/2026","units":1456,"value":45540.97},{"date":"02/14/2026","units":3388,"value":117801.21},{"date":"02/15/2026","units":2308,"value":81853.3},{"date":"02/16/2026","units":2328,"value":83833.41},{"date":"02/17/2026","units":2370,"value":83510.31},{"date":"02/18/2026","units":2143,"value":74872.29},{"date":"02/19/2026","units":2497,"value":88275.13},{"date":"02/20/2026","units":2503,"value":91224.78},{"date":"02/21/2026","units":2498,"value":84096.13},{"date":"02/22/2026","units":2390,"value":84951.92},{"date":"02/23/2026","units":2169,"value":80136.47},{"date":"02/24/2026","units":2334,"value":81653.93},{"date":"02/25/2026","units":2802,"value":96319.95},{"date":"02/26/2026","units":2379,"value":82954.08},{"date":"02/27/2026","units":2414,"value":81812.66},{"date":"02/28/2026","units":2408,"value":83120.38},{"date":"03/01/2026","units":2288,"value":82389.6},{"date":"03/02/2026","units":2613,"value":89118.36},{"date":"03/03/2026","units":2503,"value":87531.57},{"date":"03/04/2026","units":2556,"value":93303.94},{"date":"03/05/2026","units":2357,"value":81615.1},{"date":"03/06/2026","units":2248,"value":78383.17},{"date":"03/07/2026","units":2716,"value":92985.34},{"date":"03/08/2026","units":2361,"value":81301.67},{"date":"03/09/2026","units":2403,"value":84187.15},{"date":"03/10/2026","units":2292,"value":80804.73},{"date":"03/11/2026","units":2107,"value":74781.69},{"date":"03/12/2026","units":1997,"value":72254.13},{"date":"03/13/2026","units":2076,"value":72270.32},{"date":"03/14/2026","units":2117,"value":74693.23},{"date":"03/15/2026","units":826,"value":28805.12},{"date":"03/16/2026","units":1947,"value":71899.27},{"date":"03/17/2026","units":1327,"value":45868.07},{"date":"03/18/2026","units":2374,"value":85719.3},{"date":"03/19/2026","units":1860,"value":66910.43},{"date":"03/20/2026","units":413,"value":6275.18},{"date":"03/21/2026","units":341,"value":4853.76},{"date":"03/22/2026","units":269,"value":10892.4},{"date":"03/23/2026","units":232,"value":3761.22},{"date":"03/24/2026","units":182,"value":2717.49},{"date":"03/25/2026","units":253,"value":3085.67},{"date":"03/26/2026","units":268,"value":3795.75},{"date":"03/27/2026","units":358,"value":4655.23},{"date":"03/28/2026","units":298,"value":4628.36},{"date":"03/29/2026","units":188,"value":2528.58},{"date":"03/30/2026","units":209,"value":2488.81},{"date":"03/31/2026","units":221,"value":2469.19},{"date":"04/01/2026","units":276,"value":2792.59},{"date":"04/02/2026","units":272,"value":3261.35},{"date":"04/03/2026","units":350,"value":5028.89},{"date":"04/04/2026","units":355,"value":6409.56},{"date":"04/05/2026","units":184,"value":2581.65},{"date":"04/06/2026","units":208,"value":2109.13},{"date":"04/07/2026","units":168,"value":3297.68},{"date":"04/08/2026","units":268,"value":4439.25},{"date":"04/09/2026","units":272,"value":3613.28},{"date":"04/10/2026","units":523,"value":10066.09},{"date":"04/11/2026","units":319,"value":4224.19},{"date":"04/12/2026","units":220,"value":2981.68},{"date":"04/13/2026","units":215,"value":2222.48},{"date":"04/14/2026","units":233,"value":3079.79},{"date":"04/15/2026","units":319,"value":5046.66},{"date":"04/16/2026","units":268,"value":6024.49},{"date":"04/17/2026","units":585,"value":9825.09},{"date":"04/18/2026","units":678,"value":9766.04},{"date":"04/19/2026","units":356,"value":5436.17},{"date":"04/20/2026","units":688,"value":13213.08},{"date":"04/21/2026","units":231,"value":4350.15},{"date":"04/22/2026","units":224,"value":3129.59},{"date":"04/23/2026","units":290,"value":3271.54},{"date":"04/24/2026","units":344,"value":4219.21},{"date":"04/25/2026","units":361,"value":6314.43},{"date":"04/26/2026","units":212,"value":3086.86},{"date":"04/27/2026","units":266,"value":3602.41},{"date":"04/28/2026","units":259,"value":3996.72},{"date":"04/29/2026","units":582,"value":14496.18},{"date":"04/30/2026","units":354,"value":5083.59},{"date":"05/01/2026","units":412,"value":4328.47},{"date":"05/02/2026","units":339,"value":5299.82},{"date":"05/03/2026","units":231,"value":2733.87},{"date":"05/04/2026","units":278,"value":4239.64},{"date":"05/05/2026","units":250,"value":4124.55},{"date":"05/06/2026","units":251,"value":3286.72},{"date":"05/07/2026","units":411,"value":8745.47},{"date":"05/08/2026","units":300,"value":4159.61},{"date":"05/09/2026","units":373,"value":5654.23},{"date":"05/10/2026","units":240,"value":3420.45},{"date":"05/11/2026","units":275,"value":3072.68},{"date":"05/12/2026","units":240,"value":3647.4},{"date":"05/13/2026","units":736,"value":18484.46},{"date":"05/14/2026","units":237,"value":2803.11},{"date":"05/15/2026","units":365,"value":4412.12},{"date":"05/16/2026","units":333,"value":4232.42},{"date":"05/17/2026","units":234,"value":2698.33},{"date":"05/18/2026","units":236,"value":2924.58},{"date":"05/19/2026","units":234,"value":2350.39},{"date":"05/20/2026","units":285,"value":2944.48},{"date":"05/21/2026","units":318,"value":3744.95},{"date":"05/22/2026","units":413,"value":4986.22},{"date":"05/23/2026","units":349,"value":3441.98},{"date":"05/24/2026","units":294,"value":4155.38},{"date":"05/25/2026","units":285,"value":2962.99},{"date":"05/26/2026","units":782,"value":16710.6},{"date":"05/27/2026","units":278,"value":4321.68},{"date":"05/28/2026","units":415,"value":9212.83},{"date":"05/29/2026","units":383,"value":4189.1},{"date":"05/30/2026","units":401,"value":4333.21},{"date":"05/31/2026","units":224,"value":2446.81}]};
+const fmtM=v=>'$'+(v/1e6).toFixed(2)+'M';
+const fmtK=v=>v>=1e6 '$'+(v/1e6).toFixed(2)+'M':'$'+(v/1e3).toFixed(0)+'K';
+const fmt$=v=>'$'+Math.round(v).toLocaleString();
+const fmtN=v=>Math.round(v).toLocaleString();
+const GREEN='#2e7d32',LEAF='#43a047',LGT='#a5d6a7',GREY='#cfd8d0';
+const PAL=['#1b5e20','#2e7d32','#43a047','#66bb6a','#81c784','#a5d6a7','#c8e6c9','#b0bec5','#90a4ae','#78909c','#607d8b','#455a64','#37474f'];
+
+// merge Dr. Zodiak variants for brand-health view
+function llConsolidated(){
+ const map={};
+ D.brands.filter(b=>b.ll).forEach(b=>{
+  const k=b.ll;
+  if(!map[k])map[k]={brand:k,units:0,value:0,rank:b.rank,unitShare:0,valueShare:0,_w:0};
+  map[k].units+=b.units;map[k].value+=b.value;
+  map[k].unitShare+=b.unitShare;map[k].valueShare+=b.valueShare;
+  map[k].rank=Math.min(map[k].rank,b.rank);
+ });
+ Object.values(map).forEach(m=>m.avgPrice=m.value/m.units);
+ const order=['Growfather','Dr. Zodiak','Octane'];
+ const arr=Object.values(map).sort((a,b)=>order.indexOf(a.brand)-order.indexOf(b.brand));
+ // add absent brands
+ ['Sugar High','Moonrock'].forEach(nm=>arr.push({brand:nm,units:0,value:0,rank:null,unitShare:0,valueShare:0,avgPrice:0,absent:true}));
+ return arr;
+}
+function statusOf(b){
+ if(b.absent)return['s-na','No market data'];
+ const pct=b.rank/D.meta.totalBrands;
+ if(pct<=0.12)return['s-strong','Strong &#8593;'];
+ if(pct<=0.40)return['s-mid','Building &#8594;'];
+ return['s-weak','Sub-scale &#8595;'];
+}
+
+// ---- META
+document.getElementById('pperiod').textContent=D.meta.period;
+document.getElementById('pscope').textContent=D.meta.totalBrands+' brands &middot; '+D.meta.totalDispensaries+' stores';
+const subs={exec:'Top-line market traction and Little Leaf brand position at a glance.',
+ brand:'The #1 view: are our brands gaining or losing shelf space across New Jersey ',
+ compete:'Every tracked brand in NJ, ranked. Find exactly who is above and below us.',
+ cat:'Where the market dollars and volume sit, and where Little Leaf plays.',
+ disp:'The full NJ retail universe -- your account targeting and prospecting list.',
+ action:'Prioritized weekly action list for you and your sales director.',
+ notes:'What powers this dashboard and how to unlock the full spec.'};
+
+// ---- EXEC
+const gf=D.brands.find(b=>b.ll==='Growfather');
+const llAll=llConsolidated().filter(b=>!b.absent);
+const llVal=llAll.reduce((s,b)=>s+b.value,0);
+const llUnits=llAll.reduce((s,b)=>s+b.units,0);
+const llValShare=llAll.reduce((s,b)=>s+b.valueShare,0);
+document.getElementById('execlede').innerHTML=
+ `Growfather is Little Leaf's flagship at <b>rank #${gf.rank} of ${D.meta.totalBrands}</b> brands -- the top ${(gf.rank/D.meta.totalBrands*100).toFixed(0)}% of the NJ market -- with <b>${fmtM(gf.value)}</b> in estimated sell-through. Across all Little Leaf brands: <b>${fmtM(llVal)}</b> est. value, <b>${fmtN(llUnits)}</b> units, <b>${llValShare.toFixed(1)}%</b> combined market share.`;
+
+const t30=D.trends[30],t60=D.trends[60];
+function pill(g){const c=g>1 'up':g<-1 'down':'flat';const a=g>1 '&#9650;':g<-1 '&#9660;':'&#9654;';return `<span class="pill ${c}">${a} ${g>=0 '+':''}${g.toFixed(1)}%</span>`;}
+document.getElementById('execKpis').innerHTML=[
+ {l:'NJ Market Value (5mo)',v:fmtM(D.meta.marketDailyValue),s:fmtN(D.meta.marketDailyUnits)+' units tracked'},
+ {l:'Little Leaf Est. Value',v:fmtM(llVal),s:llValShare.toFixed(2)+'% of market'},
+ {l:'Growfather Market Rank',v:'#'+gf.rank,s:'of '+D.meta.totalBrands+' brands &middot; '+gf.valueShare+'% share'},
+ {l:'Market 30-Day Trend',v:pill(t30.valGrowth),s:'vs prior 30 days (value)'},
+].map(k=>`<div class="card kpi"><div class="lbl">${k.l}</div><div class="val">${k.v}</div><div class="sub">${k.s}</div></div>`).join('');
+
+// exec brand cards
+document.getElementById('execBrandCards').innerHTML=llConsolidated().map(b=>{
+ const[sc,lbl]=statusOf(b);
+ if(b.absent)return `<div class="card brandcard" style="border-left-color:#cfd8d0"><div class="bn">${b.brand}</div><div class="rk">Not yet in market data</div><div style="margin-top:12px"><span class="status ${sc}">${lbl}</span></div><div class="row" style="margin-top:10px"><span>Status</span><span>Pre-launch / untracked</span></div></div>`;
+ return `<div class="card brandcard"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div class="bn">${b.brand}</div><div class="rk">Rank #${b.rank} of ${D.meta.totalBrands}</div></div><span class="status ${sc}">${lbl}</span></div>
+  <div class="row"><span>Est. Value</span><span>${fmtM(b.value)}</span></div>
+  <div class="row"><span>Est. Units</span><span>${fmtN(b.units)}</span></div>
+  <div class="row"><span>Avg Price</span><span>$${b.avgPrice.toFixed(2)}</span></div>
+  <div class="row"><span>Market Share (val)</span><span>${b.valueShare.toFixed(2)}%</span></div></div>`;
+}).join('');
+
+// charts
+let charts={};
+function mk(id,cfg){if(charts[id])charts[id].destroy();charts[id]=new Chart(document.getElementById(id),cfg);}
+const noLeg={legend:{display:false}};
+
+function drawExec(){
+ const lab=D.daily.map(d=>d.date.slice(0,5));
+ mk('cTrend',{type:'line',data:{labels:lab,datasets:[{data:D.daily.map(d=>d.value),borderColor:GREEN,backgroundColor:'rgba(67,160,71,.12)',fill:true,tension:.3,pointRadius:0,borderWidth:2}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt$(c.parsed.y)}}},scales:{x:{ticks:{maxTicksLimit:8,font:{size:10}},grid:{display:false}},y:{ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M',font:{size:10}},grid:{color:'#eef0ee'}}}}});
+ const ll=llConsolidated().filter(b=>!b.absent);
+ mk('cLLpos',{type:'bar',data:{labels:ll.map(b=>b.brand),datasets:[
+   {label:'Value share %',data:ll.map(b=>b.valueShare),backgroundColor:GREEN},
+   {label:'Unit share %',data:ll.map(b=>b.unitShare),backgroundColor:LGT}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}}},scales:{y:{ticks:{callback:v=>v+'%',font:{size:10}},grid:{color:'#eef0ee'}},x:{grid:{display:false}}}}});
+}
+
+// BRAND HEALTH
+function drawBrand(){
+ document.getElementById('brandNote').innerHTML='<b>Reading this view:</b> Status = market-rank tier (Strong = top 12% of all NJ brands, Building = top 40%, Sub-scale = below). "Net Store Growth" and "Revenue Growth %" columns are placeholders that fill automatically once period-over-period exports + internal orders are connected &mdash; the structure is built and waiting for the feed.';
+ const rows=llConsolidated();
+ let h=`<thead><tr><th>Brand</th><th class="num">Mkt Rank</th><th class="num">Est. Units</th><th class="num">Est. Value</th><th class="num">Avg $</th><th class="num">Unit Share</th><th class="num">Value Share</th><th class="num">Net Stores</th><th class="num">Rev Growth</th><th>Status</th></tr></thead><tbody>`;
+ rows.forEach(b=>{const[sc,lbl]=statusOf(b);
+  h+=`<tr class="ll"><td>${b.brand}</td><td class="num">${b.rank '#'+b.rank:'&ndash;'}</td><td class="num">${fmtN(b.units)}</td><td class="num">${fmt$(b.value)}</td><td class="num">${b.avgPrice '$'+b.avgPrice.toFixed(2):'&ndash;'}</td><td class="num">${b.unitShare.toFixed(2)}%</td><td class="num">${b.valueShare.toFixed(2)}%</td><td class="num" style="color:#b0bec5">&mdash;*</td><td class="num" style="color:#b0bec5">&mdash;*</td><td><span class="status ${sc}">${lbl}</span></td></tr>`;});
+ h+=`</tbody>`;
+ document.getElementById('tBrandHealth').innerHTML=h;
+
+ // Growfather neighborhood
+ const i=D.brands.findIndex(b=>b.ll==='Growfather');
+ const seg=D.brands.slice(Math.max(0,i-5),i+6);
+ mk('cGFrank',{type:'bar',data:{labels:seg.map(b=>b.brand.length>16 b.brand.slice(0,15)+' ':b.brand),datasets:[{data:seg.map(b=>b.value),backgroundColor:seg.map(b=>b.ll GREEN:GREY)}]},
+  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt$(c.parsed.x)}}},scales:{x:{ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M',font:{size:10}},grid:{color:'#eef0ee'}},y:{ticks:{font:{size:10}},grid:{display:false}}}}});
+
+ const ll=llConsolidated().filter(b=>!b.absent);
+ mk('cLLbubble',{type:'bubble',data:{datasets:ll.map((b,j)=>({label:b.brand,data:[{x:b.avgPrice,y:b.value,r:Math.max(6,Math.sqrt(b.units)/35)}],backgroundColor:PAL[j]+'cc'}))},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'bottom',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>c.dataset.label+': $'+c.parsed.x.toFixed(2)+' avg, '+fmtM(c.parsed.y)}}},scales:{x:{title:{display:true,text:'Avg Price ($)',font:{size:11}},ticks:{font:{size:10}},grid:{color:'#eef0ee'}},y:{title:{display:true,text:'Est. Value',font:{size:11}},ticks:{callback:v=>'$'+(v/1e6).toFixed(1)+'M',font:{size:10}},grid:{color:'#eef0ee'}}}}});
+}
+
+// COMPETE table
+let bFilter='all',bSearch='';
+function renderBrands(){
+ let rows=D.brands;
+ if(bFilter==='ll')rows=rows.filter(b=>b.ll);
+ if(bFilter==='top50')rows=rows.filter(b=>b.rank<=50);
+ if(bSearch)rows=rows.filter(b=>b.brand.toLowerCase().includes(bSearch));
+ let h=`<thead><tr><th class="num">#</th><th>Brand</th><th class="num">Est. Units</th><th class="num">Avg $</th><th class="num">Est. Value</th><th class="num">Unit Share</th><th class="num">Value Share</th></tr></thead><tbody>`;
+ rows.slice(0,400).forEach(b=>{h+=`<tr class="${b.ll 'll':''}"><td class="num">${b.rank}</td><td>${b.brand}${b.ll '<span class="tag">LITTLE LEAF</span>':''}</td><td class="num">${fmtN(b.units)}</td><td class="num">$${b.avgPrice.toFixed(2)}</td><td class="num">${fmt$(b.value)}</td><td class="num">${b.unitShare}%</td><td class="num">${b.valueShare}%</td></tr>`;});
+ h+='</tbody>';
+ document.getElementById('tBrands').innerHTML=h;
+}
+
+// CATEGORY
+function drawCat(){
+ const c=D.categories.filter(x=>x.value>0);
+ mk('cCatVal',{type:'doughnut',data:{labels:c.map(x=>x.category),datasets:[{data:c.map(x=>x.value),backgroundColor:PAL,borderWidth:1,borderColor:'#fff'}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:c=>c.label+': '+fmtM(c.parsed)}}}}});
+ mk('cCatUnit',{type:'doughnut',data:{labels:c.map(x=>x.category),datasets:[{data:c.map(x=>x.units),backgroundColor:PAL,borderWidth:1,borderColor:'#fff'}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11},boxWidth:12}},tooltip:{callbacks:{label:c=>c.label+': '+fmtN(c.parsed)+' units'}}}}});
+ const focus={'Pre-Rolls':'Growfather (5/3-pack, Rosin & Live Resin PR)','Vaporizers':'Dr. Zodiak / Octane (carts, Liquid Diamonds)','Concentrates':'Dr. Zodiak (Moonrock, rosin)','Edibles':'Octane / Sugar High (gummies, 10-pack)','Flower':'Sugar High (infused flower)'};
+ let h=`<thead><tr><th>Category</th><th class="num">Est. Units</th><th class="num">Est. Value</th><th class="num">Avg $</th><th class="num">Val Share</th><th>Little Leaf Play</th></tr></thead><tbody>`;
+ D.categories.filter(x=>x.value>0).forEach(x=>{const f=focus[x.category];h+=`<tr class="${f 'll':''}"><td>${x.category}</td><td class="num">${fmtN(x.units)}</td><td class="num">${fmt$(x.value)}</td><td class="num">$${x.avgPrice.toFixed(2)}</td><td class="num">${x.valueShare}%</td><td>${f '<b style="color:#2e7d32">'+f+'</b>':'<span style="color:#b0bec5">&mdash;</span>'}</td></tr>`;});
+ h+='</tbody>';document.getElementById('tCat').innerHTML=h;
+}
+
+// DISPENSARIES
+let dFilter='all',dSearch='';
+function drawDisp(){
+ const top=D.dispensaries.slice(0,15);
+ mk('cDisp',{type:'bar',data:{labels:top.map(d=>d.dispensary.length>22 d.dispensary.slice(0,21)+' ':d.dispensary),datasets:[{data:top.map(d=>d.value),backgroundColor:LEAF}]},
+  options:{indexAxis:'y',maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>fmt$(c.parsed.x)}}},scales:{x:{ticks:{callback:v=>'$'+(v/1e6).toFixed(0)+'M',font:{size:10}},grid:{color:'#eef0ee'}},y:{ticks:{font:{size:9.5}},grid:{display:false}}}}});
+ // concentration
+ const tot=D.dispensaries.reduce((s,d)=>s+d.value,0);
+ const buckets=[['Top 10',0],['11-25',0],['26-50',0],['51-100',0],['101+',0]];
+ D.dispensaries.forEach((d,i)=>{const r=i+1;if(r<=10)buckets[0][1]+=d.value;else if(r<=25)buckets[1][1]+=d.value;else if(r<=50)buckets[2][1]+=d.value;else if(r<=100)buckets[3][1]+=d.value;else buckets[4][1]+=d.value;});
+ mk('cDispConc',{type:'pie',data:{labels:buckets.map(b=>b[0]+' stores'),datasets:[{data:buckets.map(b=>b[1]),backgroundColor:PAL,borderColor:'#fff',borderWidth:1}]},
+  options:{maintainAspectRatio:false,plugins:{legend:{position:'right',labels:{font:{size:11}}},tooltip:{callbacks:{label:c=>c.label+': '+fmtM(c.parsed)+' ('+(c.parsed/tot*100).toFixed(0)+'%)'}}}}});
+ renderDisp();
+}
+function renderDisp(){
+ let rows=D.dispensaries;
+ if(dFilter==='top25')rows=rows.slice(0,25);
+ if(dSearch)rows=rows.filter(d=>d.dispensary.toLowerCase().includes(dSearch));
+ let h=`<thead><tr><th class="num">#</th><th>Dispensary</th><th class="num">Est. Units</th><th class="num">Avg $</th><th class="num">Est. Value</th><th class="num">Unit Share</th><th class="num">Val Share</th></tr></thead><tbody>`;
+ rows.slice(0,300).forEach(d=>{h+=`<tr><td class="num">${d.rank}</td><td>${d.dispensary}</td><td class="num">${fmtN(d.units)}</td><td class="num">$${d.avgPrice.toFixed(2)}</td><td class="num">${fmt$(d.value)}</td><td class="num">${d.unitShare}%</td><td class="num">${d.valueShare}%</td></tr>`;});
+ h+='</tbody>';document.getElementById('tDisp').innerHTML=h;
+}
+
+// ACTION
+function drawAction(){
+ const top=D.dispensaries.slice(0,25);
+ const max=top[0].value;
+ let h=`<thead><tr><th class="num">#</th><th>Account</th><th class="num">Est. Value</th><th class="num">Opportunity</th></tr></thead><tbody>`;
+ top.forEach(d=>{const sc=Math.round(d.value/max*100);const col=sc>66 '#2e7d32':sc>33 '#b8860b':'#90a4ae';
+  h+=`<tr><td class="num">${d.rank}</td><td>${d.dispensary}</td><td class="num">${fmt$(d.value)}</td><td class="num"><span class="score" style="background:${col}">${sc}</span></td></tr>`;});
+ h+='</tbody>';document.getElementById('tTargets').innerHTML=h;
+
+ const ll=llConsolidated();
+ const push=[
+  {b:'Growfather',n:'Defend &amp; expand',d:'Rank #'+ll[0].rank+' &mdash; the proven winner. Protect shelf space, push 5-pack & Rosin line into the top-25 accounts.',c:'s-strong'},
+  {b:'Dr. Zodiak',n:'Invest to scale',d:'Rank #'+ll[1].rank+' with premium $'+ll[1].avgPrice.toFixed(0)+' avg price. Strong margin; needs distribution muscle in mid-tier stores.',c:'s-mid'},
+  {b:'Octane',n:'Prove the concept',d:'Rank #'+ll[2].rank+', early-stage. Concentrate trial in 5-10 high-volume accounts before broad push.',c:'s-weak'},
+  {b:'Sugar High',n:'Launch watch',d:'No market data yet. Set up tracking the moment first orders ship.',c:'s-na'},
+  {b:'Moonrock',n:'Launch watch',d:'No market data yet. Pre-launch.',c:'s-na'},
+ ];
+ document.getElementById('pushList').innerHTML=push.map(p=>`<div style="padding:11px 0;border-bottom:1px solid var(--line)"><div style="display:flex;justify-content:space-between;align-items:center"><b style="color:#1b5e20">${p.b}</b><span class="status ${p.c}">${p.n}</span></div><div style="font-size:12px;color:#6b7c70;margin-top:4px">${p.d}</div></div>`).join('');
+}
+
+// NAV
+const drawn={};
+function show(sec){
+ document.querySelectorAll('.sec').forEach(s=>s.classList.remove('show'));
+ document.getElementById('sec-'+sec).classList.add('show');
+ document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('active',a.dataset.sec===sec));
+ document.getElementById('ptitle').textContent=document.querySelector(`#nav a[data-sec="${sec}"]`).textContent.trim();
+ document.getElementById('psub').textContent=subs[sec];
+ if(!drawn[sec]){
+  if(sec==='exec')drawExec();
+  if(sec==='brand')drawBrand();
+  if(sec==='compete')renderBrands();
+  if(sec==='cat')drawCat();
+  if(sec==='disp')drawDisp();
+  if(sec==='action')drawAction();
+  drawn[sec]=1;
+ }
+ window.scrollTo(0,0);
+}
+document.querySelectorAll('#nav a').forEach(a=>a.onclick=()=>show(a.dataset.sec));
+
+// filters
+document.getElementById('brandSearch').oninput=e=>{bSearch=e.target.value.toLowerCase();renderBrands();};
+document.querySelectorAll('[data-bf]').forEach(c=>c.onclick=()=>{document.querySelectorAll('[data-bf]').forEach(x=>x.classList.remove('on'));c.classList.add('on');bFilter=c.dataset.bf;renderBrands();});
+document.getElementById('dispSearch').oninput=e=>{dSearch=e.target.value.toLowerCase();renderDisp();};
+document.querySelectorAll('[data-df]').forEach(c=>c.onclick=()=>{document.querySelectorAll('[data-df]').forEach(x=>x.classList.remove('on'));c.classList.add('on');dFilter=c.dataset.df;renderDisp();});
+
+document.getElementById('psub').textContent=subs.exec;
+drawExec();drawn.exec=1;
+</script>
+<!-- LLL_BOT_START --><style>#_lb{position:fixed;bottom:24px;right:24px;background:linear-gradient(135deg,#3fae6b,#2c7d4c);color:#0e1414;border:none;border-radius:28px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;z-index:8000;display:flex;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(63,174,107,.4)}#_lp{position:fixed;bottom:80px;right:24px;width:360px;max-height:520px;background:#16201f;border:1px solid #283533;border-radius:16px;display:none;flex-direction:column;z-index:8000;box-shadow:0 8px 40px rgba(0,0,0,.5)}#_lp.open{display:flex}._lh{padding:14px 16px;border-bottom:1px solid #283533;display:flex;align-items:center;justify-content:space-between}._lh h4{font-size:14px;font-weight:600;color:#e8efe9}._lh p{font-size:11px;color:#92a39c}._lhc{background:none;border:none;color:#92a39c;cursor:pointer;font-size:18px}._lm{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}._lmsg{max-width:88%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.5;color:#e8efe9}._lmsg.u{background:rgba(63,174,107,.15);border:1px solid rgba(63,174,107,.25);align-self:flex-end;border-radius:12px 12px 4px 12px}._lmsg.a{background:#1c2826;border:1px solid #283533;align-self:flex-start;border-radius:12px 12px 12px 4px}._lmsg.t{color:#92a39c;font-style:italic;align-self:flex-start}._lr{font-size:11px;color:#92a39c;padding:0 14px 8px;text-align:right}._li{padding:12px 14px;border-top:1px solid #283533;display:flex;gap:8px}._li input{flex:1;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:9px 12px;color:#e8efe9;font-size:13px;outline:none}._li input:focus{border-color:#3fae6b}._ls{background:#3fae6b;color:#0e1414;border:none;border-radius:9px;padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer}._ls:disabled{opacity:.4;cursor:not-allowed}</style><button id='_lb' onclick='_lt()'>&#127807; Ask Claude</button><div id='_lp'><div class='_lh'><div><h4>Little Leaf Assistant</h4><p>Powered by Claude</p></div><button class='_lhc' onclick='_lt()'>&#215;</button></div><div class='_lm' id='_lm'><div class='_lmsg a'>Hi! Ask me anything about this dashboard.</div></div><div class='_lr' id='_lr'></div><div class='_li'><input type='text' id='_lci' placeholder='Ask a question...' onkeydown='if(event.key==="Enter")_ls2()'><button class='_ls' id='_lsb' onclick='_ls2()'>Send</button></div></div><script>var _LSU='https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec';function _lt(){var p=document.getElementById('_lp');p.classList.toggle('open');if(p.classList.contains('open'))document.getElementById('_lci').focus();}function _lctx(){var c=document.title+'\n';try{if(typeof FOUND!=='undefined')c+='KPIs:'+JSON.stringify(FOUND)+'\n';if(typeof SEED_CUST!=='undefined')c+='Customers:'+JSON.stringify(SEED_CUST.slice(0,15))+'\n';if(typeof SEED_SKU!=='undefined')c+='SKUs:'+JSON.stringify(SEED_SKU.slice(0,15))+'\n';if(typeof SEED_SALES!=='undefined')c+='Sales:'+JSON.stringify(SEED_SALES)+'\n';if(typeof D!=='undefined')c+='Data:'+JSON.stringify(D).slice(0,2000)+'\n';if(typeof MKT!=='undefined')c+='Market:'+JSON.stringify(MKT).slice(0,2000)+'\n';}catch(e){}return c;}async function _ls2(){var inp=document.getElementById('_lci'),q=inp.value.trim();if(!q)return;var sess=sessionStorage.getItem('lll_vs');if(!sess){alert('Please log in first.');return;}var tok=JSON.parse(sess).token;var msgs=document.getElementById('_lm');var um=document.createElement('div');um.className='_lmsg u';um.textContent=q;msgs.appendChild(um);var tm=document.createElement('div');tm.className='_lmsg t';tm.textContent='Thinking...';msgs.appendChild(tm);msgs.scrollTop=msgs.scrollHeight;inp.value='';document.getElementById('_lsb').disabled=true;try{var pl=btoa(unescape(encodeURIComponent(JSON.stringify({action:'chatbot',token:tok,question:q,context:_lctx()}))));var r=await fetch(_LSU+'?p='+encodeURIComponent(pl),{method:'GET'});var d=await r.json();tm.className='_lmsg a';if(d.success){tm.textContent=d.answer;if(d.remaining!==undefined)document.getElementById('_lr').textContent=d.remaining+' questions remaining this hour';}else{tm.textContent='Error: '+(d.error||'Try again');}}catch(e){tm.className='_lmsg a';tm.textContent='Connection error. Try again.';}document.getElementById('_lsb').disabled=false;msgs.scrollTop=msgs.scrollHeight;}</script><!-- LLL_BOT_END --></body>
+</html>
