@@ -283,7 +283,7 @@ async function api(params) {
     return res.json();
   }
   const p   = btoa(unescape(encodeURIComponent(JSON.stringify(params))));
-  const res = await fetch(SCRIPT_URL + " p=" + encodeURIComponent(p), { method:"GET" });
+  const res = await fetch(SCRIPT_URL + "?p=" + encodeURIComponent(p), { method:"GET" });
   return res.json();
 }
 
@@ -368,8 +368,8 @@ async function initApp() {
         document.getElementById("upd-badge").style.display = "flex";
       }
       setDot("script","g","Apps Script: connected");
-      setDot("gh",    d.hasGhToken "g":"r", d.hasGhToken "GitHub token: configured":"GitHub token: NOT SET in Script Properties");
-      setDot("cl",    d.hasApiKey "g":"r",  d.hasApiKey "Claude API key: configured":"Claude API key: NOT SET in Script Properties");
+      setDot("gh",    d.hasGhToken?"g":"r", d.hasGhToken?"GitHub token: configured":"GitHub token: NOT SET in Script Properties");
+      setDot("cl",    d.hasApiKey?"g":"r",  d.hasApiKey?"Claude API key: configured":"Claude API key: NOT SET in Script Properties");
       if (d.users)    renderUsersData(d.users);
       if (d.viewers && currentUser.role==="superadmin") {
         renderViewersData(d.viewers);
@@ -417,13 +417,13 @@ async function startProcess() {
   function step(text, cls) {
     const d = document.createElement("div");
     d.className = "ps " + (cls||"active");
-    d.textContent = (cls==="done" "OK  ":cls==="fail" "FAIL":"... ") + " " + text;
+    d.textContent = (cls==="done" "OK  ":cls==="fail"?"FAIL":"... ") + " " + text;
     document.getElementById("prog-steps").appendChild(d);
     return d;
   }
   function upd(el, text, cls) {
     el.className = "ps " + cls;
-    el.textContent = (cls==="done" "OK  ":cls==="fail" "FAIL":"... ") + " " + text;
+    el.textContent = (cls==="done" "OK  ":cls==="fail"?"FAIL":"... ") + " " + text;
   }
 
   // STEP 1: Read Drive files
@@ -587,7 +587,7 @@ function injectViewerLogin(html, scriptUrl) {
     + "function tok(){try{var d=JSON.parse(sessionStorage.getItem(SK)||'{}');return d.token||null;}catch(e){return null;}}"
     + "function call(params,cb){"
       + "var p=btoa(unescape(encodeURIComponent(JSON.stringify(params))));"
-      + "fetch(SU+' p='+encodeURIComponent(p),{method:'GET'})"
+      + "fetch(SU+'?p='+encodeURIComponent(p),{method:'GET'})"
       + ".then(function(r){return r.json();})"
       + ".then(cb)"
       + ".catch(function(){cb({success:false,error:'Connection error. Check internet.'});});"
@@ -699,7 +699,7 @@ function injectChatbot(html, scriptUrl) {
       + "document.getElementById('_lsb').disabled=true;"
       + "try{"
         + "var pl=btoa(unescape(encodeURIComponent(JSON.stringify({action:'chatbot',token:tok,question:q,context:_lctx()}))));"
-        + "var r=await fetch(_LSU+' p='+encodeURIComponent(pl),{method:'GET'});"
+        + "var r=await fetch(_LSU+'?p='+encodeURIComponent(pl),{method:'GET'});"
         + "var d=await r.json();"
         + "tm.className='_lmsg a';"
         + "if(d.success){tm.textContent=d.answer;"
@@ -732,7 +732,7 @@ function buildFmTabsUI() {
   tabs.innerHTML = "";
   FM_CATS.forEach((cat, i) => {
     const btn = document.createElement("button");
-    btn.className = "fm-tab" + (i===0 " on":"");
+    btn.className = "fm-tab" + (i===0?" on":"");
     btn.textContent = cat.label;
     btn.onclick = function() {
       document.querySelectorAll(".fm-tab").forEach(t => t.classList.remove("on"));
@@ -792,14 +792,14 @@ function renderUsersData(users) {
       : `<td style="color:var(--muted)">........</td>`;
     const tr = document.createElement("tr");
     tr.innerHTML = `<td style="font-weight:500">${uname}${self ' <span style="color:var(--muted);font-size:10px">(you)</span>':""}</td>`
-      + `<td><span class="rp ${u.role==="superadmin" "rs":"ra"}">${u.role==="superadmin" "Super Admin":"Admin"}</span></td>`
+      + `<td><span class="rp ${u.role==="superadmin"?"rs":"ra"}">${u.role==="superadmin"?"Super Admin":"Admin"}</span></td>`
       + pwCell
       + `<td style="color:var(--muted);font-size:11px">${u.created new Date(u.created).toLocaleDateString():"-"}</td>`
       + `<td>${(isSA&&!self) `<button class="btn btn-red btn-sm" onclick="removeUser('${uname}')">Remove</button>`:"-"}</td>`;
     tb.appendChild(tr);
   });
   const ar = document.getElementById("add-user-row");
-  if (ar) ar.style.display = isSA "grid":"none";
+  if (ar) ar.style.display = isSA?"grid":"none";
 }
 
 async function loadUsersTable() {
@@ -937,15 +937,15 @@ function copyLink(id) {
 async function checkStatus() {
   setDot("script","y","Checking...");
   try {
-    const r=await fetch(SCRIPT_URL+" p="+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({action:"ping"}))))),{method:"GET"});
+    const r=await fetch(SCRIPT_URL+"?p="+encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify({action:"ping"}))))),{method:"GET"});
     const d=await r.json();
-    setDot("script",d.success "g":"r",d.success "Apps Script: connected":"Apps Script: error");
+    setDot("script",d.success?"g":"r",d.success?"Apps Script: connected":"Apps Script: error");
   } catch(e){setDot("script","r","Apps Script: cannot connect");}
   try {
     const cfg=await api({action:"getConfig"});
     if(cfg.success){
-      setDot("gh",cfg.hasGhToken "g":"r",cfg.hasGhToken "GitHub token: configured":"GitHub token: NOT SET in Script Properties");
-      setDot("cl",cfg.hasApiKey "g":"r",cfg.hasApiKey "Claude API key: configured":"Claude API key: NOT SET in Script Properties");
+      setDot("gh",cfg.hasGhToken?"g":"r",cfg.hasGhToken?"GitHub token: configured":"GitHub token: NOT SET in Script Properties");
+      setDot("cl",cfg.hasApiKey?"g":"r",cfg.hasApiKey?"Claude API key: configured":"Claude API key: NOT SET in Script Properties");
     }
   } catch(e){}
 }
@@ -1004,7 +1004,7 @@ async function sendChat() {
 // ============================================================
 function toast(msg,type){
   const el=document.getElementById("toast");
-  el.textContent=msg;el.className="show "+(type==="err" "err":"ok");
+  el.textContent=msg;el.className="show "+(type==="err"?"err":"ok");
   clearTimeout(el._t);el._t=setTimeout(()=>el.className="",4000);
 }
 
@@ -1085,7 +1085,7 @@ function injectVar(html, varPattern, newValue) {
   if (!match) return { html, success: false };
   const startPos = match.index + match[0].length - 1;
   const openChar = match[1];
-  const closeChar = openChar === '[' ']':'}';
+  const closeChar = openChar === '['?']':'}';
   let depth = 0, endPos = startPos;
   for (let i = startPos; i < html.length; i++) {
     if (html[i] === openChar) depth++;
@@ -1367,7 +1367,7 @@ function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
   // Update inventory SKU table
   if (apex.skuTable.length > 0) {
     const skuRows = apex.skuTable.slice(0, 16).map(s => {
-      const statusClass = s.status === 'CRITICAL'   'pill s-CRITICAL' : s.status === 'RED' 'pill s-RED':'pill s-ORANGE';
+      const statusClass = s.status === 'CRITICAL'   'pill s-CRITICAL' : s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
       return `<tr><td class="n">${s.name}</td><td class="r">${fmt(s.on_hand)}</td><td class="r">${s.weekly_vel}</td><td class="r">${s.weeks_left}</td><td><span class="${statusClass}">${s.status}</span></td></tr>`;
     }).join('\n');
     h = h.replace(/<tr><td class="n">Dr\. Zodiak[^<]*[\s\S]* <\/tr>( =\s*<tr><td class="n">Account)/, skuRows);
@@ -1500,7 +1500,7 @@ function buildSalesActionForm(html, apex, timeStr) {
       const aov = Math.round(num(b['Average Order Size']||0));
       return {
         name,
-        type: days >= 45 'Lapsed':'Reorder',
+        type: days >= 45?'Lapsed':'Reorder',
         contact: contact.contact || '',
         phone: contact.phone || '',
         email: contact.email || '',
