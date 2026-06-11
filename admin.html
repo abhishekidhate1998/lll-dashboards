@@ -952,7 +952,7 @@ function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
   // Update inventory SKU table
   if (apex.skuTable.length > 0) {
     const skuRows = apex.skuTable.slice(0, 16).map(s => {
-      const statusClass = s.status === 'CRITICAL'   'pill s-CRITICAL' : s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
+      const statusClass = s.status === 'CRITICAL'?'pill s-CRITICAL':s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
       return `<tr><td class="n">${s.name}</td><td class="r">${fmt(s.on_hand)}</td><td class="r">${s.weekly_vel}</td><td class="r">${s.weeks_left}</td><td><span class="${statusClass}">${s.status}</span></td></tr>`;
     }).join('\n');
     h = h.replace(/<tr><td class="n">Dr\. Zodiak[^<]*[\s\S]* <\/tr>( =\s*<tr><td class="n">Account)/, skuRows);
