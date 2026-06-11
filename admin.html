@@ -1173,12 +1173,17 @@ function loadFmFiles(category) {
     d.files.forEach(function(f) {
       var div = document.createElement("div");
       div.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:10px 14px;margin-bottom:8px";
+      div.className = "fm-item";
+      div.dataset.id = f.id;
+      div.dataset.cat = category;
+      div.dataset.name = f.name;
       div.innerHTML =
         "<div>" +
-          "<div style='font-size:13px;font-weight:500'>" + f.name + "</div>" +
-          "<div style='font-size:11px;color:var(--mu);margin-top:2px'>" + Math.round(f.size/1024) + " KB &bull; " + new Date(f.modified).toLocaleDateString() + "</div>" +
+          "<div class=\'fm-name\'>" + f.name + "</div>" +
+          "<div class=\'fm-meta\'>" + Math.round(f.size/1024) + " KB &bull; " + new Date(f.modified).toLocaleDateString() + "</div>" +
         "</div>" +
-        "<button class='btn btn-red btn-sm' onclick='deleteFmFile("" + f.id + "","" + f.name + "","" + category + "")'>Delete</button>";
+        "<button class=\'btn btn-red btn-sm\' onclick=\'this.closest(\\\'.fm-item\\\').dispatchEvent(new CustomEvent(\\\"fmdel\\\",{bubbles:true}))\'>Delete</button>";
+      div.addEventListener("fmdel", function(){ deleteFmFile(div.dataset.id, div.dataset.name, div.dataset.cat); });
       list.appendChild(div);
     });
   }).catch(function(e){ list.innerHTML = "<p style='color:var(--red);font-size:13px'>" + e.message + "</p>"; });
