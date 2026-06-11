@@ -787,7 +787,7 @@ function renderUsersData(users) {
   Object.entries(users||{}).forEach(([uname, u]) => {
     const self   = uname===currentUser.username;
     const pwCell = isSA
-        `<td><span id="ps-${uname}" style="font-family:monospace">........</span>
+      ? `<td><span id="ps-${uname}" style="font-family:monospace">........</span>
           <button class="btn btn-ghost btn-sm" style="padding:2px 7px;margin-left:4px;font-size:10px" onclick="togglePw('ps-${uname}','${(u.password||'').replace(/'/g,"\\'")}')">Show</button></td>`
       : `<td style="color:var(--muted)">........</td>`;
     const tr = document.createElement("tr");
@@ -795,7 +795,7 @@ function renderUsersData(users) {
       + `<td><span class="rp ${u.role==="superadmin"?"rs":"ra"}">${u.role==="superadmin"?"Super Admin":"Admin"}</span></td>`
       + pwCell
       + `<td style="color:var(--muted);font-size:11px">${u.created?new Date(u.created).toLocaleDateString():"-"}</td>`
-      + `<td>${(isSA&&!self) `<button class="btn btn-red btn-sm" onclick="removeUser('${uname}')">Remove</button>`:"-"}</td>`;
+      + `<td>${(isSA&&!self)?`<button class="btn btn-red btn-sm" onclick="removeUser('${uname}')">Remove</button>`:"-"}</td>`;
     tb.appendChild(tr);
   });
   const ar = document.getElementById("add-user-row");
