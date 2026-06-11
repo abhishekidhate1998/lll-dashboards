@@ -1102,7 +1102,7 @@ function buildCards(){
   RECIPES.forEach(r=>{
     let cannBom = r.cannabis.reduce((s,l)=>s+l.qty*lcost(l,c),0);
     let pkgSub = r.pkg.reduce((s,_,i)=>s+pkgCost(r,i),0);
-    const units = r.perUnit   1 : (r.yieldG / r.unitG);
+    const units = r.perUnit?1:(r.yieldG / r.unitG);
     const cannPerUnit = r.perUnit?cannBom:cannBom/units;
     const allIn = cannPerUnit + pkgSub + labCost(r,c) + opxCost(r,c);
 
@@ -1132,15 +1132,15 @@ function buildCards(){
           <tr><td colspan="4" class="sub">Cannabis Materials</td></tr>
           ${cannRows}
           <tr class="tot"><td class="lbl">Cannabis Subtotal${r.perUnit?'':' (batch)'}</td><td></td><td></td>
-              <td class="r gold money">${fmt(cannBom)}${r.perUnit '':' <span style="color:var(--mut);font-weight:400;font-size:11px">('+fmt(cannPerUnit)+'/u)</span>'}</td></tr>
+              <td class="r gold money">${fmt(cannBom)}${r.perUnit?'':' <span style="color:var(--mut);font-weight:400;font-size:11px">('+fmt(cannPerUnit)+'/u)</span>'}</td></tr>
 
           <tr><td colspan="4" class="sub">Packaging (per unit)</td></tr>
           ${pkgRows}
           <tr class="tot"><td class="lbl">Packaging Subtotal</td><td></td><td></td><td class="r gold money">${fmt(pkgSub)}</td></tr>
 
           <tr><td colspan="4" class="sub">Labor</td></tr>
-          <tr><td class="mat">Production Labor${(LABOR_SKU[r.id]!=null||r.labor!=null) ' <span class="dim" style="font-size:11px">(per-SKU)</span>':''}</td><td class="r dim">1 unit</td><td class="r dim">${fmt(labCost(r,c))}/u</td><td class="r money">${fmt(labCost(r,c))}</td></tr>
-          <tr><td class="mat">OpEx / Overhead${(OPEX_SKU[r.id]!=null||r.opex!=null) ' <span class="dim" style="font-size:11px">(per-SKU)</span>':''}</td><td class="r dim">1 unit</td><td class="r dim">${fmt(opxCost(r,c))}/u</td><td class="r money">${fmt(opxCost(r,c))}</td></tr>
+          <tr><td class="mat">Production Labor${(LABOR_SKU[r.id]!=null||r.labor!=null)?' <span class="dim" style="font-size:11px">(per-SKU)</span>':''}</td><td class="r dim">1 unit</td><td class="r dim">${fmt(labCost(r,c))}/u</td><td class="r money">${fmt(labCost(r,c))}</td></tr>
+          <tr><td class="mat">OpEx / Overhead${(OPEX_SKU[r.id]!=null||r.opex!=null)?' <span class="dim" style="font-size:11px">(per-SKU)</span>':''}</td><td class="r dim">1 unit</td><td class="r dim">${fmt(opxCost(r,c))}/u</td><td class="r money">${fmt(opxCost(r,c))}</td></tr>
 
           <tr class="grand"><td class="lbl">All-In COGS / Unit</td><td></td><td></td><td class="r money" style="font-size:15px">${fmt(allIn)}</td></tr>
         </tbody>
@@ -1231,7 +1231,7 @@ function genTable(elId, key, cols, data, statusFn){
     data.sort((a,b)=>{const x=nv(a[k]),y=nv(b[k]); if(x!=null&&y!=null)return (x-y)*sortDir; return String(a[k]  '').localeCompare(String(b[k]  ''))*sortDir;});
     store.set(key,data); render(); }
   function render(){
-    let head=cols.map(c=>{const w=c.w `min-width:${c.w}px;`:'';const sc=c.k 'cursor:pointer;':'';const st=(w||sc) ` style="${w}${sc}"`:'';return `<th class="${c.r 'r':''}"${c.k ` data-sort="${c.k}" title="Sort by ${c.h}"`:''}${st}>${c.h}${sortKey&&sortKey===c.k (sortDir>0 '  ':'  '):(c.k '  ':'')}</th>`;}).join('')+'<th></th>';
+    let head=cols.map(c=>{const w=c.w `min-width:${c.w}px;`:'';const sc=c.k?'cursor:pointer;':'';const st=(w||sc) ` style="${w}${sc}"`:'';return `<th class="${c.r?'r':''}"${c.k ` data-sort="${c.k}" title="Sort by ${c.h}"`:''}${st}>${c.h}${sortKey&&sortKey===c.k (sortDir>0?'  ':'  '):(c.k?'  ':'')}</th>`;}).join('')+'<th></th>';
     let body=data.map((row,ri)=>{
       let tds=cols.map(c=>{
         if(c.calc) return `<td class="r money gold">${c.calc(row)}</td>`;
@@ -1574,7 +1574,7 @@ function buildOverview(){
   const invVal=INV.reduce((s,r)=>s+(+r.qty||0)*(+r.price||0),0);
   $('#ov_live').innerHTML=
     `<div class="kpi"><div class="k">Active Batches</div><div class="v">${active}</div></div>`+
-    `<div class="kpi"><div class="k">Items at Reorder</div><div class="v" style="color:${reorder.length 'var(--red)':'var(--green)'}">${reorder.length}</div></div>`+
+    `<div class="kpi"><div class="k">Items at Reorder</div><div class="v" style="color:${reorder.length?'var(--red)':'var(--green)'}">${reorder.length}</div></div>`+
     `<div class="kpi"><div class="k">Planned Units / mo</div><div class="v">${fmt0(totUnits)}</div></div>`+
     `<div class="kpi"><div class="k">Planned COGS / mo</div><div class="v gold">${fmt(totCOGS)}</div></div>`+
     `<div class="kpi"><div class="k">Inventory Value (live)</div><div class="v green">${fmt(invVal)}</div></div>`;
@@ -1642,7 +1642,7 @@ function buildWorkflow(){
     `<div class="kpi"><div class="k">WIP (active)</div><div class="v" style="color:var(--red)">${wipB}</div></div>`+
     `<div class="kpi"><div class="k">Final + Label (active)</div><div class="v gold">${finalB}</div></div>`+
     `<div class="kpi"><div class="k">Ready For Sale</div><div class="v green">${labelB}</div></div>`+
-    `<div class="kpi"><div class="k">Avg |Yield Var|</div><div class="v" style="color:${avgV>10 'var(--red)':(avgV>5 'var(--gold)':'var(--green)')}">${avgV.toFixed(1)}%</div></div>`;
+    `<div class="kpi"><div class="k">Avg |Yield Var|</div><div class="v" style="color:${avgV>10 'var(--red)':(avgV>5?'var(--gold)':'var(--green)')}">${avgV.toFixed(1)}%</div></div>`;
   const body=rows.map(x=>{
     if(!x.p.product&&!x.act)return '';
     const vtxt=(x.v>=0?'+':'')+x.v.toFixed(1)+'%';
@@ -1924,7 +1924,7 @@ function stockoutDate(r){
   const dt=new Date(Date.now()+d*86400000);
   const s=String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getDate()).padStart(2,'0');
   const col=d<=7 'var(--red)':(d<=21?'var(--gold)':'var(--mut)');
-  return `<span style="color:${col};font-weight:${d<=21 '700':'400'}">${s}</span>`;
+  return `<span style="color:${col};font-weight:${d<=21?'700':'400'}">${s}</span>`;
 }
 const PLAN_COLS=[{h:'Product -- Strain . Weight',k:'name',plain:true,w:300},{h:'Status',status:1},{h:'Out-of-Stock',calc:stockoutDate},{h:'Days Left',k:'days',r:1},{h:'On Hand',k:'oh',r:1},{h:'Units / wk',k:'vel',r:1},{h:'Make (to 1.5-mo)',k:'batch',r:1},{h:'Rev at Risk $',k:'risk',r:1},{h:'SKU',k:'sku',w:110},{h:'Recommended Action',k:'action',w:200}];
 function addPlan(){PLAN.unshift({sku:'',name:'',brand:'',vel:'',oh:'',days:'',wks:'',wkrev:'',risk:'',batch:'',wipin:'',status:'',action:'Monitor'});store.set('plan',PLAN);planT.render();}
