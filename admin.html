@@ -939,7 +939,7 @@ function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
   let h = html;
   
   // KPI replacements
-  const revOld = h.match(/\$[\d,]+( =<div class="l">.* Revenue)/s) .[0] || '';
+  const revOld = h.match(/\$[\d,]+( =<div class="l">.* Revenue)/s)?.[0] || '';
   h = h.replace(/\$2,753,930( =<div)/, fmtD(qb.rev));
   h = h.replace(/GP \d+%/, `GP ${qb.gp_pct}%`);
   h = h.replace(/\$1,487,822/, fmtD(qb.gp));
