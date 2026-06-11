@@ -638,7 +638,7 @@ document.getElementById("c-ok").onclick = function(){ closeConfirm(); if(confirm
 
 <script>
 function parseCSV(text) {
-  const lines = text.trim().split(/\r \n/);
+  const lines = text.trim().split(/\r?\n/);
   if (!lines.length) return [];
   const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g,'').trim());
   const rows = [];
