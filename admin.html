@@ -118,6 +118,7 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
   </div>
   <div class="nav">
     <button class="nb on"  onclick="showPage('process',this)">&#9654; Process &amp; Deploy</button>
+    <button class="nb"     onclick="showPage('files',this)">&#128193; File Manager</button>
     <button class="nb"     onclick="showPage('users',this)">&#128101; Users</button>
     <button class="nb"     onclick="showPage('history',this)">&#128203; History</button>
     <button class="nb"     onclick="showPage('settings',this)">&#9881; Settings</button>
@@ -144,6 +145,14 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
       </div>
     </div>
 
+    <div class="page" id="page-files">
+      <div class="card">
+        <h3>File Manager &mdash; Google Drive</h3>
+        <p style="font-size:13px;color:var(--mu);margin-bottom:16px">CSV files stored in your Google Drive folders. Delete old files here before uploading new ones.</p>
+        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="fm-tabs"></div>
+        <div id="fm-list"><p style="color:var(--mu);font-size:13px">Select a folder above.</p></div>
+      </div>
+    </div>
     <div class="page" id="page-users">
       <div class="card">
         <h3>Admin Users</h3>
@@ -321,6 +330,7 @@ function showPage(name, btn) {
   document.querySelectorAll(".nb").forEach(function(b){ b.classList.remove("on"); });
   document.getElementById("page-" + name).classList.add("on");
   if (btn) btn.classList.add("on");
+  if (name === "files") buildFmTabs();
 }
 
 // ── PROCESS & DEPLOY ─────────────────────────────────────────
@@ -1112,6 +1122,67 @@ function buildLitCommandCenter(html, lit, apex, timeStr) {
   h = injectLastUpdated(h, timeStr);
   return h;
 }
+
+// ── FILE MANAGER ─────────────────────────────────────────────
+var FM_CATS = [
+  {key:"quickbooks", label:"QuickBooks"},
+  {key:"distru",     label:"Distru"},
+  {key:"apex",       label:"Apex CRM"},
+  {key:"metrc",      label:"Metrc"},
+  {key:"lit_alerts", label:"Lit Alerts"}
+];
+
+function buildFmTabs() {
+  var tabs = document.getElementById("fm-tabs");
+  if (!tabs) return;
+  tabs.innerHTML = "";
+  FM_CATS.forEach(function(cat, i) {
+    var btn = document.createElement("button");
+    btn.className = "btn btn-ghost btn-sm" + (i === 0 ? " btn-gr" : "");
+    btn.textContent = cat.label;
+    btn.onclick = function() {
+      document.querySelectorAll("#fm-tabs button").forEach(function(b){ b.className="btn btn-ghost btn-sm"; });
+      btn.className = "btn btn-gr btn-sm";
+      loadFmFiles(cat.key);
+    };
+    tabs.appendChild(btn);
+  });
+  loadFmFiles(FM_CATS[0].key);
+}
+
+function loadFmFiles(category) {
+  var list = document.getElementById("fm-list");
+  list.innerHTML = "<p style='color:var(--mu);font-size:13px'>Loading...</p>";
+  api({action:"listFiles", category:category}).then(function(d) {
+    if (!d.success) { list.innerHTML = "<p style='color:var(--red);font-size:13px'>Error: " + d.error + "</p>"; return; }
+    if (!d.files || !d.files.length) {
+      list.innerHTML = "<p style='color:var(--mu);font-size:13px'>No CSV files in this folder. Upload files directly to Google Drive.</p>";
+      return;
+    }
+    list.innerHTML = "";
+    d.files.forEach(function(f) {
+      var div = document.createElement("div");
+      div.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:10px 14px;margin-bottom:8px";
+      div.innerHTML =
+        "<div>" +
+          "<div style='font-size:13px;font-weight:500'>" + f.name + "</div>" +
+          "<div style='font-size:11px;color:var(--mu);margin-top:2px'>" + Math.round(f.size/1024) + " KB &bull; " + new Date(f.modified).toLocaleDateString() + "</div>" +
+        "</div>" +
+        "<button class='btn btn-red btn-sm' onclick='deleteFmFile("" + f.id + "","" + f.name + "","" + category + "")'>Delete</button>";
+      list.appendChild(div);
+    });
+  }).catch(function(e){ list.innerHTML = "<p style='color:var(--red);font-size:13px'>" + e.message + "</p>"; });
+}
+
+function deleteFmFile(id, name, cat) {
+  showConfirm("Delete File", "Delete " + name + "? A backup is saved automatically.", function() {
+    api({action:"deleteFile", fileId:id, category:cat}).then(function(d) {
+      if (d.success) { toast("Deleted (backup saved)", "ok"); loadFmFiles(cat); }
+      else toast("Error: " + d.error, "err");
+    }).catch(function(e){ toast(e.message, "err"); });
+  });
+}
+
 </script>
 </body>
 </html>
