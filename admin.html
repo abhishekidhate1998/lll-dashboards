@@ -85,6 +85,13 @@ body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacS
 .cc{background:var(--panel);border:1px solid var(--ln);border-radius:14px;padding:26px 28px;width:340px}
 .cc h3{font-size:16px;margin-bottom:8px}.cc p{color:var(--mu);font-size:13px;margin-bottom:20px}
 .cc-btns{display:flex;gap:8px;justify-content:flex-end}
+
+.fm-tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap}
+.fm-tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--ln);background:var(--p2);color:var(--mu);transition:all .15s}
+.fm-tab:hover{color:var(--ink);border-color:var(--gr)}
+.fm-tab.on{background:rgba(63,174,107,.12);border-color:rgba(63,174,107,.4);color:var(--gr)}
+.fm-item{display:flex;align-items:center;justify-content:space-between;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:12px 16px;margin-bottom:8px}
+.fm-name{font-size:14px;font-weight:500}.fm-meta{font-size:12px;color:var(--mu);margin-top:2px}
 </style>
 </head>
 <body>
@@ -148,9 +155,9 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
     <div class="page" id="page-files">
       <div class="card">
         <h3>File Manager &mdash; Google Drive</h3>
-        <p style="font-size:13px;color:var(--mu);margin-bottom:16px">CSV files stored in your Google Drive folders. Delete old files here before uploading new ones.</p>
-        <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap" id="fm-tabs"></div>
-        <div id="fm-list"><p style="color:var(--mu);font-size:13px">Select a folder above.</p></div>
+        <p style="font-size:13px;color:var(--mu);margin-bottom:16px">CSV files in your Google Drive folders. Delete old files before uploading new ones.</p>
+        <div id="fm-tabs" class="fm-tabs"></div>
+        <div id="fm-list"><p style="color:var(--mu);font-size:13px">Loading...</p></div>
       </div>
     </div>
     <div class="page" id="page-users">
@@ -330,7 +337,7 @@ function showPage(name, btn) {
   document.querySelectorAll(".nb").forEach(function(b){ b.classList.remove("on"); });
   document.getElementById("page-" + name).classList.add("on");
   if (btn) btn.classList.add("on");
-  if (name === "files") buildFmTabs();
+  if (name === "files") buildFmTabsUI();
 }
 
 // ── PROCESS & DEPLOY ─────────────────────────────────────────
@@ -1132,23 +1139,26 @@ var FM_CATS = [
   {key:"lit_alerts", label:"Lit Alerts"}
 ];
 
-function buildFmTabs() {
+function buildFmTabsUI() {
   var tabs = document.getElementById("fm-tabs");
   if (!tabs) return;
   tabs.innerHTML = "";
   FM_CATS.forEach(function(cat, i) {
     var btn = document.createElement("button");
-    btn.className = "btn btn-ghost btn-sm" + (i === 0 ? " btn-gr" : "");
+    btn.className = "fm-tab" + (i === 0 ? " on" : "");
     btn.textContent = cat.label;
     btn.onclick = function() {
-      document.querySelectorAll("#fm-tabs button").forEach(function(b){ b.className="btn btn-ghost btn-sm"; });
-      btn.className = "btn btn-gr btn-sm";
+      document.querySelectorAll(".fm-tab").forEach(function(t){ t.classList.remove("on"); });
+      btn.classList.add("on");
       loadFmFiles(cat.key);
     };
     tabs.appendChild(btn);
   });
   loadFmFiles(FM_CATS[0].key);
 }
+
+// Keep alias for backward compat
+function buildFmTabs() { buildFmTabsUI(); }
 
 function loadFmFiles(category) {
   var list = document.getElementById("fm-list");
