@@ -471,7 +471,7 @@ async function startProcess() {
   for (var _ti=0; _ti<DASHBOARDS.length; _ti++) {
     var file=DASHBOARDS[_ti].file, label=DASHBOARDS[_ti].label;
     try {
-      const url = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/main/" + file + " t=" + Date.now();
+      const url = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/main/" + file + "?t=" + Date.now();
       const res = await fetch(url);
       if (!res.ok) throw new Error("HTTP " + res.status);
       const html = await res.text();
