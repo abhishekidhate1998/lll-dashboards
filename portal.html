@@ -2,155 +2,149 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Little Leaf Labs</title>
 <style>
-:root{--bg:#0e1414;--panel:#16201f;--p2:#1c2826;--ink:#e8efe9;--mu:#92a39c;--ln:#283533;--gr:#3fae6b;--gd:#2c7d4c;}
+:root{--bg:#0e1414;--panel:#16201f;--p2:#1c2826;--ink:#e8efe9;--mu:#92a39c;--ln:#283533;--gr:#3fae6b;--gd:#2c7d4c;--red:#e5484d;--blue:#4a9ed9;--sb:220px;--tb:52px;}
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 
-/* LOGIN */
-#lw{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center}
-.lbox{background:var(--panel);border:1px solid var(--ln);border-radius:18px;padding:40px 36px;width:340px;text-align:center}
+/* ── LOGIN ── */
+#lw{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+.lbox{background:var(--panel);border:1px solid var(--ln);border-radius:18px;padding:36px 32px;width:100%;max-width:340px;text-align:center}
 .lbox h1{font-size:20px;font-weight:700;margin-bottom:4px}
 .lbox p{color:var(--mu);font-size:13px;margin-bottom:24px}
-.lbox input{width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:10px 14px;color:var(--ink);font-size:14px;outline:none;margin-bottom:10px;display:block}
+.lbox input{width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:11px 14px;color:var(--ink);font-size:14px;outline:none;margin-bottom:10px;display:block}
 .lbox input:focus{border-color:var(--gr)}
 #lerr{color:#ff7378;font-size:12px;min-height:18px;margin-bottom:8px;text-align:left}
-#lbtn{width:100%;background:var(--gr);color:#0e1414;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none}
+#lbtn{width:100%;background:var(--gr);color:#0e1414;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s}
 #lbtn:disabled{opacity:.5;cursor:not-allowed}
 
-/* APP */
-#app{display:none;flex-direction:column;height:100%}
+/* ── APP SHELL ── */
+#app{display:none;flex-direction:column;height:100%;position:relative}
 #app.on{display:flex}
 
-/* TOPBAR */
-.tb{background:var(--panel);border-bottom:1px solid var(--ln);height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;flex-shrink:0;z-index:100}
-.brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700}
-.bdot{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--gr),var(--gd));display:flex;align-items:center;justify-content:center;font-size:15px}
-.who{font-size:12px;color:var(--mu)}
+/* ── TOPBAR ── */
+.tb{background:var(--panel);border-bottom:1px solid var(--ln);height:var(--tb);display:flex;align-items:center;padding:0 14px;flex-shrink:0;z-index:200;gap:10px}
+#sb-toggle{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--ln);color:var(--mu);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;line-height:1}
+#sb-toggle:hover{background:var(--p2);color:var(--ink);border-color:var(--gr)}
+.brand{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;flex:1;min-width:0}
+.bdot{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--gr),var(--gd));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.brand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who{font-size:11px;color:var(--mu);white-space:nowrap;flex-shrink:0}
 .who b{color:var(--gr)}
-.lout{background:var(--p2);border:1px solid var(--ln);border-radius:7px;padding:5px 12px;font-size:12px;color:var(--ink);cursor:pointer}
+.lout{background:var(--p2);border:1px solid var(--ln);border-radius:7px;padding:5px 10px;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap;flex-shrink:0}
 .lout:hover{border-color:var(--gr);color:var(--gr)}
 
-/* BODY */
-.ab{display:flex;flex:1;overflow:hidden;min-height:0}
+/* ── BODY ── */
+.ab{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
 
-/* SIDEBAR */
-.sb{width:210px;background:var(--panel);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
-.sbh{padding:14px 16px 6px;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;font-weight:700}
-.nav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;color:var(--mu);font-size:13px;font-weight:500;border-left:3px solid transparent;border:none;background:none;width:100%;text-align:left;transition:all .15s}
+/* ── SIDEBAR ── */
+.sb{width:var(--sb);background:var(--panel);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden;transition:width .25s ease,transform .25s ease;z-index:150}
+.sb.collapsed{width:0;border-right:none}
+.sbh{padding:14px 16px 6px;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;font-weight:700;white-space:nowrap;overflow:hidden}
+.nav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;color:var(--mu);font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;transition:all .15s;white-space:nowrap;overflow:hidden}
 .nav-item:hover{background:var(--p2);color:var(--ink)}
 .nav-item.on{background:rgba(63,174,107,.1);color:var(--gr);border-left:3px solid var(--gr)}
+.nav-item:not(.on){border-left:3px solid transparent}
 .ni{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.nl{flex:1;line-height:1.3}
+.nl{flex:1;overflow:hidden;text-overflow:ellipsis}
 
-/* CONTENT AREA */
-.ca{flex:1;position:relative;overflow:hidden;background:var(--bg)}
+/* Mobile overlay sidebar */
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:140;opacity:0;transition:opacity .25s}
+.sb-overlay.show{opacity:1}
 
-/* IFRAMES */
-.dash-frame{
-  position:absolute;inset:0;width:100%;height:100%;
-  border:none;display:none;background:var(--bg);
-}
+/* ── CONTENT ── */
+.ca{flex:1;position:relative;overflow:hidden}
+.dash-frame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;background:var(--bg)}
 .dash-frame.on{display:block}
 
-/* LOADING OVERLAY */
-.loading{
-  position:absolute;inset:0;display:flex;align-items:center;
-  justify-content:center;flex-direction:column;gap:12px;
-  background:var(--bg);z-index:10;pointer-events:none;
-  transition:opacity .3s;
-}
-.loading.hide{opacity:0}
+/* ── LOADING ── */
+.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);z-index:10;transition:opacity .3s}
+.loading.hide{opacity:0;pointer-events:none}
 .spinner{width:36px;height:36px;border:3px solid var(--ln);border-top-color:var(--gr);border-radius:50%;animation:spin .8s linear infinite}
 @keyframes spin{to{transform:rotate(360deg)}}
 .loading p{font-size:13px;color:var(--mu)}
 
 /* ── CHATBOT ── */
-#cb-btn{position:fixed;bottom:24px;right:24px;width:52px;height:52px;border-radius:50%;
-  background:linear-gradient(135deg,var(--gr),var(--gd));border:none;cursor:pointer;
-  z-index:8000;box-shadow:0 4px 20px rgba(63,174,107,.4);transition:transform .2s;
-  display:flex;align-items:center;justify-content:center;font-size:22px;}
-#cb-btn:hover{transform:scale(1.08);}
-#cb-btn .cb-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;
-  background:var(--red);border-radius:50%;font-size:9px;color:#fff;
-  display:none;align-items:center;justify-content:center;font-weight:700;}
-#cb-panel{position:fixed;bottom:88px;right:24px;width:380px;height:520px;
-  background:var(--panel);border:1px solid var(--ln);border-radius:18px;
-  display:flex;flex-direction:column;z-index:8000;box-shadow:0 8px 40px rgba(0,0,0,.5);
-  transform:scale(.92) translateY(12px);opacity:0;pointer-events:none;
-  transition:all .22s cubic-bezier(.34,1.56,.64,1);}
-#cb-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all;}
-.cb-head{padding:14px 16px;border-bottom:1px solid var(--ln);display:flex;
-  align-items:center;gap:10px;flex-shrink:0;}
-.cb-head .cb-icon{width:32px;height:32px;border-radius:8px;
-  background:linear-gradient(135deg,var(--gr),var(--gd));
-  display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
-.cb-head h4{font-size:14px;font-weight:700;flex:1;}
-.cb-head span{font-size:11px;color:var(--mu);}
-.cb-close{background:none;border:none;color:var(--mu);font-size:18px;cursor:pointer;
-  padding:2px 6px;border-radius:6px;line-height:1;}
-.cb-close:hover{color:var(--ink);background:var(--p2);}
-.cb-msgs{flex:1;overflow-y:auto;padding:14px 14px 6px;display:flex;
-  flex-direction:column;gap:10px;min-height:0;}
-.cb-msgs::-webkit-scrollbar{width:4px;}
-.cb-msgs::-webkit-scrollbar-track{background:transparent;}
-.cb-msgs::-webkit-scrollbar-thumb{background:var(--ln);border-radius:2px;}
-.cb-msg{max-width:88%;font-size:13px;line-height:1.5;padding:9px 13px;border-radius:12px;word-break:break-word;}
-.cb-msg.user{background:rgba(63,174,107,.15);border:1px solid rgba(63,174,107,.25);
-  color:var(--ink);align-self:flex-end;border-bottom-right-radius:3px;}
-.cb-msg.bot{background:var(--p2);border:1px solid var(--ln);
-  color:var(--ink);align-self:flex-start;border-bottom-left-radius:3px;}
-.cb-msg.bot.thinking{color:var(--mu);font-style:italic;}
-.cb-msg a{color:var(--blue);text-decoration:none;}
-.cb-msg a:hover{text-decoration:underline;}
-.cb-msg strong{color:var(--gr);}
-.cb-msg code{background:var(--bg);border:1px solid var(--ln);border-radius:4px;
-  padding:1px 5px;font-size:12px;font-family:monospace;}
-.cb-chips{padding:6px 14px;display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;}
-.cb-chip{background:var(--p2);border:1px solid var(--ln);border-radius:20px;
-  padding:4px 10px;font-size:11px;color:var(--mu);cursor:pointer;white-space:nowrap;transition:all .15s;}
-.cb-chip:hover{border-color:var(--gr);color:var(--gr);}
-.cb-foot{padding:10px 12px;border-top:1px solid var(--ln);display:flex;gap:8px;flex-shrink:0;}
-#cb-input{flex:1;background:var(--p2);border:1px solid var(--ln);border-radius:10px;
-  padding:9px 12px;color:var(--ink);font-size:13px;outline:none;resize:none;
-  max-height:80px;min-height:36px;font-family:inherit;line-height:1.4;}
-#cb-input:focus{border-color:var(--gr);}
-#cb-send{background:var(--gr);color:#0e1414;border:none;border-radius:10px;
-  width:36px;height:36px;cursor:pointer;font-size:16px;flex-shrink:0;
-  display:flex;align-items:center;justify-content:center;transition:opacity .15s;}
-#cb-send:hover{opacity:.85;}
-#cb-send:disabled{opacity:.35;cursor:not-allowed;}
+#cb-btn{position:fixed;bottom:20px;right:20px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gr),var(--gd));border:none;cursor:pointer;z-index:8000;box-shadow:0 4px 20px rgba(63,174,107,.4);transition:transform .2s;display:none;align-items:center;justify-content:center;font-size:20px}
+#cb-btn.visible{display:flex}
+#cb-btn:hover{transform:scale(1.08)}
+.cb-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;color:#fff;display:none;align-items:center;justify-content:center;font-weight:700}
+#cb-panel{position:fixed;bottom:80px;right:16px;width:min(360px,calc(100vw - 32px));height:min(500px,calc(100vh - 120px));background:var(--panel);border:1px solid var(--ln);border-radius:18px;display:flex;flex-direction:column;z-index:8000;box-shadow:0 8px 40px rgba(0,0,0,.5);transform:scale(.92) translateY(12px);opacity:0;pointer-events:none;transition:all .22s cubic-bezier(.34,1.56,.64,1)}
+#cb-panel.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+.cb-head{padding:12px 14px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:10px;flex-shrink:0}
+.cb-icon{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--gr),var(--gd));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.cb-head h4{font-size:13px;font-weight:700;flex:1}
+.cb-head span{font-size:11px;color:var(--mu)}
+.cb-close{background:none;border:none;color:var(--mu);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px}
+.cb-close:hover{color:var(--ink);background:var(--p2)}
+.cb-msgs{flex:1;overflow-y:auto;padding:12px 12px 6px;display:flex;flex-direction:column;gap:8px;min-height:0}
+.cb-msgs::-webkit-scrollbar{width:4px}
+.cb-msgs::-webkit-scrollbar-thumb{background:var(--ln);border-radius:2px}
+.cb-msg{max-width:88%;font-size:13px;line-height:1.5;padding:8px 12px;border-radius:12px;word-break:break-word}
+.cb-msg.user{background:rgba(63,174,107,.15);border:1px solid rgba(63,174,107,.25);align-self:flex-end;border-bottom-right-radius:3px}
+.cb-msg.bot{background:var(--p2);border:1px solid var(--ln);align-self:flex-start;border-bottom-left-radius:3px}
+.cb-msg.thinking{color:var(--mu);font-style:italic}
+.cb-msg strong{color:var(--gr)}
+.cb-msg code{background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:1px 5px;font-size:11px;font-family:monospace}
+.cb-chips{padding:6px 12px;display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+.cb-chip{background:var(--p2);border:1px solid var(--ln);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--mu);cursor:pointer;white-space:nowrap;transition:all .15s}
+.cb-chip:hover{border-color:var(--gr);color:var(--gr)}
+.cb-foot{padding:8px 10px;border-top:1px solid var(--ln);display:flex;gap:8px;flex-shrink:0}
+#cb-input{flex:1;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:8px 11px;color:var(--ink);font-size:13px;outline:none;resize:none;max-height:80px;min-height:34px;font-family:inherit;line-height:1.4}
+#cb-input:focus{border-color:var(--gr)}
+#cb-send{background:var(--gr);color:#0e1414;border:none;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
+#cb-send:hover{opacity:.85}
+#cb-send:disabled{opacity:.35;cursor:not-allowed}
 
+/* ── RESPONSIVE ── */
+/* Sidebar always fixed overlay on all screen sizes */
+.sb{position:fixed;top:var(--tb);left:0;height:calc(100% - var(--tb));transform:translateX(-100%);width:var(--sb) !important;border-right:1px solid var(--ln);z-index:150}
+.sb.mobile-open{transform:translateX(0)}
+.sb-overlay{display:block}
+@media(max-width:768px){
+  :root{--sb:260px}
+  .who{display:none}
+  .brand-name{font-size:13px}
+}
+@media(max-width:400px){
+  .lbox{padding:28px 20px}
+  .lbox h1{font-size:18px}
+}
+@media(max-width:400px){
+  .lbox{padding:28px 20px}
+  .lbox h1{font-size:18px}
+}
 </style>
 </head>
 <body>
 
-<!-- LOGIN -->
 <div id="lw">
   <div class="lbox">
-    <div style="font-size:42px;margin-bottom:14px">🌿</div>
+    <div style="font-size:40px;margin-bottom:12px">🌿</div>
     <h1>Little Leaf Labs</h1>
-    <p>Sign in to access the dashboards</p>
-    <input type="text"     id="lu" placeholder="Username" autocomplete="username">
+    <p>Sign in to access your dashboards</p>
+    <input type="text" id="lu" placeholder="Username" autocomplete="username">
     <input type="password" id="lp" placeholder="Password" autocomplete="current-password">
     <div id="lerr"></div>
     <button id="lbtn" onclick="doLogin()">Sign In</button>
   </div>
 </div>
 
-<!-- APP -->
 <div id="app">
   <div class="tb">
-    <div class="brand"><div class="bdot">🌿</div>Little Leaf Labs</div>
-    <div style="display:flex;align-items:center;gap:12px">
-      <span class="who">Signed in as <b id="wn">-</b></span>
-      <button class="lout" onclick="doLogout()">Logout</button>
+    <button id="sb-toggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
+    <div class="brand">
+      <div class="bdot">🌿</div>
+      <span class="brand-name">Little Leaf Labs</span>
     </div>
+    <span class="who">Signed in as <b id="wn">-</b></span>
+    <button class="lout" onclick="doLogout()">Logout</button>
   </div>
   <div class="ab">
-    <div class="sb">
+    <div class="sb-overlay" id="sb-overlay" onclick="closeSidebarMobile()"></div>
+    <div class="sb" id="sidebar">
       <div class="sbh">Dashboards</div>
       <button class="nav-item" id="nav-master" onclick="showDash('master')"><span class="ni">📊</span><span class="nl">Master Dashboard</span></button>
 <button class="nav-item" id="nav-weekly" onclick="showDash('weekly')"><span class="ni">📋</span><span class="nl">Weekly Exec</span></button>
@@ -178,145 +172,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
   </div>
 </div>
 
-<script>
-var SU  = "https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
-var SK  = "lll_vs";
-var tok = null;
-var loaded = {};
-
-function api(p, cb) {
-  if (tok) p.token = tok;
-  var enc = btoa(unescape(encodeURIComponent(JSON.stringify(p))));
-  fetch(SU + "?p=" + encodeURIComponent(enc), {method:"GET"})
-    .then(function(r) { return r.json(); }).then(cb)
-    .catch(function() { cb({success:false, error:"Connection error"}); });
-}
-
-/* ── LOGIN ── */
-document.getElementById("lp").addEventListener("keydown", function(e) { if(e.key==="Enter") doLogin(); });
-document.getElementById("lu").addEventListener("keydown", function(e) { if(e.key==="Enter") doLogin(); });
-
-function doLogin() {
-  var u   = document.getElementById("lu").value.trim();
-  var p   = document.getElementById("lp").value;
-  var err = document.getElementById("lerr");
-  err.textContent = "";
-  if (!u || !p) { err.textContent = "Please enter username and password."; return; }
-  var btn = document.getElementById("lbtn");
-  btn.disabled = true; btn.textContent = "Signing in...";
-  api({action:"viewerLogin", username:u, password:p}, function(d) {
-    if (d.success) {
-      tok = d.token;
-      sessionStorage.setItem(SK, JSON.stringify({token:d.token, username:d.username}));
-      document.getElementById("lw").style.display = "none";
-      document.getElementById("app").classList.add("on");
-      document.getElementById("wn").textContent = d.username;
-      showDash("master");
-    } else {
-      err.textContent = d.error || "Incorrect credentials.";
-      document.getElementById("lp").value = "";
-      btn.disabled = false; btn.textContent = "Sign In";
-    }
-  });
-}
-
-function doLogout() {
-  sessionStorage.removeItem(SK); tok = null; loaded = {};
-  document.getElementById("app").classList.remove("on");
-  document.getElementById("lw").style.display = "flex";
-  document.getElementById("lu").value = "";
-  document.getElementById("lp").value = "";
-  document.getElementById("lbtn").disabled = false;
-  document.getElementById("lbtn").textContent = "Sign In";
-  // Clear all iframe srcs
-  document.querySelectorAll(".dash-frame").forEach(function(f) {
-    f.src = ""; f.classList.remove("on");
-  });
-  document.querySelectorAll(".nav-item").forEach(function(n) { n.classList.remove("on"); });
-}
-
-/* ── SHOW DASHBOARD ── */
-function showDash(id) {
-  document.querySelectorAll(".dash-frame").forEach(function(f) { f.classList.remove("on"); });
-  document.querySelectorAll(".nav-item").forEach(function(n) { n.classList.remove("on"); });
-
-  var frame = document.getElementById("frame-" + id);
-  var nav   = document.getElementById("nav-"   + id);
-  if (nav) nav.classList.add("on");
-
-  var loading = document.getElementById("loading");
-
-  if (!frame) return;
-
-  // If not yet loaded, set src now with token in hash
-  if (!loaded[id]) {
-    loading.classList.remove("hide");
-    var src = frame.getAttribute("data-src");
-    frame.src = src + "#token=" + encodeURIComponent(tok || "");
-    loaded[id] = true;
-
-    frame.onload = function() {
-      loading.classList.add("hide");
-      // After brief delay, hide loading completely
-      setTimeout(function() { loading.style.display = "none"; }, 400);
-      // Send token via postMessage for the viewer login to pick up
-      try {
-        frame.contentWindow.postMessage({
-          type: "LLL_AUTH", token: tok, username: document.getElementById("wn").textContent
-        }, "*");
-      } catch(e) {}
-    };
-  } else {
-    loading.style.display = "none";
-  }
-
-  frame.classList.add("on");
-}
-
-/* ── RESTORE SESSION ── */
-(function() {
-  var s = sessionStorage.getItem(SK);
-  if (!s) return;
-  try {
-    var d = JSON.parse(s); if (!d.token) return;
-    var enc = btoa(unescape(encodeURIComponent(JSON.stringify({action:"verifyToken",token:d.token,role:"viewer"}))));
-    fetch(SU + "?p=" + encodeURIComponent(enc), {method:"GET"})
-      .then(function(r) { return r.json(); })
-      .then(function(res) {
-        if (res.success) {
-          tok = d.token;
-          document.getElementById("lw").style.display = "none";
-          document.getElementById("app").classList.add("on");
-          document.getElementById("wn").textContent = d.username || "viewer";
-          showDash("master");
-        } else {
-          sessionStorage.removeItem(SK);
-        }
-      }).catch(function() {});
-  } catch(e) {}
-})();
-</script>
-
-
-<!-- CHATBOT -->
-<button id="cb-btn" onclick="cbToggle()" title="Ask Claude about your dashboards">
-  🌿<span class="cb-badge" id="cb-badge"></span>
-</button>
-
+<!-- Chatbot -->
+<button id="cb-btn" onclick="cbToggle()" title="Ask Claude">🌿<span class="cb-badge" id="cb-badge"></span></button>
 <div id="cb-panel">
   <div class="cb-head">
     <div class="cb-icon">🌿</div>
-    <div style="flex:1">
-      <h4>Little Leaf Assistant</h4>
-      <span>Powered by Claude AI</span>
-    </div>
+    <div style="flex:1"><h4>Little Leaf Assistant</h4><span>Powered by Claude AI</span></div>
     <button class="cb-close" onclick="cbToggle()">&#x2715;</button>
   </div>
   <div class="cb-msgs" id="cb-msgs">
-    <div class="cb-msg bot">
-      Hi! I&#39;m your Little Leaf Labs assistant. I can help you understand your dashboards, interpret data, answer questions about sales, margins, inventory, and more.<br><br>
-      What would you like to know?
-    </div>
+    <div class="cb-msg bot">Hi! I&#39;m your Little Leaf Labs assistant. Ask me anything about your dashboards, sales, margins, or inventory.</div>
   </div>
   <div class="cb-chips" id="cb-chips">
     <span class="cb-chip" onclick="cbChip(this)">Top selling brands?</span>
@@ -331,135 +196,238 @@ function showDash(id) {
   </div>
 </div>
 
-
 <script>
-/* ── CHATBOT ── */
+var SU      = "https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
+var SK      = "lll_vs";
+var tok     = null;
+var loaded  = {};
+var SB_OPEN = true;
+var IS_MOBILE = window.innerWidth <= 768;
 var CB_OPEN = false;
 var CB_HIST = [];
 var CB_BUSY = false;
 var CB_NEW  = 0;
 
-var CB_SYSTEM = "You are a helpful assistant for Little Leaf Labs, a cannabis company in New Jersey. " +
-  "You help viewers understand their business dashboards which include: " +
-  "1) Master Dashboard V3 - complete business overview with tabs: Overview, Sales & Forecasting, Margin & COGS, Workflows & Efficiency, Recipe Cards/BOM, SOPs, Naming & Batch ID, Forecasting, Production, Labels, Inventory, Ordering, Flagged, Label Queue, Reconciliation, Dispensary Finance (CFO), Data Sources, Product Profit, Cash Flow, Systems & SOPs, Production Plan, SKU Map, Labor Tracking, Customer Profit, Promo ROI. " +
-  "2) Weekly Exec - weekly executive summary with QuickBooks financials, revenue, GP, net income, AR/AP, cash. " +
-  "3) Retail Intel - Apex CRM data, COO follow-up list, accounts needing attention, visit tracking by Rocco/Matt. " +
-  "4) Weekly Refresh - weekly data refresh showing key metrics update status. " +
-  "5) Sales Dashboard - Lit Alerts data, brand performance, dispensary coverage, market share, SKU sell-through. " +
-  "6) Sales Action Form - Matt\'s action list, reorder accounts, new door targets, follow-up tasks. " +
-  "7) Lit Command Center - comprehensive sales intelligence with market penetration, AR aging, forecasting, COO actions, expansion targets. " +
-  "Data sources: QuickBooks (P&L, Balance Sheet), Distru (orders/inventory), Apex CRM (accounts/visits), Metrc (compliance/inventory), Lit Alerts (retail analytics). " +
+var CB_SYSTEM = "You are a business intelligence assistant for Little Leaf Labs LLC, a cannabis company in New Jersey. " +
+  "Help viewers understand their dashboards: Master Dashboard (full business overview), Weekly Exec (QB financials), " +
+  "Retail Intel (Apex CRM/COO follow-ups), Weekly Refresh (data status), Sales Dashboard (Lit Alerts/brand performance), " +
+  "Action Form (Matt sales tasks), Command Center (market intelligence). " +
   "Key brands: The Growfather, Sugar High, Dr. Zodiak Moonrock, Octane, Illadelph. " +
-  "Key people: Abhishek (admin/owner), Chris (operations/sales lead), Matt (sales rep), Rocco (sales rep), Bookkeeper. " +
-  "Be concise, helpful, and business-focused. Format responses clearly. If asked about specific numbers, explain you can see the dashboard data they\'re looking at but don\'t have the exact live values unless they share them.";
+  "Be concise and business-focused.";
 
-function cbToggle() {
-  CB_OPEN = !CB_OPEN;
-  document.getElementById("cb-panel").classList.toggle("open", CB_OPEN);
-  if (CB_OPEN) {
-    CB_NEW = 0;
-    var badge = document.getElementById("cb-badge");
-    badge.style.display = "none";
-    setTimeout(function(){ document.getElementById("cb-input").focus(); }, 300);
+/* ── AUTH ── */
+function api(params) {
+  if (tok) params.token = tok;
+  var large = ["deployDashboards","readAllFiles"];
+  if (large.indexOf(params.action) >= 0) {
+    return fetch(SU,{method:"POST",body:JSON.stringify(params)}).then(function(r){return r.json();});
+  }
+  var enc = btoa(unescape(encodeURIComponent(JSON.stringify(params))));
+  return fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"}).then(function(r){return r.json();});
+}
+
+document.getElementById("lp").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
+document.getElementById("lu").addEventListener("keydown",function(e){if(e.key==="Enter")doLogin();});
+
+function doLogin(){
+  var u=document.getElementById("lu").value.trim();
+  var p=document.getElementById("lp").value;
+  var err=document.getElementById("lerr");
+  err.textContent="";
+  if(!u||!p){err.textContent="Please enter username and password.";return;}
+  var btn=document.getElementById("lbtn");
+  btn.disabled=true;btn.textContent="Signing in...";
+  api({action:"viewerLogin",username:u,password:p}).then(function(d){
+    if(d.success){
+      tok=d.token;
+      sessionStorage.setItem(SK,JSON.stringify({token:d.token,username:d.username}));
+      document.getElementById("lw").style.display="none";
+      document.getElementById("app").classList.add("on");
+      document.getElementById("wn").textContent=d.username;
+      document.getElementById("cb-btn").classList.add("visible");
+      initSidebar();
+      showDash("master");
+    }else{
+      err.textContent=d.error||"Incorrect credentials.";
+      document.getElementById("lp").value="";
+      btn.disabled=false;btn.textContent="Sign In";
+    }
+  }).catch(function(){
+    err.textContent="Connection error.";
+    btn.disabled=false;btn.textContent="Sign In";
+  });
+}
+
+function doLogout(){
+  sessionStorage.removeItem(SK);tok=null;loaded={};
+  document.getElementById("app").classList.remove("on");
+  document.getElementById("lw").style.display="flex";
+  document.getElementById("lu").value="";
+  document.getElementById("lp").value="";
+  document.getElementById("lbtn").disabled=false;
+  document.getElementById("lbtn").textContent="Sign In";
+  document.getElementById("cb-btn").classList.remove("visible");
+  document.querySelectorAll(".dash-frame").forEach(function(f){f.src="";f.classList.remove("on");});
+  document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("on");});
+}
+
+/* ── SIDEBAR ── */
+function initSidebar(){
+  IS_MOBILE = window.innerWidth <= 768;
+  // Always start closed on all screens
+  document.getElementById("sidebar").classList.remove("mobile-open");
+  document.getElementById("sidebar").classList.remove("collapsed");
+  SB_OPEN = false;
+}
+
+function toggleSidebar(){
+  IS_MOBILE = window.innerWidth <= 768;
+  var sb = document.getElementById("sidebar");
+  var overlay = document.getElementById("sb-overlay");
+  SB_OPEN = !SB_OPEN;
+  if(IS_MOBILE){
+    sb.classList.toggle("mobile-open", SB_OPEN);
+    overlay.classList.toggle("show", SB_OPEN);
+  } else {
+    // Desktop: use same overlay approach as mobile
+    sb.classList.toggle("mobile-open", SB_OPEN);
+    overlay.classList.toggle("show", SB_OPEN);
+  }
+}
+
+function closeSidebarMobile(){
+  SB_OPEN = false;
+  document.getElementById("sidebar").classList.remove("mobile-open");
+  document.getElementById("sb-overlay").classList.remove("show");
+}
+
+/* ── DASHBOARDS ── */
+function showDash(id){
+  document.querySelectorAll(".dash-frame").forEach(function(f){f.classList.remove("on");});
+  document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("on");});
+  var frame=document.getElementById("frame-"+id);
+  var nav=document.getElementById("nav-"+id);
+  if(nav) nav.classList.add("on");
+
+  var loading=document.getElementById("loading");
+  if(!frame) return;
+
+  if(!loaded[id]){
+    loading.style.display="flex";
+    loading.classList.remove("hide");
+    var src=frame.getAttribute("data-src");
+    frame.src=src+"#token="+encodeURIComponent(tok||"");
+    loaded[id]=true;
+    frame.onload=function(){
+      loading.classList.add("hide");
+      setTimeout(function(){loading.style.display="none";},400);
+      try{
+        frame.contentWindow.postMessage({type:"LLL_AUTH",token:tok,username:document.getElementById("wn").textContent},"*");
+      }catch(e){}
+    };
+  } else {
+    loading.style.display="none";
+  }
+
+  frame.classList.add("on");
+
+  // Close sidebar on all screens after selecting a dashboard
+  if(SB_OPEN) closeSidebarMobile();
+}
+
+/* ── SESSION RESTORE ── */
+(function(){
+  var s=sessionStorage.getItem(SK);
+  if(!s) return;
+  try{
+    var d=JSON.parse(s);if(!d.token) return;
+    var enc=btoa(unescape(encodeURIComponent(JSON.stringify({action:"verifyToken",token:d.token,role:"viewer"}))));
+    fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"}).then(function(r){return r.json();}).then(function(res){
+      if(res.success){
+        tok=d.token;
+        document.getElementById("lw").style.display="none";
+        document.getElementById("app").classList.add("on");
+        document.getElementById("wn").textContent=d.username||"viewer";
+        document.getElementById("cb-btn").classList.add("visible");
+        initSidebar();
+        showDash("master");
+      }else{sessionStorage.removeItem(SK);}
+    }).catch(function(){});
+  }catch(e){}
+})();
+
+/* ── CHATBOT ── */
+function cbToggle(){
+  CB_OPEN=!CB_OPEN;
+  document.getElementById("cb-panel").classList.toggle("open",CB_OPEN);
+  if(CB_OPEN){
+    CB_NEW=0;
+    document.getElementById("cb-badge").style.display="none";
+    setTimeout(function(){document.getElementById("cb-input").focus();},300);
     cbScrollBottom();
   }
 }
 
-function cbScrollBottom() {
-  var msgs = document.getElementById("cb-msgs");
-  setTimeout(function(){ msgs.scrollTop = msgs.scrollHeight; }, 50);
+function cbScrollBottom(){
+  var msgs=document.getElementById("cb-msgs");
+  setTimeout(function(){msgs.scrollTop=msgs.scrollHeight;},50);
 }
 
-function cbAddMsg(role, text, thinking) {
-  var msgs = document.getElementById("cb-msgs");
-  var div = document.createElement("div");
-  div.className = "cb-msg " + role + (thinking ? " thinking" : "");
-  div.innerHTML = thinking ? text : cbFormat(text);
+function cbAddMsg(role,text,thinking){
+  var msgs=document.getElementById("cb-msgs");
+  var div=document.createElement("div");
+  div.className="cb-msg "+role+(thinking?" thinking":"");
+  div.innerHTML=thinking?text:cbFormat(text);
   msgs.appendChild(div);
   cbScrollBottom();
   return div;
 }
 
-function cbFormat(text) {
-  var t = text.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
-  t = t.replace(/[*][*]([^*]+)[*][*]/g,"<strong>$1</strong>");
-  t = t.replace(/[*]([^*]+)[*]/g,"<em>$1</em>");
-  t = t.replace(/`([^`]+)`/g,"<code>$1</code>");
-  t = t.split("\n\n").join("<br><br>");
-  t = t.split("\n").join("<br>");
-  t = t.split("\u2022 ").join("&bull; ");
+function cbFormat(t){
+  t=t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  t=t.replace(/[*][*]([^*]+)[*][*]/g,"<strong>$1</strong>");
+  t=t.replace(/[*]([^*]+)[*]/g,"<em>$1</em>");
+  t=t.replace(/`([^`]+)`/g,"<code>$1</code>");
+  t=t.split("\n\n").join("<br><br>");
+  t=t.split("\n").join("<br>");
   return t;
 }
 
-function cbChip(el) {
-  document.getElementById("cb-input").value = el.textContent;
-  document.getElementById("cb-chips").style.display = "none";
+function cbChip(el){
+  document.getElementById("cb-input").value=el.textContent;
+  document.getElementById("cb-chips").style.display="none";
   cbSend();
 }
 
-function cbSend() {
-  if (CB_BUSY) return;
-  var input = document.getElementById("cb-input");
-  var text = input.value.trim();
-  if (!text) return;
-  
-  // Add to history + display
-  CB_HIST.push({ role: "user", content: text });
-  cbAddMsg("user", text);
-  input.value = "";
-  input.style.height = "36px";
-  
-  // Hide chips after first message
-  document.getElementById("cb-chips").style.display = "none";
-  
-  // Show thinking
-  var thinkDiv = cbAddMsg("bot", "Thinking...", true);
-  CB_BUSY = true;
-  document.getElementById("cb-send").disabled = true;
-  
-  // Build context from conversation history for Apps Script handler
-  var ctx = CB_SYSTEM + "\n\nConversation so far:\n";
-  CB_HIST.slice(0, -1).forEach(function(m){
-    ctx += (m.role === "user" ? "User: " : "Assistant: ") + m.content + "\n";
-  });
-  
-  // Call via Apps Script (keeps API key secure)
-  api({ action: "chatbot", question: text, context: ctx })
-  .then(function(d){
+function cbSend(){
+  if(CB_BUSY) return;
+  var input=document.getElementById("cb-input");
+  var text=input.value.trim();
+  if(!text) return;
+  CB_HIST.push({role:"user",content:text});
+  cbAddMsg("user",text);
+  input.value="";
+  input.style.height="34px";
+  document.getElementById("cb-chips").style.display="none";
+  var thinkDiv=cbAddMsg("bot","Thinking...",true);
+  CB_BUSY=true;
+  document.getElementById("cb-send").disabled=true;
+  var ctx=CB_SYSTEM+"\n\nConversation so far:\n";
+  CB_HIST.slice(0,-1).forEach(function(m){ctx+=(m.role==="user"?"User: ":"Assistant: ")+m.content+"\n";});
+  api({action:"chatbot",question:text,context:ctx}).then(function(d){
     thinkDiv.remove();
-    var reply = "";
-    if (d.success && d.answer) {
-      reply = d.answer;
-      if (d.remaining !== undefined && d.remaining <= 3) {
-        reply += "\n\n_(" + d.remaining + " messages remaining this hour)_";
-      }
-    } else {
-      reply = d.error || "Sorry, I couldn\'t get a response. Please try again.";
-    }
-    CB_HIST.push({ role: "assistant", content: reply });
-    cbAddMsg("bot", reply);
-    if (!CB_OPEN) {
-      CB_NEW++;
-      var badge = document.getElementById("cb-badge");
-      badge.textContent = CB_NEW;
-      badge.style.display = "flex";
-    }
-  })
-  .catch(function(){
-    thinkDiv.remove();
-    cbAddMsg("bot", "Connection error. Please check your internet and try again.");
-  })
-  .finally(function(){
-    CB_BUSY = false;
-    document.getElementById("cb-send").disabled = false;
-    document.getElementById("cb-input").focus();
-  });
+    var reply=d.success&&d.answer?d.answer:(d.error||"Sorry, I couldn\'t get a response.");
+    if(d.remaining!==undefined&&d.remaining<=3) reply+="\n\n_("+d.remaining+" messages left this hour)_";
+    CB_HIST.push({role:"assistant",content:reply});
+    cbAddMsg("bot",reply);
+    if(!CB_OPEN){CB_NEW++;var b=document.getElementById("cb-badge");b.textContent=CB_NEW;b.style.display="flex";}
+  }).catch(function(){thinkDiv.remove();cbAddMsg("bot","Connection error. Please try again.");})
+  .finally(function(){CB_BUSY=false;document.getElementById("cb-send").disabled=false;document.getElementById("cb-input").focus();});
 }
 
-// Auto-resize textarea
-document.getElementById("cb-input").addEventListener("input", function(){
-  this.style.height = "36px";
-  this.style.height = Math.min(this.scrollHeight, 80) + "px";
+document.getElementById("cb-input").addEventListener("input",function(){
+  this.style.height="34px";
+  this.style.height=Math.min(this.scrollHeight,80)+"px";
 });
 </script>
 
