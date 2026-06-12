@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>Little Leaf Labs — Admin</title>
 <style>
 :root{--bg:#0e1414;--panel:#16201f;--p2:#1c2826;--ink:#e8efe9;--mu:#92a39c;--ln:#283533;--gr:#3fae6b;--gd:#2c7d4c;--gold:#d9a441;--red:#e5484d;--blue:#4a9ed9}
@@ -96,13 +96,6 @@ body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacS
 </head>
 <body>
 
-<script>
-var SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
-var GITHUB_OWNER = "abhishekidhate1998";
-var GITHUB_REPO  = "lll-dashboards";
-var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
-</script>
-
 <div id="login-screen">
   <div class="lbox">
     <div style="font-size:40px;margin-bottom:14px">&#127807;</div>
@@ -124,19 +117,19 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
     </div>
   </div>
   <div class="nav">
-    <button class="nb on"  onclick="showPage('process',this)">&#9654; Process &amp; Deploy</button>
-    <button class="nb"     onclick="showPage('files',this)">&#128193; File Manager</button>
-    <button class="nb"     onclick="showPage('users',this)">&#128101; Users</button>
-    <button class="nb"     onclick="showPage('history',this)">&#128203; History</button>
-    <button class="nb"     onclick="showPage('settings',this)">&#9881; Settings</button>
+    <button class="nb on" onclick="showPage('process',this)">&#9654; Process &amp; Deploy</button>
+    <button class="nb"    onclick="showPage('files',this)">&#128193; File Manager</button>
+    <button class="nb"    onclick="showPage('users',this)">&#128101; Users</button>
+    <button class="nb"    onclick="showPage('history',this)">&#128203; History</button>
+    <button class="nb"    onclick="showPage('settings',this)">&#9881; Settings</button>
   </div>
   <div class="content">
 
     <div class="page on" id="page-process">
       <div class="upd-badge" id="upd-badge">Last updated: <span id="upd-time">-</span></div>
       <div class="proc-box">
-        <h3>Process &amp; Deploy Portal</h3>
-        <p>Upload CSV files to Google Drive first. Then click below to read all data, build the portal with all 7 dashboards, and deploy it live.</p>
+        <h3>Process &amp; Deploy All Dashboards</h3>
+        <p>Upload CSV files to Google Drive first. Then click below to read all data, build all 7 dashboards, and deploy live.</p>
         <button class="proc-btn" id="proc-btn" onclick="startProcess()">&#128640; Process &amp; Deploy</button>
         <div class="prog-wrap" id="prog-wrap">
           <div class="prog-bg"><div class="prog-bar" id="prog-bar"></div></div>
@@ -144,7 +137,7 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
           <div class="prog-steps" id="prog-steps"></div>
         </div>
         <div class="success-wrap" id="success-wrap">
-          <h4>&#10003; Portal deployed!</h4>
+          <h4>&#10003; All dashboards deployed!</h4>
           <p id="success-time" style="font-size:12px;color:var(--mu);margin-bottom:8px"></p>
           <p style="font-size:12px;color:var(--mu)">Live on GitHub Pages in 1-2 minutes.</p>
           <div class="dl-row" id="success-links"></div>
@@ -157,19 +150,20 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
         <h3>File Manager &mdash; Google Drive</h3>
         <p style="font-size:13px;color:var(--mu);margin-bottom:16px">CSV files in your Google Drive folders. Delete old files before uploading new ones.</p>
         <div id="fm-tabs" class="fm-tabs"></div>
-        <div id="fm-list"><p style="color:var(--mu);font-size:13px">Loading...</p></div>
+        <div id="fm-list"><p style="color:var(--mu);font-size:13px">Select a folder above.</p></div>
       </div>
     </div>
+
     <div class="page" id="page-users">
       <div class="card">
         <h3>Admin Users</h3>
         <table class="tbl"><thead><tr><th>Username</th><th>Role</th><th>Created</th><th></th></tr></thead>
         <tbody id="users-body"></tbody></table>
         <div class="add-row ar3" id="add-user-row" style="display:none">
-          <div><label>Username</label><input type="text" id="new-u" placeholder="e.g. suwarna"></div>
+          <div><label>Username</label><input type="text" id="new-u" placeholder="Username"></div>
           <div><label>Password</label><input type="password" id="new-p" placeholder="Min 4 chars"></div>
           <div><label>Role</label><select id="new-r"><option value="admin">Admin</option><option value="superadmin">Super Admin</option></select></div>
-          <button class="btn btn-gr btn-sm" onclick="addUser()" style="white-space:nowrap">+ Add</button>
+          <button class="btn btn-gr btn-sm" onclick="addUser()">+ Add</button>
         </div>
       </div>
       <div class="card" id="viewers-card" style="display:none">
@@ -177,9 +171,9 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
         <table class="tbl"><thead><tr><th>Username</th><th>Created</th><th></th></tr></thead>
         <tbody id="viewers-body"></tbody></table>
         <div class="add-row ar2" style="margin-top:14px">
-          <div><label>Username</label><input type="text" id="new-vu" placeholder="e.g. chris"></div>
+          <div><label>Username</label><input type="text" id="new-vu" placeholder="Username"></div>
           <div><label>Password</label><input type="password" id="new-vp" placeholder="Min 4 chars"></div>
-          <button class="btn btn-gr btn-sm" onclick="addViewer()" style="white-space:nowrap">+ Add Viewer</button>
+          <button class="btn btn-gr btn-sm" onclick="addViewer()">+ Add Viewer</button>
         </div>
       </div>
     </div>
@@ -204,7 +198,7 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
         </div>
         <div class="scard">
           <h3>Change My Password</h3>
-          <div class="field"><label>Current Password</label><input type="password" id="cp-cur"></div>
+          <div class="field"><label>Current</label><input type="password" id="cp-cur"></div>
           <div class="field"><label>New Password</label><input type="password" id="cp-new"></div>
           <div class="field"><label>Confirm</label><input type="password" id="cp-cf"></div>
           <div class="errmsg" id="cp-err"></div>
@@ -237,14 +231,21 @@ var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
 </div></div>
 
 <script>
-// ── CONFIG ──────────────────────────────────────────────────
+var SCRIPT_URL="https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
+var GITHUB_OWNER="abhishekidhate1998";
+var GITHUB_REPO="lll-dashboards";
+var BASE_URL="https://"+GITHUB_OWNER+".github.io/"+GITHUB_REPO;
+
+var SCRIPT_URL   = "https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
+var GITHUB_OWNER = "abhishekidhate1998";
+var GITHUB_REPO  = "lll-dashboards";
+var BASE_URL     = "https://" + GITHUB_OWNER + ".github.io/" + GITHUB_REPO;
 var sessionToken = null;
 var currentUser  = null;
 var confirmCb    = null;
 var failedAttempts = 0;
 var lockUntil = 0;
 
-// ── API ──────────────────────────────────────────────────────
 function api(params) {
   if (sessionToken) params.token = sessionToken;
   var large = ["deployDashboards","readAllFiles"];
@@ -255,387 +256,426 @@ function api(params) {
   return fetch(SCRIPT_URL + "?p=" + encodeURIComponent(p), {method:"GET"}).then(function(r){return r.json();});
 }
 
-// ── LOGIN ────────────────────────────────────────────────────
 document.getElementById("inp-p").addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
 document.getElementById("inp-u").addEventListener("keydown", function(e){ if(e.key==="Enter") doLogin(); });
 
 function doLogin() {
   if (Date.now() < lockUntil) { toast("Too many attempts. Wait 15 minutes.","err"); return; }
-  var u   = document.getElementById("inp-u").value.trim();
-  var p   = document.getElementById("inp-p").value;
-  var err = document.getElementById("login-err");
-  err.style.display = "none";
-  if (!u || !p) { err.textContent="Please enter username and password."; err.style.display="block"; return; }
-  var btn = document.getElementById("login-btn");
-  btn.disabled = true; btn.textContent = "Signing in...";
-  api({action:"adminLogin", username:u, password:p}).then(function(d) {
-    if (d.success) {
-      failedAttempts = 0;
-      sessionToken   = d.token;
-      currentUser    = {username:d.username, role:d.role};
-      sessionStorage.setItem("lll_tok",  d.token);
-      sessionStorage.setItem("lll_user", d.username);
-      sessionStorage.setItem("lll_role", d.role);
-      document.getElementById("login-screen").style.display = "none";
-      document.getElementById("app").style.display = "block";
-      document.getElementById("who-name").textContent = d.username;
+  var u=document.getElementById("inp-u").value.trim();
+  var p=document.getElementById("inp-p").value;
+  var err=document.getElementById("login-err");
+  err.style.display="none";
+  if(!u||!p){err.textContent="Please enter username and password.";err.style.display="block";return;}
+  var btn=document.getElementById("login-btn");
+  btn.disabled=true;btn.textContent="Signing in...";
+  api({action:"adminLogin",username:u,password:p}).then(function(d){
+    if(d.success){
+      failedAttempts=0;
+      sessionToken=d.token;currentUser={username:d.username,role:d.role};
+      sessionStorage.setItem("lll_tok",d.token);
+      sessionStorage.setItem("lll_user",d.username);
+      sessionStorage.setItem("lll_role",d.role);
+      document.getElementById("login-screen").style.display="none";
+      document.getElementById("app").style.display="block";
+      document.getElementById("who-name").textContent=d.username;
       initApp();
-    } else {
+    }else{
       failedAttempts++;
-      err.textContent = d.error || "Incorrect username or password.";
-      err.style.display = "block";
-      if (failedAttempts >= 5) { lockUntil = Date.now() + 15*60*1000; }
-      btn.disabled = false; btn.textContent = "Sign In";
+      if(failedAttempts>=5) lockUntil=Date.now()+15*60*1000;
+      err.textContent=d.error||"Incorrect username or password.";
+      err.style.display="block";
+      btn.disabled=false;btn.textContent="Sign In";
     }
-  }).catch(function(e) {
-    err.textContent = "Connection failed. Check internet.";
-    err.style.display = "block";
-    btn.disabled = false; btn.textContent = "Sign In";
+  }).catch(function(e){
+    err.textContent="Connection failed. Check internet.";
+    err.style.display="block";
+    btn.disabled=false;btn.textContent="Sign In";
   });
 }
 
 function doLogout() {
   api({action:"logout"}).catch(function(){});
-  sessionToken = null; currentUser = null;
+  sessionToken=null;currentUser=null;
   sessionStorage.clear();
-  document.getElementById("app").style.display = "none";
-  document.getElementById("login-screen").style.display = "flex";
-  document.getElementById("inp-u").value = "";
-  document.getElementById("inp-p").value = "";
-  document.getElementById("login-err").style.display = "none";
-  document.getElementById("login-btn").disabled = false;
-  document.getElementById("login-btn").textContent = "Sign In";
+  document.getElementById("app").style.display="none";
+  document.getElementById("login-screen").style.display="flex";
+  document.getElementById("inp-u").value="";
+  document.getElementById("inp-p").value="";
+  document.getElementById("login-err").style.display="none";
+  document.getElementById("login-btn").disabled=false;
+  document.getElementById("login-btn").textContent="Sign In";
 }
 
-// ── INIT ─────────────────────────────────────────────────────
 function initApp() {
-  var pl = BASE_URL + "/portal.html";
-  document.getElementById("portal-link").value = pl;
-  document.getElementById("portal-open").href  = pl;
-  showPage("process", document.querySelector(".nb.on"));
-  api({action:"getAll"}).then(function(d) {
-    if (!d.success) return;
-    if (d.lastUpdated) {
-      document.getElementById("upd-time").textContent    = new Date(d.lastUpdated).toLocaleString();
-      document.getElementById("upd-badge").style.display = "flex";
+  var pl=BASE_URL+"/portal.html";
+  document.getElementById("portal-link").value=pl;
+  document.getElementById("portal-open").href=pl;
+  showPage("process",document.querySelector(".nb.on"));
+  api({action:"getAll"}).then(function(d){
+    if(!d.success) return;
+    if(d.lastUpdated){
+      document.getElementById("upd-time").textContent=new Date(d.lastUpdated).toLocaleString();
+      document.getElementById("upd-badge").style.display="flex";
     }
     setDot("script","g","Apps Script: connected");
-    setDot("gh",    d.hasGhToken ? "g":"r", d.hasGhToken ? "GitHub token: OK":"GitHub token: NOT SET");
-    setDot("cl",    d.hasApiKey  ? "g":"r", d.hasApiKey  ? "Claude API key: OK":"Claude API key: NOT SET");
-    if (d.users)   renderUsers(d.users);
-    if (d.viewers && currentUser.role === "superadmin") {
-      renderViewers(d.viewers);
-      document.getElementById("viewers-card").style.display = "block";
-    }
-    if (d.history) renderHistory(d.history);
+    setDot("gh",d.hasGhToken?"g":"r",d.hasGhToken?"GitHub token: OK":"GitHub token: NOT SET");
+    setDot("cl",d.hasApiKey?"g":"r",d.hasApiKey?"Claude API key: OK":"Claude API key: NOT SET");
+    if(d.users) renderUsers(d.users);
+    if(d.viewers&&currentUser.role==="superadmin"){renderViewers(d.viewers);document.getElementById("viewers-card").style.display="block";}
+    if(d.history) renderHistory(d.history);
   }).catch(function(){});
 }
 
-// ── NAVIGATION ───────────────────────────────────────────────
-function showPage(name, btn) {
-  document.querySelectorAll(".page").forEach(function(p){ p.classList.remove("on"); });
-  document.querySelectorAll(".nb").forEach(function(b){ b.classList.remove("on"); });
-  document.getElementById("page-" + name).classList.add("on");
-  if (btn) btn.classList.add("on");
-  if (name === "files") buildFmTabsUI();
+function showPage(name,btn) {
+  document.querySelectorAll(".page").forEach(function(p){p.classList.remove("on");});
+  document.querySelectorAll(".nb").forEach(function(b){b.classList.remove("on");});
+  document.getElementById("page-"+name).classList.add("on");
+  if(btn) btn.classList.add("on");
+  if(name==="files") buildFmTabsUI();
 }
 
-// ── PROCESS & DEPLOY ─────────────────────────────────────────
 function startProcess() {
-  var btn = document.getElementById("proc-btn");
-  btn.disabled = true;
-  document.getElementById("prog-wrap").style.display    = "block";
-  document.getElementById("success-wrap").style.display = "none";
-  document.getElementById("prog-steps").innerHTML       = "";
+  var btn=document.getElementById("proc-btn");
+  btn.disabled=true;
+  document.getElementById("prog-wrap").style.display="block";
+  document.getElementById("success-wrap").style.display="none";
+  document.getElementById("prog-steps").innerHTML="";
 
-  function step(txt, cls) {
-    var d = document.createElement("div");
-    d.className = "ps " + (cls || "active");
-    d.textContent = (cls === "done" ? "OK   " : cls === "fail" ? "FAIL " : "...  ") + txt;
+  function step(txt,cls){
+    var d=document.createElement("div");
+    d.className="ps "+(cls||"active");
+    d.textContent=(cls==="done"?"OK   ":cls==="fail"?"FAIL ":"...  ")+txt;
     document.getElementById("prog-steps").appendChild(d);
     return d;
   }
-  function upd(el, txt, cls) {
-    el.className = "ps " + cls;
-    el.textContent = (cls === "done" ? "OK   " : cls === "fail" ? "FAIL " : "...  ") + txt;
-  }
-  function setP(pct, lbl) {
-    document.getElementById("prog-bar").style.width = pct + "%";
-    document.getElementById("prog-lbl").textContent = lbl;
-  }
+  function upd(el,txt,cls){el.className="ps "+cls;el.textContent=(cls==="done"?"OK   ":cls==="fail"?"FAIL ":"...  ")+txt;}
+  function setP(pct,lbl){document.getElementById("prog-bar").style.width=pct+"%";document.getElementById("prog-lbl").textContent=lbl;}
 
-  // Run async steps
-  (function() {
-    var s1 = step("Reading CSV files from Google Drive...");
-    setP(5, "Reading Drive files...");
-    var driveFiles = {};
+  var s1=step("Reading CSV files from Google Drive...");
+  setP(5,"Reading Drive files...");
 
-    api({action:"readAllFiles"}).then(function(r) {
-      if (!r.success) throw new Error(r.error || "Failed to read files");
-      driveFiles = r.files || {};
-      if (!r.totalFiles) throw new Error("No CSV files found. Upload files to Google Drive first.");
-      upd(s1, "Read " + r.totalFiles + " files", "done");
-      setP(20, "Processing data...");
+  api({action:"readAllFiles"}).then(function(r){
+    if(!r.success) throw new Error(r.error||"Failed to read files");
+    if(!r.totalFiles) throw new Error("No CSV files found. Upload CSV files to Google Drive first.");
+    var files=r.files||{};
+    upd(s1,"Read "+r.totalFiles+" files from "+Object.keys(files).length+" folders","done");
+    setP(20,"Processing data...");
 
-      var s2 = step("Processing all data sources...");
-      var qb={}, apex={}, distru={}, metrc={}, lit={}, warns=[];
+    var s2=step("Processing all data sources...");
+    var qb={},apex={},distru={},metrc={},lit={},warns=[];
 
-      var p1 = readQBData(driveFiles).then(function(d){qb=d;}).catch(function(e){warns.push("QuickBooks: "+e.message);});
-      var p2 = readApexData(driveFiles).then(function(d){apex=d;}).catch(function(e){warns.push("Apex: "+e.message);});
-      var p3 = readDistruData(driveFiles).then(function(d){distru=d;}).catch(function(e){warns.push("Distru: "+e.message);});
-      var p4 = readMetrcData(driveFiles).then(function(d){metrc=d;}).catch(function(e){warns.push("Metrc: "+e.message);});
-      var p5 = readLitData(driveFiles).then(function(d){lit=d;}).catch(function(e){warns.push("Lit: "+e.message);});
+    return Promise.all([
+      readQBData(files).then(function(d){qb=d;}).catch(function(e){warns.push("QuickBooks: "+e.message);}),
+      readApexData(files).then(function(d){apex=d;}).catch(function(e){warns.push("Apex: "+e.message);}),
+      readDistruData(files).then(function(d){distru=d;}).catch(function(e){warns.push("Distru: "+e.message);}),
+      readMetrcData(files).then(function(d){metrc=d;}).catch(function(e){warns.push("Metrc: "+e.message);}),
+      readLitData(files).then(function(d){lit=d;}).catch(function(e){warns.push("Lit: "+e.message);})
+    ]).then(function(){
+      if(warns.length){upd(s2,"Processed with "+warns.length+" warnings","done");warns.forEach(function(w){toast(w,"err");});}
+      else upd(s2,"All data sources processed","done");
 
-      return Promise.all([p1,p2,p3,p4,p5]).then(function() {
-        if (warns.length) upd(s2, "Processed with " + warns.length + " warnings", "done");
-        else upd(s2, "All data sources processed", "done");
-        warns.forEach(function(w){ toast(w, "err"); });
+      var now=new Date();
+      var timeStr=now.toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
+      var DASH=[
+        "master_dashboard.html","weekly_exec.html","retail_intel.html","weekly_refresh.html",
+        "sales_dashboard.html","sales_action_form.html","lit_sales_command_center.html"
+      ];
+      var base="https://raw.githubusercontent.com/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/main/";
 
-        var now     = new Date();
-        var timeStr = now.toLocaleString("en-US",{month:"short",day:"numeric",year:"numeric",hour:"2-digit",minute:"2-digit"});
+      setP(35,"Fetching dashboard templates...");
+      var s3=step("Fetching all 7 templates from GitHub...");
 
-        setP(40, "Fetching portal template...");
-        var s3 = step("Fetching portal.html from GitHub...");
-        var url = "https://raw.githubusercontent.com/" + GITHUB_OWNER + "/" + GITHUB_REPO + "/main/portal.html?t=" + Date.now();
+      return Promise.all(DASH.map(function(f){
+        return fetch(base+f+"?t="+Date.now())
+          .then(function(res){
+            if(!res.ok) throw new Error(f+" not found (HTTP "+res.status+") — upload all files to GitHub first");
+            return res.text().then(function(t){return {name:f,html:t};});
+          });
+      })).then(function(templates){
+        upd(s3,"All 7 templates fetched","done");
+        setP(55,"Injecting data...");
+        var s4=step("Injecting data into all 7 dashboards...");
+        var built={};
+        templates.forEach(function(t){
+          var h=t.html;
+          try{
+            if(t.name==="master_dashboard.html")          h=buildMasterDashboard(h,qb,apex,distru,metrc,lit,timeStr);
+            else if(t.name==="weekly_exec.html")          h=buildWeeklyExec(h,qb,apex,metrc,lit,timeStr);
+            else if(t.name==="retail_intel.html")         h=buildRetailIntel(h,apex,lit,timeStr);
+            else if(t.name==="weekly_refresh.html")       h=buildWeeklyRefresh(h,qb,apex,metrc,timeStr);
+            else if(t.name==="sales_dashboard.html")      h=buildSalesDashboard(h,lit,timeStr);
+            else if(t.name==="sales_action_form.html")    h=buildSalesActionForm(h,apex,timeStr);
+            else if(t.name==="lit_sales_command_center.html") h=buildLitCommandCenter(h,lit,apex,timeStr);
+          }catch(e){warns.push(t.name+": "+e.message);}
+          built[t.name]=h;
+        });
+        upd(s4,"Data injected into all 7 dashboards","done");
 
-        return fetch(url).then(function(res) {
-          if (!res.ok) throw new Error("HTTP " + res.status + " — upload portal.html to GitHub first");
-          return res.text();
-        }).then(function(portalHtml) {
-          if (portalHtml.length < 50000) throw new Error("portal.html too small. Upload the correct file to GitHub.");
-          upd(s3, "Fetched portal.html (" + Math.round(portalHtml.length/1024) + "KB)", "done");
+        setP(72,"Deploying set 1...");
+        var s5a=step("Deploying dashboards (set 1 of 2)...");
+        var keys=Object.keys(built);
+        var set1={},set2={};
+        keys.forEach(function(k,i){if(i<4)set1[k]=built[k];else set2[k]=built[k];});
 
-          setP(60, "Injecting data...");
-          var s4 = step("Injecting data into portal...");
+        return api({action:"deployDashboards",set:1,dashboardContent:set1,lastUpdated:now.toISOString()}).then(function(r1){
+          if(r1.failed&&r1.failed.length) throw new Error("Set 1 failed: "+r1.failed.join(", "));
+          upd(s5a,"Set 1 deployed: 4 dashboards","done");
+          setP(88,"Deploying set 2...");
+          var s5b=step("Deploying dashboards (set 2 of 2)...");
 
-          portalHtml = buildMasterDashboard(portalHtml, qb, apex, distru, metrc, lit, timeStr);
-          portalHtml = buildWeeklyExec(portalHtml, qb, apex, metrc, lit, timeStr);
-          portalHtml = buildRetailIntel(portalHtml, apex, lit, timeStr);
-          portalHtml = buildWeeklyRefresh(portalHtml, qb, apex, metrc, timeStr);
-          portalHtml = buildSalesDashboard(portalHtml, lit, timeStr);
-          portalHtml = buildSalesActionForm(portalHtml, apex, timeStr);
-          portalHtml = buildLitCommandCenter(portalHtml, lit, apex, timeStr);
-          upd(s4, "Data injected — " + Math.round(portalHtml.length/1024) + "KB", "done");
+          return api({action:"deployDashboards",set:2,dashboardContent:set2,lastUpdated:now.toISOString()}).then(function(r2){
+            if(r2.failed&&r2.failed.length) throw new Error("Set 2 failed: "+r2.failed.join(", "));
+            upd(s5b,"Set 2 deployed: 3 dashboards","done");
+            setP(100,"Complete!");
 
-          setP(80, "Deploying portal.html...");
-          var s5 = step("Deploying portal.html to GitHub...");
-          var content = {"portal.html": portalHtml};
+            document.getElementById("success-wrap").style.display="block";
+            document.getElementById("success-time").textContent="Deployed: "+timeStr+" | Live in 1-2 minutes";
+            document.getElementById("upd-time").textContent=timeStr;
+            document.getElementById("upd-badge").style.display="flex";
 
-          return api({action:"deployDashboards", set:1, dashboardContent:content, lastUpdated:now.toISOString()}).then(function(r) {
-            if (r.failed && r.failed.length) throw new Error(r.failed.join(", "));
-            upd(s5, "portal.html deployed", "done");
-            setP(100, "Complete!");
-
-            document.getElementById("success-wrap").style.display = "block";
-            document.getElementById("success-time").textContent   = "Deployed: " + timeStr + " — live in 1-2 minutes";
-            document.getElementById("upd-time").textContent       = timeStr;
-            document.getElementById("upd-badge").style.display    = "flex";
-
-            var lDiv = document.getElementById("success-links");
-            lDiv.innerHTML = "";
-            var a = document.createElement("a");
-            a.className = "dl-a"; a.href = BASE_URL + "/portal.html"; a.target = "_blank";
-            a.textContent = "Open Portal ->";
+            var lDiv=document.getElementById("success-links");
+            lDiv.innerHTML="";
+            var a=document.createElement("a");
+            a.className="dl-a";
+            a.href=BASE_URL+"/portal.html";
+            a.target="_blank";
+            a.textContent="Open Portal ->";
             lDiv.appendChild(a);
 
-            btn.disabled = false;
-            toast("Portal deployed!", "ok");
+            btn.disabled=false;
+            toast("All dashboards deployed!","ok");
           });
         });
       });
-    }).catch(function(e) {
-      // find last active step and mark fail
-      var steps = document.querySelectorAll(".ps.active");
-      if (steps.length) steps[steps.length-1].className = "ps fail";
-      toast(e.message, "err");
-      btn.disabled = false;
     });
-  })();
+  }).catch(function(e){
+    var active=document.querySelectorAll(".ps.active");
+    if(active.length) active[active.length-1].className="ps fail";
+    toast(e.message,"err");
+    btn.disabled=false;
+  });
 }
 
-// ── USERS ────────────────────────────────────────────────────
 function renderUsers(users) {
-  var isSA = currentUser && currentUser.role === "superadmin";
-  var tb   = document.getElementById("users-body");
-  if (!tb) return;
-  tb.innerHTML = "";
-  Object.entries(users || {}).forEach(function(entry) {
-    var uname = entry[0], u = entry[1];
-    var self = uname === currentUser.username;
-    var tr   = document.createElement("tr");
-    tr.innerHTML =
-      "<td style='font-weight:500'>" + uname + (self ? " <span style='color:var(--mu);font-size:10px'>(you)</span>" : "") + "</td>" +
-      "<td><span class='rp " + (u.role === "superadmin" ? "rs" : "ra") + "'>" + (u.role === "superadmin" ? "Super Admin" : "Admin") + "</span></td>" +
-      "<td style='color:var(--mu);font-size:11px'>" + (u.created ? new Date(u.created).toLocaleDateString() : "-") + "</td>" +
-      "<td>" + (isSA && !self ? "<button class='btn btn-red btn-sm' onclick='removeUser(\"" + uname + "\")'>Remove</button>" : "-") + "</td>";
+  var isSA=currentUser&&currentUser.role==="superadmin";
+  var tb=document.getElementById("users-body");
+  if(!tb) return;
+  tb.innerHTML="";
+  Object.entries(users||{}).forEach(function(entry){
+    var uname=entry[0],u=entry[1],self=uname===currentUser.username;
+    var tr=document.createElement("tr");
+    var delCell = isSA&&!self ? "<button class=\'btn btn-red btn-sm\'>Remove</button>" : "-";
+    tr.innerHTML="<td style=\'font-weight:500\'>"+uname+(self?" <span style=\'color:var(--mu);font-size:10px\'>(you)</span>":"")+
+      "</td><td><span class=\'rp "+(u.role==="superadmin"?"rs":"ra")+"\'>"+
+      (u.role==="superadmin"?"Super Admin":"Admin")+"</span></td>"+
+      "<td style=\'color:var(--mu);font-size:11px\'>"+(u.created?new Date(u.created).toLocaleDateString():"-")+"</td>"+
+      "<td>"+delCell+"</td>";
+    if(isSA&&!self){
+      var b=tr.querySelector("button");
+      if(b)(function(n){b.onclick=function(){removeUser(n);};})(uname);
+    }
     tb.appendChild(tr);
   });
-  var ar = document.getElementById("add-user-row");
-  if (ar) ar.style.display = isSA ? "grid" : "none";
+  var ar=document.getElementById("add-user-row");
+  if(ar) ar.style.display=isSA?"grid":"none";
 }
 
 function renderViewers(viewers) {
-  var tb = document.getElementById("viewers-body");
-  if (!tb) return;
-  tb.innerHTML = "";
-  Object.entries(viewers || {}).forEach(function(entry) {
-    var uname = entry[0], v = entry[1];
-    var tr = document.createElement("tr");
-    tr.innerHTML =
-      "<td style='font-weight:500'>" + uname + "</td>" +
-      "<td style='color:var(--mu);font-size:11px'>" + (v.created ? new Date(v.created).toLocaleDateString() : "-") + "</td>" +
-      "<td><button class='btn btn-red btn-sm' onclick='removeViewer(\"" + uname + "\")'>Remove</button></td>";
+  var tb=document.getElementById("viewers-body");
+  if(!tb) return;
+  tb.innerHTML="";
+  Object.entries(viewers||{}).forEach(function(entry){
+    var uname=entry[0],v=entry[1];
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td style=\'font-weight:500\'>"+uname+"</td>"+
+      "<td style=\'color:var(--mu);font-size:11px\'>"+(v.created?new Date(v.created).toLocaleDateString():"-")+"</td>"+
+      "<td><button class=\'btn btn-red btn-sm\'>Remove</button></td>";
+    (function(n){tr.querySelector("button").onclick=function(){removeViewer(n);};})(uname);
     tb.appendChild(tr);
   });
 }
 
 function addUser() {
-  var u = document.getElementById("new-u").value.trim();
-  var p = document.getElementById("new-p").value;
-  var r = document.getElementById("new-r").value;
-  if (!u || p.length < 4) { toast("Username and password (min 4 chars) required.","err"); return; }
-  api({action:"saveUser", username:u, password:p, role:r}).then(function(d) {
-    if (d.success) {
-      document.getElementById("new-u").value = "";
-      document.getElementById("new-p").value = "";
-      toast("User " + u + " added.", "ok");
-      api({action:"getUsers"}).then(function(d2){ if(d2.success) renderUsers(d2.users); });
-    } else toast(d.error, "err");
-  }).catch(function(e){ toast(e.message,"err"); });
+  var u=document.getElementById("new-u").value.trim();
+  var p=document.getElementById("new-p").value;
+  var r=document.getElementById("new-r").value;
+  if(!u||p.length<4){toast("Username and password (min 4 chars) required.","err");return;}
+  api({action:"saveUser",username:u,password:p,role:r}).then(function(d){
+    if(d.success){document.getElementById("new-u").value="";document.getElementById("new-p").value="";toast("User "+u+" added.","ok");api({action:"getUsers"}).then(function(d2){if(d2.success)renderUsers(d2.users);});}
+    else toast(d.error,"err");
+  }).catch(function(e){toast(e.message,"err");});
 }
 
 function removeUser(uname) {
-  showConfirm("Remove User", "Remove " + uname + "? They lose access immediately.", function() {
-    api({action:"deleteUser", username:uname}).then(function(d) {
-      if (d.success) { toast("User removed.", "ok"); api({action:"getUsers"}).then(function(d2){ if(d2.success) renderUsers(d2.users); }); }
+  showConfirm("Remove User","Remove "+uname+"?",function(){
+    api({action:"deleteUser",username:uname}).then(function(d){
+      if(d.success){toast("User removed.","ok");api({action:"getUsers"}).then(function(d2){if(d2.success)renderUsers(d2.users);});}
       else toast(d.error,"err");
-    }).catch(function(e){ toast(e.message,"err"); });
+    }).catch(function(e){toast(e.message,"err");});
   });
 }
 
 function addViewer() {
-  var u = document.getElementById("new-vu").value.trim();
-  var p = document.getElementById("new-vp").value;
-  if (!u || p.length < 4) { toast("Username and password (min 4 chars) required.","err"); return; }
-  api({action:"saveViewer", username:u, password:p}).then(function(d) {
-    if (d.success) {
-      document.getElementById("new-vu").value = "";
-      document.getElementById("new-vp").value = "";
-      toast("Viewer " + u + " added.", "ok");
-      api({action:"getViewers"}).then(function(d2){ if(d2.success) renderViewers(d2.viewers); });
-    } else toast(d.error,"err");
-  }).catch(function(e){ toast(e.message,"err"); });
+  var u=document.getElementById("new-vu").value.trim();
+  var p=document.getElementById("new-vp").value;
+  if(!u||p.length<4){toast("Username and password (min 4 chars) required.","err");return;}
+  api({action:"saveViewer",username:u,password:p}).then(function(d){
+    if(d.success){document.getElementById("new-vu").value="";document.getElementById("new-vp").value="";toast("Viewer "+u+" added.","ok");api({action:"getViewers"}).then(function(d2){if(d2.success)renderViewers(d2.viewers);});}
+    else toast(d.error,"err");
+  }).catch(function(e){toast(e.message,"err");});
 }
 
 function removeViewer(uname) {
-  showConfirm("Remove Viewer", "Remove viewer " + uname + "?", function() {
-    api({action:"deleteViewer", username:uname}).then(function(d) {
-      if (d.success) { toast("Viewer removed.", "ok"); api({action:"getViewers"}).then(function(d2){ if(d2.success) renderViewers(d2.viewers); }); }
+  showConfirm("Remove Viewer","Remove viewer "+uname+"?",function(){
+    api({action:"deleteViewer",username:uname}).then(function(d){
+      if(d.success){toast("Viewer removed.","ok");api({action:"getViewers"}).then(function(d2){if(d2.success)renderViewers(d2.viewers);});}
       else toast(d.error,"err");
-    }).catch(function(e){ toast(e.message,"err"); });
+    }).catch(function(e){toast(e.message,"err");});
   });
 }
 
-// ── HISTORY ──────────────────────────────────────────────────
 function renderHistory(history) {
-  var tb = document.getElementById("hist-body");
-  var em = document.getElementById("hist-empty");
-  if (!tb) return;
-  tb.innerHTML = "";
-  if (!history || !history.length) { if(em) em.style.display="block"; return; }
-  if (em) em.style.display = "none";
-  history.slice(0,50).forEach(function(h) {
-    var tr = document.createElement("tr");
-    tr.innerHTML =
-      "<td style='color:var(--mu);white-space:nowrap'>" + new Date(h.time).toLocaleString() + "</td>" +
-      "<td style='font-weight:500'>" + (h.username||"-") + "</td>" +
-      "<td style='color:var(--blue)'>" + (h.action||"-") + "</td>" +
-      "<td style='color:var(--mu)'>" + (h.details||"-") + "</td>";
+  var tb=document.getElementById("hist-body");
+  var em=document.getElementById("hist-empty");
+  if(!tb) return;
+  tb.innerHTML="";
+  if(!history||!history.length){if(em)em.style.display="block";return;}
+  if(em) em.style.display="none";
+  history.slice(0,50).forEach(function(h){
+    var tr=document.createElement("tr");
+    tr.innerHTML="<td style='color:var(--mu);white-space:nowrap'>"+new Date(h.time).toLocaleString()+"</td>"+
+      "<td style='font-weight:500'>"+(h.username||"-")+"</td>"+
+      "<td style='color:var(--blue)'>"+(h.action||"-")+"</td>"+
+      "<td style='color:var(--mu)'>"+(h.details||"-")+"</td>";
     tb.appendChild(tr);
   });
 }
 
-// ── SETTINGS ─────────────────────────────────────────────────
 function checkStatus() {
   setDot("script","y","Checking...");
-  var p = btoa(unescape(encodeURIComponent(JSON.stringify({action:"ping"}))));
-  fetch(SCRIPT_URL + "?p=" + encodeURIComponent(p), {method:"GET"}).then(function(r){return r.json();}).then(function(d) {
-    setDot("script", d.success ? "g" : "r", d.success ? "Apps Script: connected" : "Apps Script: error");
-  }).catch(function(){ setDot("script","r","Apps Script: cannot connect"); });
-  api({action:"getConfig"}).then(function(cfg) {
-    if (cfg.success) {
-      setDot("gh", cfg.hasGhToken ? "g" : "r", cfg.hasGhToken ? "GitHub token: configured" : "GitHub token: NOT SET");
-      setDot("cl", cfg.hasApiKey  ? "g" : "r", cfg.hasApiKey  ? "Claude API key: configured" : "Claude API key: NOT SET");
+  var p=btoa(unescape(encodeURIComponent(JSON.stringify({action:"ping"}))));
+  fetch(SCRIPT_URL+"?p="+encodeURIComponent(p),{method:"GET"}).then(function(r){return r.json();}).then(function(d){
+    setDot("script",d.success?"g":"r",d.success?"Apps Script: connected":"Apps Script: error");
+  }).catch(function(){setDot("script","r","Apps Script: cannot connect");});
+  api({action:"getConfig"}).then(function(cfg){
+    if(cfg.success){
+      setDot("gh",cfg.hasGhToken?"g":"r",cfg.hasGhToken?"GitHub token: configured":"GitHub token: NOT SET");
+      setDot("cl",cfg.hasApiKey?"g":"r",cfg.hasApiKey?"Claude API key: configured":"Claude API key: NOT SET");
     }
   }).catch(function(){});
 }
 
-function setDot(id, col, txt) {
-  var d = document.getElementById("dot-" + id);
-  var t = document.getElementById("st-"  + id);
-  var c = {g:"sg", r:"srd", y:"sy", m:"sm"};
-  if (d) d.className = "sd " + (c[col] || "sm");
-  if (t) t.textContent = txt;
+function setDot(id,col,txt){
+  var c={g:"sg",r:"srd",y:"sy",m:"sm"};
+  var d=document.getElementById("dot-"+id);
+  var t=document.getElementById("st-"+id);
+  if(d) d.className="sd "+(c[col]||"sm");
+  if(t) t.textContent=txt;
 }
 
 function changeMyPass() {
-  var cur = document.getElementById("cp-cur").value;
-  var nw  = document.getElementById("cp-new").value;
-  var cf  = document.getElementById("cp-cf").value;
-  var err = document.getElementById("cp-err");
-  err.style.display = "none";
-  if (!cur||!nw||!cf) { err.textContent="All fields required."; err.style.display="block"; return; }
-  if (nw.length < 4)  { err.textContent="Min 4 characters.";    err.style.display="block"; return; }
-  if (nw !== cf)       { err.textContent="Passwords do not match."; err.style.display="block"; return; }
-  api({action:"changePassword", currentPassword:cur, newPassword:nw}).then(function(d) {
-    if (d.success) {
-      ["cp-cur","cp-new","cp-cf"].forEach(function(i){ document.getElementById(i).value=""; });
-      toast("Password updated!","ok");
-    } else { err.textContent=d.error; err.style.display="block"; }
-  }).catch(function(e){ err.textContent=e.message; err.style.display="block"; });
+  var cur=document.getElementById("cp-cur").value;
+  var nw=document.getElementById("cp-new").value;
+  var cf=document.getElementById("cp-cf").value;
+  var err=document.getElementById("cp-err");
+  err.style.display="none";
+  if(!cur||!nw||!cf){err.textContent="All fields required.";err.style.display="block";return;}
+  if(nw.length<4){err.textContent="Min 4 characters.";err.style.display="block";return;}
+  if(nw!==cf){err.textContent="Passwords do not match.";err.style.display="block";return;}
+  api({action:"changePassword",currentPassword:cur,newPassword:nw}).then(function(d){
+    if(d.success){["cp-cur","cp-new","cp-cf"].forEach(function(i){document.getElementById(i).value="";});toast("Password updated!","ok");}
+    else{err.textContent=d.error;err.style.display="block";}
+  }).catch(function(e){err.textContent=e.message;err.style.display="block";});
 }
 
 function copyLink(id) {
-  var el = document.getElementById(id);
-  if (!el) return;
-  navigator.clipboard.writeText(el.value).then(function(){ toast("Copied!","ok"); }).catch(function(){
-    el.select(); document.execCommand("copy"); toast("Copied!","ok");
+  var el=document.getElementById(id);
+  if(!el) return;
+  navigator.clipboard.writeText(el.value).then(function(){toast("Copied!","ok");}).catch(function(){el.select();document.execCommand("copy");toast("Copied!","ok");});
+}
+
+var FM_CATS=[
+  {key:"quickbooks",label:"QuickBooks"},
+  {key:"distru",    label:"Distru"},
+  {key:"apex",      label:"Apex CRM"},
+  {key:"metrc",     label:"Metrc"},
+  {key:"lit_alerts",label:"Lit Alerts"}
+];
+
+function buildFmTabsUI() {
+  var tabs=document.getElementById("fm-tabs");
+  if(!tabs) return;
+  tabs.innerHTML="";
+  FM_CATS.forEach(function(cat,i){
+    var btn=document.createElement("button");
+    btn.className="fm-tab"+(i===0?" on":"");
+    btn.textContent=cat.label;
+    btn.onclick=function(){
+      document.querySelectorAll(".fm-tab").forEach(function(t){t.classList.remove("on");});
+      btn.classList.add("on");
+      loadFmFiles(cat.key);
+    };
+    tabs.appendChild(btn);
+  });
+  loadFmFiles(FM_CATS[0].key);
+}
+
+function loadFmFiles(category) {
+  var list=document.getElementById("fm-list");
+  list.innerHTML="<p style='color:var(--mu);font-size:13px'>Loading...</p>";
+  api({action:"listFiles",category:category}).then(function(d){
+    if(!d.success){list.innerHTML="<p style='color:var(--red);font-size:13px'>Error: "+d.error+"</p>";return;}
+    if(!d.files||!d.files.length){list.innerHTML="<p style='color:var(--mu);font-size:13px'>No CSV files in this folder.</p>";return;}
+    list.innerHTML="";
+    d.files.forEach(function(f){
+      var div=document.createElement("div");
+      div.className="fm-item";
+      div.dataset.id=f.id;div.dataset.cat=category;div.dataset.name=f.name;
+      div.innerHTML="<div><div class='fm-name'>"+f.name+"</div><div class='fm-meta'>"+Math.round(f.size/1024)+" KB &bull; "+new Date(f.modified).toLocaleDateString()+"</div></div>"+
+        "<button class='btn btn-red btn-sm'>Delete</button>";
+      div.querySelector("button").onclick=function(){deleteFmFile(f.id,f.name,category);};
+      list.appendChild(div);
+    });
+  }).catch(function(e){list.innerHTML="<p style='color:var(--red);font-size:13px'>"+e.message+"</p>";});
+}
+
+function deleteFmFile(id,name,cat) {
+  showConfirm("Delete File","Delete "+name+"?",function(){
+    api({action:"deleteFile",fileId:id,category:cat}).then(function(d){
+      if(d.success){toast("Deleted","ok");loadFmFiles(cat);}
+      else toast("Error: "+d.error,"err");
+    }).catch(function(e){toast(e.message,"err");});
   });
 }
 
-// ── UTILITIES ────────────────────────────────────────────────
-function toast(msg, type) {
-  var el = document.getElementById("toast");
-  el.textContent = msg;
-  el.className = "show " + (type === "err" ? "err" : "ok");
-  clearTimeout(el._t);
-  el._t = setTimeout(function(){ el.className=""; }, 4000);
+function toast(msg,type) {
+  var el=document.getElementById("toast");
+  el.textContent=msg;el.className="show "+(type==="err"?"err":"ok");
+  clearTimeout(el._t);el._t=setTimeout(function(){el.className="";},4000);
 }
 
-function showConfirm(title, msg, cb) {
-  document.getElementById("c-ttl").textContent = title;
-  document.getElementById("c-msg").textContent = msg;
+function showConfirm(title,msg,cb) {
+  document.getElementById("c-ttl").textContent=title;
+  document.getElementById("c-msg").textContent=msg;
   document.getElementById("confirm").classList.add("show");
-  confirmCb = cb;
+  confirmCb=cb;
 }
-function closeConfirm() { document.getElementById("confirm").classList.remove("show"); confirmCb = null; }
-document.getElementById("c-ok").onclick = function(){ closeConfirm(); if(confirmCb) confirmCb(); };
+function closeConfirm(){document.getElementById("confirm").classList.remove("show");confirmCb=null;}
+document.getElementById("c-ok").onclick=function(){closeConfirm();if(confirmCb)confirmCb();};
 
-// ── RESTORE SESSION ──────────────────────────────────────────
-(function() {
-  var tok  = sessionStorage.getItem("lll_tok");
-  var user = sessionStorage.getItem("lll_user");
-  var role = sessionStorage.getItem("lll_role");
-  if (!tok || !user) return;
-  sessionToken = tok;
-  currentUser  = {username:user, role:role};
-  document.getElementById("login-screen").style.display = "none";
-  document.getElementById("app").style.display = "block";
-  document.getElementById("who-name").textContent = user;
+(function(){
+  var tok=sessionStorage.getItem("lll_tok");
+  var user=sessionStorage.getItem("lll_user");
+  var role=sessionStorage.getItem("lll_role");
+  if(!tok||!user) return;
+  sessionToken=tok;currentUser={username:user,role:role};
+  document.getElementById("login-screen").style.display="none";
+  document.getElementById("app").style.display="block";
+  document.getElementById("who-name").textContent=user;
   initApp();
 })();
-</script>
 
+</script>
 <script>
 function parseCSV(text) {
   const lines = text.trim().split(/\r?\n/);
@@ -969,7 +1009,7 @@ function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
   // Update inventory SKU table
   if (apex.skuTable.length > 0) {
     const skuRows = apex.skuTable.slice(0, 16).map(s => {
-      const statusClass = s.status === 'CRITICAL'?'pill s-CRITICAL':s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
+      const statusClass = s.status === 'CRITICAL'?'pill s-CRITICAL': s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
       return `<tr><td class="n">${s.name}</td><td class="r">${fmt(s.on_hand)}</td><td class="r">${s.weekly_vel}</td><td class="r">${s.weeks_left}</td><td><span class="${statusClass}">${s.status}</span></td></tr>`;
     }).join('\n');
     h = h.replace(/<tr><td class="n">Dr\. Zodiak[^<]*[\s\S]* <\/tr>( =\s*<tr><td class="n">Account)/, skuRows);
@@ -1129,75 +1169,6 @@ function buildLitCommandCenter(html, lit, apex, timeStr) {
   h = injectLastUpdated(h, timeStr);
   return h;
 }
-
-// ── FILE MANAGER ─────────────────────────────────────────────
-var FM_CATS = [
-  {key:"quickbooks", label:"QuickBooks"},
-  {key:"distru",     label:"Distru"},
-  {key:"apex",       label:"Apex CRM"},
-  {key:"metrc",      label:"Metrc"},
-  {key:"lit_alerts", label:"Lit Alerts"}
-];
-
-function buildFmTabsUI() {
-  var tabs = document.getElementById("fm-tabs");
-  if (!tabs) return;
-  tabs.innerHTML = "";
-  FM_CATS.forEach(function(cat, i) {
-    var btn = document.createElement("button");
-    btn.className = "fm-tab" + (i === 0 ? " on" : "");
-    btn.textContent = cat.label;
-    btn.onclick = function() {
-      document.querySelectorAll(".fm-tab").forEach(function(t){ t.classList.remove("on"); });
-      btn.classList.add("on");
-      loadFmFiles(cat.key);
-    };
-    tabs.appendChild(btn);
-  });
-  loadFmFiles(FM_CATS[0].key);
-}
-
-// Keep alias for backward compat
-function buildFmTabs() { buildFmTabsUI(); }
-
-function loadFmFiles(category) {
-  var list = document.getElementById("fm-list");
-  list.innerHTML = "<p style='color:var(--mu);font-size:13px'>Loading...</p>";
-  api({action:"listFiles", category:category}).then(function(d) {
-    if (!d.success) { list.innerHTML = "<p style='color:var(--red);font-size:13px'>Error: " + d.error + "</p>"; return; }
-    if (!d.files || !d.files.length) {
-      list.innerHTML = "<p style='color:var(--mu);font-size:13px'>No CSV files in this folder. Upload files directly to Google Drive.</p>";
-      return;
-    }
-    list.innerHTML = "";
-    d.files.forEach(function(f) {
-      var div = document.createElement("div");
-      div.style.cssText = "display:flex;align-items:center;justify-content:space-between;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:10px 14px;margin-bottom:8px";
-      div.className = "fm-item";
-      div.dataset.id = f.id;
-      div.dataset.cat = category;
-      div.dataset.name = f.name;
-      div.innerHTML =
-        "<div>" +
-          "<div class=\'fm-name\'>" + f.name + "</div>" +
-          "<div class=\'fm-meta\'>" + Math.round(f.size/1024) + " KB &bull; " + new Date(f.modified).toLocaleDateString() + "</div>" +
-        "</div>" +
-        "<button class=\'btn btn-red btn-sm\' onclick=\'this.closest(\\\'.fm-item\\\').dispatchEvent(new CustomEvent(\\\"fmdel\\\",{bubbles:true}))\'>Delete</button>";
-      div.addEventListener("fmdel", function(){ deleteFmFile(div.dataset.id, div.dataset.name, div.dataset.cat); });
-      list.appendChild(div);
-    });
-  }).catch(function(e){ list.innerHTML = "<p style='color:var(--red);font-size:13px'>" + e.message + "</p>"; });
-}
-
-function deleteFmFile(id, name, cat) {
-  showConfirm("Delete File", "Delete " + name + "? A backup is saved automatically.", function() {
-    api({action:"deleteFile", fileId:id, category:cat}).then(function(d) {
-      if (d.success) { toast("Deleted (backup saved)", "ok"); loadFmFiles(cat); }
-      else toast("Error: " + d.error, "err");
-    }).catch(function(e){ toast(e.message, "err"); });
-  });
-}
-
 </script>
 </body>
 </html>
