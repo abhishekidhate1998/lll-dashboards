@@ -130,6 +130,7 @@ body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacS
       <div class="proc-box">
         <h3>Process &amp; Deploy All Dashboards</h3>
         <p>Upload CSV files to Google Drive first. Then click below to read all data, build all 7 dashboards, and deploy live.</p>
+        <button class="proc-btn" id="tmpl-btn" onclick="pushTemplates()" style="background:#2563a8;margin-right:10px" title="Push correct base files to GitHub first">&#8679; Push Base Files</button>
         <button class="proc-btn" id="proc-btn" onclick="startProcess()">&#128640; Process &amp; Deploy</button>
         <div class="prog-wrap" id="prog-wrap">
           <div class="prog-bg"><div class="prog-bar" id="prog-bar"></div></div>
@@ -384,7 +385,6 @@ function startProcess() {
 
       setP(35,"Fetching dashboard templates...");
       var s3=step("Fetching all 7 templates from GitHub...");
-
       return Promise.all(DASH.map(function(f){
         return fetch(base+f+"?t="+Date.now())
           .then(function(res){
@@ -1199,6 +1199,46 @@ function togglePw(btn,uname,prefix){
       },8000);
     });
   }
+}
+
+function pushTemplates() {
+  var btn = document.getElementById("tmpl-btn");
+  btn.disabled = true;
+  btn.textContent = "Pushing...";
+  toast("Pushing base dashboard files to GitHub...", "ok");
+  api({action:"pushBaseTemplates"}).then(function(d){
+    if(d.success){
+      toast("Base files pushed! Now run Process & Deploy.", "ok");
+      btn.textContent = "OK ✓ Base Files Pushed";
+    } else {
+      toast("Push failed: "+(d.error||"unknown"), "err");
+      btn.disabled = false;
+      btn.textContent = "&#8593; Push Base Files to GitHub";
+    }
+  }).catch(function(e){
+    toast("Error: "+e.message, "err");
+    btn.disabled = false;
+    btn.textContent = "&#8593; Push Base Files to GitHub";
+  });
+}
+
+
+function pushTemplates(){
+  var btn=document.getElementById("tmpl-btn");
+  btn.disabled=true;btn.textContent="Pushing...";
+  toast("Pushing base dashboard files to GitHub...","ok");
+  api({action:"pushBaseTemplates"}).then(function(d){
+    if(d.success){
+      toast("Base files pushed! Now run Process & Deploy.","ok");
+      btn.textContent="&#10003; Base Files Pushed";
+    } else {
+      toast("Push failed: "+(d.error||"unknown"),"err");
+      btn.disabled=false;btn.textContent="&#8679; Push Base Files";
+    }
+  }).catch(function(e){
+    toast("Error: "+e.message,"err");
+    btn.disabled=false;btn.textContent="&#8679; Push Base Files";
+  });
 }
 </script>
 </body>
