@@ -5,69 +5,48 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>Little Leaf Labs</title>
 <style>
-:root{--bg:#0e1414;--panel:#16201f;--p2:#1c2826;--ink:#e8efe9;--mu:#92a39c;--ln:#283533;--gr:#3fae6b;--gd:#2c7d4c;--red:#e5484d;--blue:#4a9ed9;--sb:220px;--tb:52px;}
+:root{--bg:#0e1414;--panel:#16201f;--p2:#1c2826;--ink:#e8efe9;--mu:#92a39c;--ln:#283533;--gr:#3fae6b;--gd:#2c7d4c;--red:#e5484d;}
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+html,body{height:100%;background:var(--bg);color:var(--ink);font:14px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 
-/* ── LOGIN ── */
+/* LOGIN */
 #lw{position:fixed;inset:0;background:var(--bg);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
 .lbox{background:var(--panel);border:1px solid var(--ln);border-radius:18px;padding:36px 32px;width:100%;max-width:340px;text-align:center}
 .lbox h1{font-size:20px;font-weight:700;margin-bottom:4px}
 .lbox p{color:var(--mu);font-size:13px;margin-bottom:24px}
-.lbox input{width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:11px 14px;color:var(--ink);font-size:14px;outline:none;margin-bottom:10px;display:block}
+.lbox input{width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:11px 14px;color:var(--ink);font-size:14px;outline:none;margin-bottom:10px;display:block;box-sizing:border-box}
 .lbox input:focus{border-color:var(--gr)}
+.pw-wrap{position:relative;margin-bottom:10px}
+.pw-wrap input{margin-bottom:0;padding-right:42px}
+.pw-eye{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--mu);font-size:16px;line-height:1;padding:0}
 #lerr{color:#ff7378;font-size:12px;min-height:18px;margin-bottom:8px;text-align:left}
 #lbtn{width:100%;background:var(--gr);color:#0e1414;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:opacity .15s}
 #lbtn:disabled{opacity:.5;cursor:not-allowed}
 
-/* ── APP SHELL ── */
-#app{display:none;flex-direction:column;height:100%;position:relative}
+/* DASHBOARD PICKER */
+#app{display:none;flex-direction:column;min-height:100%;background:var(--bg)}
 #app.on{display:flex}
-
-/* ── TOPBAR ── */
-.tb{background:var(--panel);border-bottom:1px solid var(--ln);height:var(--tb);display:flex;align-items:center;padding:0 14px;flex-shrink:0;z-index:200;gap:10px}
-#sb-toggle{width:36px;height:36px;border-radius:8px;background:none;border:1px solid var(--ln);color:var(--mu);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;line-height:1}
-#sb-toggle:hover{background:var(--p2);color:var(--ink);border-color:var(--gr)}
-.brand{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;flex:1;min-width:0}
-.bdot{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,var(--gr),var(--gd));display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
-.brand-name{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.who{font-size:11px;color:var(--mu);white-space:nowrap;flex-shrink:0}
+.tb{background:var(--panel);border-bottom:1px solid var(--ln);padding:14px 20px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:700;flex:1}
+.bdot{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--gr),var(--gd));display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.who{font-size:12px;color:var(--mu)}
 .who b{color:var(--gr)}
-.lout{background:var(--p2);border:1px solid var(--ln);border-radius:7px;padding:5px 10px;font-size:12px;color:var(--ink);cursor:pointer;white-space:nowrap;flex-shrink:0}
+.lout{background:var(--p2);border:1px solid var(--ln);border-radius:7px;padding:6px 12px;font-size:12px;color:var(--ink);cursor:pointer}
 .lout:hover{border-color:var(--gr);color:var(--gr)}
 
-/* ── BODY ── */
-.ab{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
+/* GRID */
+.grid-wrap{flex:1;padding:32px 24px;max-width:900px;margin:0 auto;width:100%}
+.grid-title{font-size:13px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;font-weight:700;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px}
+.dash-card{background:var(--panel);border:1px solid var(--ln);border-radius:14px;padding:20px;cursor:pointer;transition:all .18s;display:flex;align-items:flex-start;gap:14px}
+.dash-card:hover{border-color:var(--gr);background:#1a2820;transform:translateY(-2px);box-shadow:0 4px 20px rgba(63,174,107,.15)}
+.dash-icon{width:42px;height:42px;border-radius:10px;background:var(--p2);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.dash-card:hover .dash-icon{background:rgba(63,174,107,.12);border-color:var(--gr)}
+.dash-info h3{font-size:14px;font-weight:600;margin-bottom:3px}
+.dash-info p{font-size:12px;color:var(--mu);line-height:1.4}
 
-/* ── SIDEBAR ── */
-.sb{width:var(--sb);background:var(--panel);border-right:1px solid var(--ln);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;overflow-x:hidden;transition:width .25s ease,transform .25s ease;z-index:150}
-.sb.collapsed{width:0;border-right:none}
-.sbh{padding:14px 16px 6px;font-size:10px;color:var(--mu);text-transform:uppercase;letter-spacing:1px;font-weight:700;white-space:nowrap;overflow:hidden}
-.nav-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;color:var(--mu);font-size:13px;font-weight:500;border:none;background:none;width:100%;text-align:left;transition:all .15s;white-space:nowrap;overflow:hidden}
-.nav-item:hover{background:var(--p2);color:var(--ink)}
-.nav-item.on{background:rgba(63,174,107,.1);color:var(--gr);border-left:3px solid var(--gr)}
-.nav-item:not(.on){border-left:3px solid transparent}
-.ni{font-size:16px;width:20px;text-align:center;flex-shrink:0}
-.nl{flex:1;overflow:hidden;text-overflow:ellipsis}
-
-/* Mobile overlay sidebar */
-.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:140;opacity:0;transition:opacity .25s}
-.sb-overlay.show{opacity:1}
-
-/* ── CONTENT ── */
-.ca{flex:1;position:relative;overflow:hidden}
-.dash-frame{position:absolute;inset:0;width:100%;height:100%;border:none;display:none;background:var(--bg)}
-.dash-frame.on{display:block}
-
-/* ── LOADING ── */
-.loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:var(--bg);z-index:10;transition:opacity .3s}
-.loading.hide{opacity:0;pointer-events:none}
-.spinner{width:36px;height:36px;border:3px solid var(--ln);border-top-color:var(--gr);border-radius:50%;animation:spin .8s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.loading p{font-size:13px;color:var(--mu)}
-
-/* ── CHATBOT ── */
-#cb-btn{position:fixed;bottom:20px;right:20px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gr),var(--gd));border:none;cursor:pointer;z-index:8000;box-shadow:0 4px 20px rgba(63,174,107,.4);transition:transform .2s;display:none;align-items:center;justify-content:center;font-size:20px}
+/* Chatbot */
+#cb-btn{position:fixed;bottom:20px;right:20px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,var(--gr),var(--gd));border:none;cursor:pointer;z-index:8000;box-shadow:0 4px 20px rgba(63,174,107,.4);display:none;align-items:center;justify-content:center;font-size:20px;transition:transform .2s}
 #cb-btn.visible{display:flex}
 #cb-btn:hover{transform:scale(1.08)}
 .cb-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:var(--red);border-radius:50%;font-size:9px;color:#fff;display:none;align-items:center;justify-content:center;font-weight:700}
@@ -79,42 +58,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 .cb-head span{font-size:11px;color:var(--mu)}
 .cb-close{background:none;border:none;color:var(--mu);font-size:18px;cursor:pointer;padding:2px 6px;border-radius:6px}
 .cb-close:hover{color:var(--ink);background:var(--p2)}
-.cb-msgs{flex:1;overflow-y:auto;padding:12px 12px 6px;display:flex;flex-direction:column;gap:8px;min-height:0}
-.cb-msgs::-webkit-scrollbar{width:4px}
-.cb-msgs::-webkit-scrollbar-thumb{background:var(--ln);border-radius:2px}
+.cb-msgs{flex:1;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:8px;min-height:0}
 .cb-msg{max-width:88%;font-size:13px;line-height:1.5;padding:8px 12px;border-radius:12px;word-break:break-word}
 .cb-msg.user{background:rgba(63,174,107,.15);border:1px solid rgba(63,174,107,.25);align-self:flex-end;border-bottom-right-radius:3px}
 .cb-msg.bot{background:var(--p2);border:1px solid var(--ln);align-self:flex-start;border-bottom-left-radius:3px}
 .cb-msg.thinking{color:var(--mu);font-style:italic}
 .cb-msg strong{color:var(--gr)}
-.cb-msg code{background:var(--bg);border:1px solid var(--ln);border-radius:4px;padding:1px 5px;font-size:11px;font-family:monospace}
 .cb-chips{padding:6px 12px;display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
 .cb-chip{background:var(--p2);border:1px solid var(--ln);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--mu);cursor:pointer;white-space:nowrap;transition:all .15s}
 .cb-chip:hover{border-color:var(--gr);color:var(--gr)}
 .cb-foot{padding:8px 10px;border-top:1px solid var(--ln);display:flex;gap:8px;flex-shrink:0}
 #cb-input{flex:1;background:var(--p2);border:1px solid var(--ln);border-radius:10px;padding:8px 11px;color:var(--ink);font-size:13px;outline:none;resize:none;max-height:80px;min-height:34px;font-family:inherit;line-height:1.4}
 #cb-input:focus{border-color:var(--gr)}
-#cb-send{background:var(--gr);color:#0e1414;border:none;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:opacity .15s}
-#cb-send:hover{opacity:.85}
+#cb-send{background:var(--gr);color:#0e1414;border:none;border-radius:10px;width:34px;height:34px;cursor:pointer;font-size:15px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 #cb-send:disabled{opacity:.35;cursor:not-allowed}
 
-/* ── RESPONSIVE ── */
-/* Sidebar always fixed overlay on all screen sizes */
-.sb{position:fixed;top:var(--tb);left:0;height:calc(100% - var(--tb));transform:translateX(-100%);width:var(--sb) !important;border-right:1px solid var(--ln);z-index:150}
-.sb.mobile-open{transform:translateX(0)}
-.sb-overlay{display:block}
-@media(max-width:768px){
-  :root{--sb:260px}
-  .who{display:none}
-  .brand-name{font-size:13px}
+@media(max-width:600px){
+  .grid-wrap{padding:20px 14px}
+  .dash-card{padding:16px}
+  .grid{grid-template-columns:1fr 1fr}
 }
-@media(max-width:400px){
-  .lbox{padding:28px 20px}
-  .lbox h1{font-size:18px}
-}
-@media(max-width:400px){
-  .lbox{padding:28px 20px}
-  .lbox h1{font-size:18px}
+@media(max-width:380px){
+  .grid{grid-template-columns:1fr}
 }
 </style>
 </head>
@@ -122,11 +87,14 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 
 <div id="lw">
   <div class="lbox">
-    <div style="font-size:40px;margin-bottom:12px">🌿</div>
+    <div style="font-size:40px;margin-bottom:12px">&#127807;</div>
     <h1>Little Leaf Labs</h1>
     <p>Sign in to access your dashboards</p>
     <input type="text" id="lu" placeholder="Username" autocomplete="username">
-    <div style="position:relative"><input type="password" id="lp" placeholder="Password" autocomplete="current-password" style="padding-right:42px;width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:11px 42px 11px 14px;color:var(--ink);font-size:14px;outline:none;display:block;box-sizing:border-box"><button type="button" id="lp-eye" onclick="(function(){var f=document.getElementById('lp');f.type=f.type==='password'?'text':'password';document.getElementById('lp-eye').innerHTML=f.type==='password'?'&#128065;':'&#128064;'})()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--mu);font-size:16px;line-height:1;padding:0">&#128065;</button></div>
+    <div class="pw-wrap">
+      <input type="password" id="lp" placeholder="Password" autocomplete="current-password">
+      <button type="button" class="pw-eye" onclick="(function(){var f=document.getElementById('lp');f.type=f.type==='password'?'text':'password';this.innerHTML=f.type==='password'?'&#128065;':'&#128064;';}).call(this)">&#128065;</button>
+    </div>
     <div id="lerr"></div>
     <button id="lbtn" onclick="doLogin()">Sign In</button>
   </div>
@@ -134,54 +102,58 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 
 <div id="app">
   <div class="tb">
-    <button id="sb-toggle" onclick="toggleSidebar()" title="Toggle sidebar">&#9776;</button>
     <div class="brand">
-      <div class="bdot">🌿</div>
-      <span class="brand-name">Little Leaf Labs</span>
+      <div class="bdot">&#127807;</div>
+      Little Leaf Labs
     </div>
     <span class="who">Signed in as <b id="wn">-</b></span>
     <button class="lout" onclick="doLogout()">Logout</button>
   </div>
-  <div class="ab">
-    <div class="sb-overlay" id="sb-overlay" onclick="closeSidebarMobile()"></div>
-    <div class="sb" id="sidebar">
-      <div class="sbh">Dashboards</div>
-      <button class="nav-item" id="nav-master" onclick="showDash('master')"><span class="ni">📊</span><span class="nl">Master Dashboard</span></button>
-<button class="nav-item" id="nav-weekly" onclick="showDash('weekly')"><span class="ni">📋</span><span class="nl">Weekly Exec</span></button>
-<button class="nav-item" id="nav-retail" onclick="showDash('retail')"><span class="ni">🛒</span><span class="nl">Retail Intel</span></button>
-<button class="nav-item" id="nav-refresh" onclick="showDash('refresh')"><span class="ni">🔄</span><span class="nl">Weekly Refresh</span></button>
-<button class="nav-item" id="nav-sales" onclick="showDash('sales')"><span class="ni">📈</span><span class="nl">Sales Dashboard</span></button>
-<button class="nav-item" id="nav-action" onclick="showDash('action')"><span class="ni">✅</span><span class="nl">Action Form</span></button>
-<button class="nav-item" id="nav-command" onclick="showDash('command')"><span class="ni">⚡</span><span class="nl">Command Center</span></button>
-
-    </div>
-    <div class="ca" id="ca">
-      <div class="loading" id="loading">
-        <div class="spinner"></div>
-        <p>Loading dashboard...</p>
+  <div class="grid-wrap">
+    <div class="grid-title">Select a Dashboard</div>
+    <div class="grid">
+      <div class="dash-card" onclick="goDash('master_dashboard.html')">
+        <div class="dash-icon">&#128202;</div>
+        <div class="dash-info"><h3>Master Dashboard</h3><p>Full business overview, 25+ tabs</p></div>
       </div>
-      <iframe id="frame-master" class="dash-frame" src="" data-src="https://abhishekidhate1998.github.io/lll-dashboards/master_dashboard.html" allowfullscreen></iframe>
-<iframe id="frame-weekly" class="dash-frame" src="" data-src="https://abhishekidhate1998.github.io/lll-dashboards/weekly_exec.html" allowfullscreen></iframe>
-<iframe id="frame-retail" class="dash-frame" src="" data-src="https://abhishekidhate1998.github.io/lll-dashboards/retail_intel.html" allowfullscreen></iframe>
-<iframe id="frame-refresh" class="dash-frame" src="" data-src="https://abhishekidhate1998.github.io/lll-dashboards/weekly_refresh.html" allowfullscreen></iframe>
-<iframe id="frame-sales" class="dash-frame" src="" data-src="https://abhishekidhate1998.github.io/lll-dashboards/sales_dashboard.html" allowfullscreen></iframe>
-<iframe id="frame-action" class="dash-frame" src="" data-src="https://abhishekidhate1998.github.io/lll-dashboards/sales_action_form.html" allowfullscreen></iframe>
-<iframe id="frame-command" class="dash-frame" src="" data-src="https://abhishekidhate1998.github.io/lll-dashboards/lit_sales_command_center.html" allowfullscreen></iframe>
-
+      <div class="dash-card" onclick="goDash('weekly_exec.html')">
+        <div class="dash-icon">&#128203;</div>
+        <div class="dash-info"><h3>Weekly Exec</h3><p>QuickBooks financials summary</p></div>
+      </div>
+      <div class="dash-card" onclick="goDash('retail_intel.html')">
+        <div class="dash-icon">&#128717;</div>
+        <div class="dash-info"><h3>Retail Intel</h3><p>Apex CRM &amp; COO follow-ups</p></div>
+      </div>
+      <div class="dash-card" onclick="goDash('weekly_refresh.html')">
+        <div class="dash-icon">&#128260;</div>
+        <div class="dash-info"><h3>Weekly Refresh</h3><p>Data status &amp; updates</p></div>
+      </div>
+      <div class="dash-card" onclick="goDash('sales_dashboard.html')">
+        <div class="dash-icon">&#128200;</div>
+        <div class="dash-info"><h3>Sales Dashboard</h3><p>Lit Alerts &amp; brand performance</p></div>
+      </div>
+      <div class="dash-card" onclick="goDash('sales_action_form.html')">
+        <div class="dash-icon">&#9989;</div>
+        <div class="dash-info"><h3>Action Form</h3><p>Matt&#39;s sales tasks &amp; reorders</p></div>
+      </div>
+      <div class="dash-card" onclick="goDash('lit_sales_command_center.html')">
+        <div class="dash-icon">&#9889;</div>
+        <div class="dash-info"><h3>Command Center</h3><p>Market intelligence &amp; forecasting</p></div>
+      </div>
     </div>
   </div>
 </div>
 
 <!-- Chatbot -->
-<button id="cb-btn" onclick="cbToggle()" title="Ask Claude">🌿<span class="cb-badge" id="cb-badge"></span></button>
+<button id="cb-btn" onclick="cbToggle()">&#127807;<span class="cb-badge" id="cb-badge"></span></button>
 <div id="cb-panel">
   <div class="cb-head">
-    <div class="cb-icon">🌿</div>
+    <div class="cb-icon">&#127807;</div>
     <div style="flex:1"><h4>Little Leaf Assistant</h4><span>Powered by Claude AI</span></div>
     <button class="cb-close" onclick="cbToggle()">&#x2715;</button>
   </div>
   <div class="cb-msgs" id="cb-msgs">
-    <div class="cb-msg bot">Hi! I&#39;m your Little Leaf Labs assistant. Ask me anything about your dashboards, sales, margins, or inventory.</div>
+    <div class="cb-msg bot">Hi! Ask me anything about your dashboards, sales, margins, or inventory.</div>
   </div>
   <div class="cb-chips" id="cb-chips">
     <span class="cb-chip" onclick="cbChip(this)">Top selling brands?</span>
@@ -197,32 +169,16 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
 </div>
 
 <script>
-var SU      = "https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
-var SK      = "lll_vs";
-var tok     = null;
-var loaded  = {};
-var SB_OPEN = true;
-var IS_MOBILE = window.innerWidth <= 768;
-var CB_OPEN = false;
-var CB_HIST = [];
-var CB_BUSY = false;
-var CB_NEW  = 0;
+var SU  = "https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
+var BU  = "https://abhishekidhate1998.github.io/lll-dashboards";
+var SK  = "lll_vs";
+var tok = null;
+var CB_OPEN=false,CB_HIST=[],CB_BUSY=false,CB_NEW=0;
+var CB_SYS="You are a business assistant for Little Leaf Labs LLC, a cannabis company in NJ. Help viewers understand their dashboards: Master Dashboard (full overview), Weekly Exec (QB financials), Retail Intel (Apex CRM/COO), Weekly Refresh (data status), Sales Dashboard (Lit Alerts/brands), Action Form (Matt tasks), Command Center (market intelligence). Key brands: The Growfather, Sugar High, Dr.Zodiak Moonrock, Octane, Illadelph. Be concise.";
 
-var CB_SYSTEM = "You are a business intelligence assistant for Little Leaf Labs LLC, a cannabis company in New Jersey. " +
-  "Help viewers understand their dashboards: Master Dashboard (full business overview), Weekly Exec (QB financials), " +
-  "Retail Intel (Apex CRM/COO follow-ups), Weekly Refresh (data status), Sales Dashboard (Lit Alerts/brand performance), " +
-  "Action Form (Matt sales tasks), Command Center (market intelligence). " +
-  "Key brands: The Growfather, Sugar High, Dr. Zodiak Moonrock, Octane, Illadelph. " +
-  "Be concise and business-focused.";
-
-/* ── AUTH ── */
-function api(params) {
-  if (tok) params.token = tok;
-  var large = ["deployDashboards","readAllFiles"];
-  if (large.indexOf(params.action) >= 0) {
-    return fetch(SU,{method:"POST",body:JSON.stringify(params)}).then(function(r){return r.json();});
-  }
-  var enc = btoa(unescape(encodeURIComponent(JSON.stringify(params))));
+function api(p){
+  if(tok) p.token=tok;
+  var enc=btoa(unescape(encodeURIComponent(JSON.stringify(p))));
   return fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"}).then(function(r){return r.json();});
 }
 
@@ -245,8 +201,6 @@ function doLogin(){
       document.getElementById("app").classList.add("on");
       document.getElementById("wn").textContent=d.username;
       document.getElementById("cb-btn").classList.add("visible");
-      initSidebar();
-      showDash("master");
     }else{
       err.textContent=d.error||"Incorrect credentials.";
       document.getElementById("lp").value="";
@@ -259,7 +213,7 @@ function doLogin(){
 }
 
 function doLogout(){
-  sessionStorage.removeItem(SK);tok=null;loaded={};
+  sessionStorage.removeItem(SK);tok=null;
   document.getElementById("app").classList.remove("on");
   document.getElementById("lw").style.display="flex";
   document.getElementById("lu").value="";
@@ -267,75 +221,15 @@ function doLogout(){
   document.getElementById("lbtn").disabled=false;
   document.getElementById("lbtn").textContent="Sign In";
   document.getElementById("cb-btn").classList.remove("visible");
-  document.querySelectorAll(".dash-frame").forEach(function(f){f.src="";f.classList.remove("on");});
-  document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("on");});
 }
 
-/* ── SIDEBAR ── */
-function initSidebar(){
-  IS_MOBILE = window.innerWidth <= 768;
-  // Always start closed on all screens
-  document.getElementById("sidebar").classList.remove("mobile-open");
-  document.getElementById("sidebar").classList.remove("collapsed");
-  SB_OPEN = false;
+function goDash(fname){
+  if(!tok){ var s=sessionStorage.getItem(SK); if(s){try{tok=JSON.parse(s).token;}catch(e){}} }
+  var url=BU+"/"+fname+(tok?"#token="+encodeURIComponent(tok):"");
+  window.location.href=url;
 }
 
-function toggleSidebar(){
-  IS_MOBILE = window.innerWidth <= 768;
-  var sb = document.getElementById("sidebar");
-  var overlay = document.getElementById("sb-overlay");
-  SB_OPEN = !SB_OPEN;
-  if(IS_MOBILE){
-    sb.classList.toggle("mobile-open", SB_OPEN);
-    overlay.classList.toggle("show", SB_OPEN);
-  } else {
-    // Desktop: use same overlay approach as mobile
-    sb.classList.toggle("mobile-open", SB_OPEN);
-    overlay.classList.toggle("show", SB_OPEN);
-  }
-}
-
-function closeSidebarMobile(){
-  SB_OPEN = false;
-  document.getElementById("sidebar").classList.remove("mobile-open");
-  document.getElementById("sb-overlay").classList.remove("show");
-}
-
-/* ── DASHBOARDS ── */
-function showDash(id){
-  document.querySelectorAll(".dash-frame").forEach(function(f){f.classList.remove("on");});
-  document.querySelectorAll(".nav-item").forEach(function(n){n.classList.remove("on");});
-  var frame=document.getElementById("frame-"+id);
-  var nav=document.getElementById("nav-"+id);
-  if(nav) nav.classList.add("on");
-
-  var loading=document.getElementById("loading");
-  if(!frame) return;
-
-  if(!loaded[id]){
-    loading.style.display="flex";
-    loading.classList.remove("hide");
-    var src=frame.getAttribute("data-src");
-    frame.src=src+"#token="+encodeURIComponent(tok||"");
-    loaded[id]=true;
-    frame.onload=function(){
-      loading.classList.add("hide");
-      setTimeout(function(){loading.style.display="none";},400);
-      try{
-        frame.contentWindow.postMessage({type:"LLL_AUTH",token:tok,username:document.getElementById("wn").textContent},"*");
-      }catch(e){}
-    };
-  } else {
-    loading.style.display="none";
-  }
-
-  frame.classList.add("on");
-
-  // Close sidebar on all screens after selecting a dashboard
-  if(SB_OPEN) closeSidebarMobile();
-}
-
-/* ── SESSION RESTORE ── */
+/* Session restore */
 (function(){
   var s=sessionStorage.getItem(SK);
   if(!s) return;
@@ -349,87 +243,56 @@ function showDash(id){
         document.getElementById("app").classList.add("on");
         document.getElementById("wn").textContent=d.username||"viewer";
         document.getElementById("cb-btn").classList.add("visible");
-        initSidebar();
-        showDash("master");
       }else{sessionStorage.removeItem(SK);}
     }).catch(function(){});
   }catch(e){}
 })();
 
-/* ── CHATBOT ── */
+/* Chatbot */
 function cbToggle(){
   CB_OPEN=!CB_OPEN;
   document.getElementById("cb-panel").classList.toggle("open",CB_OPEN);
-  if(CB_OPEN){
-    CB_NEW=0;
-    document.getElementById("cb-badge").style.display="none";
-    setTimeout(function(){document.getElementById("cb-input").focus();},300);
-    cbScrollBottom();
-  }
+  if(CB_OPEN){CB_NEW=0;document.getElementById("cb-badge").style.display="none";
+    setTimeout(function(){document.getElementById("cb-input").focus();},300);}
 }
-
-function cbScrollBottom(){
-  var msgs=document.getElementById("cb-msgs");
-  setTimeout(function(){msgs.scrollTop=msgs.scrollHeight;},50);
-}
-
+function cbScrollBottom(){var m=document.getElementById("cb-msgs");setTimeout(function(){m.scrollTop=m.scrollHeight;},50);}
 function cbAddMsg(role,text,thinking){
-  var msgs=document.getElementById("cb-msgs");
-  var div=document.createElement("div");
-  div.className="cb-msg "+role+(thinking?" thinking":"");
-  div.innerHTML=thinking?text:cbFormat(text);
-  msgs.appendChild(div);
-  cbScrollBottom();
-  return div;
+  var m=document.getElementById("cb-msgs");
+  var d=document.createElement("div");
+  d.className="cb-msg "+role+(thinking?" thinking":"");
+  d.innerHTML=thinking?text:cbFmt(text);
+  m.appendChild(d);cbScrollBottom();return d;
 }
-
-function cbFormat(t){
+function cbFmt(t){
   t=t.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
   t=t.replace(/[*][*]([^*]+)[*][*]/g,"<strong>$1</strong>");
-  t=t.replace(/[*]([^*]+)[*]/g,"<em>$1</em>");
-  t=t.replace(/`([^`]+)`/g,"<code>$1</code>");
-  t=t.split("\n\n").join("<br><br>");
-  t=t.split("\n").join("<br>");
+  t=t.split("\n\n").join("<br><br>");t=t.split("\n").join("<br>");
   return t;
 }
-
-function cbChip(el){
-  document.getElementById("cb-input").value=el.textContent;
-  document.getElementById("cb-chips").style.display="none";
-  cbSend();
-}
-
+function cbChip(el){document.getElementById("cb-input").value=el.textContent;document.getElementById("cb-chips").style.display="none";cbSend();}
 function cbSend(){
   if(CB_BUSY) return;
-  var input=document.getElementById("cb-input");
-  var text=input.value.trim();
-  if(!text) return;
-  CB_HIST.push({role:"user",content:text});
-  cbAddMsg("user",text);
-  input.value="";
-  input.style.height="34px";
+  var inp=document.getElementById("cb-input");
+  var txt=inp.value.trim();if(!txt) return;
+  CB_HIST.push({role:"user",content:txt});
+  cbAddMsg("user",txt);inp.value="";inp.style.height="34px";
   document.getElementById("cb-chips").style.display="none";
-  var thinkDiv=cbAddMsg("bot","Thinking...",true);
-  CB_BUSY=true;
-  document.getElementById("cb-send").disabled=true;
-  var ctx=CB_SYSTEM+"\n\nConversation so far:\n";
-  CB_HIST.slice(0,-1).forEach(function(m){ctx+=(m.role==="user"?"User: ":"Assistant: ")+m.content+"\n";});
-  api({action:"chatbot",question:text,context:ctx}).then(function(d){
-    thinkDiv.remove();
-    var reply=d.success&&d.answer?d.answer:(d.error||"Sorry, I couldn\'t get a response.");
-    if(d.remaining!==undefined&&d.remaining<=3) reply+="\n\n_("+d.remaining+" messages left this hour)_";
-    CB_HIST.push({role:"assistant",content:reply});
-    cbAddMsg("bot",reply);
+  var thk=cbAddMsg("bot","Thinking...",true);
+  CB_BUSY=true;document.getElementById("cb-send").disabled=true;
+  var ctx=CB_SYS+"\n\nHistory:\n";
+  CB_HIST.slice(0,-1).forEach(function(m){ctx+=(m.role==="user"?"User: ":"Bot: ")+m.content+"\n";});
+  api({action:"chatbot",question:txt,context:ctx}).then(function(d){
+    thk.remove();
+    var rep=d.success&&d.answer?d.answer:(d.error||"Sorry, try again.");
+    CB_HIST.push({role:"assistant",content:rep});
+    cbAddMsg("bot",rep);
     if(!CB_OPEN){CB_NEW++;var b=document.getElementById("cb-badge");b.textContent=CB_NEW;b.style.display="flex";}
-  }).catch(function(){thinkDiv.remove();cbAddMsg("bot","Connection error. Please try again.");})
-  .finally(function(){CB_BUSY=false;document.getElementById("cb-send").disabled=false;document.getElementById("cb-input").focus();});
+  }).catch(function(){thk.remove();cbAddMsg("bot","Connection error.");})
+  .finally(function(){CB_BUSY=false;document.getElementById("cb-send").disabled=false;});
 }
-
 document.getElementById("cb-input").addEventListener("input",function(){
-  this.style.height="34px";
-  this.style.height=Math.min(this.scrollHeight,80)+"px";
+  this.style.height="34px";this.style.height=Math.min(this.scrollHeight,80)+"px";
 });
 </script>
-
 </body>
 </html>
