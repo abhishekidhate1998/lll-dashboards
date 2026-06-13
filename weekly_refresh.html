@@ -64,86 +64,41 @@
   .two-line:last-child{border:none}
   .two-line .r{color:var(--muted);font-variant-numeric:tabular-nums}
 
-/* ══ MOBILE RESPONSIVE ══ */
+/* ══ MOBILE RESPONSIVE (safe) ══ */
 *{-webkit-text-size-adjust:100%}
-img,canvas,iframe{max-width:100%}
+img,canvas{max-width:100%;height:auto}
 
-/* Scrollable tables on small screens */
-.tbl-wrap,.table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
-table{min-width:500px}
-
-/* Make header/topbar scroll-safe */
-.header,.hbar,.topbar,.tb{position:sticky;top:0;z-index:100}
-
-/* Tabs wrap on small screens */
-.tabs,.tab-row,.nav-tabs{display:flex;flex-wrap:wrap;gap:4px;overflow-x:auto;-webkit-overflow-scrolling:touch}
-.tab,.tab-btn{white-space:nowrap;flex-shrink:0}
-
-/* Cards stack on mobile */
 @media(max-width:600px){
   body{font-size:13px}
-  
-  /* All grids go single column */
-  [class*="grid"],[class*="g2"],[class*="g3"],[class*="g4"],[class*="g5"],
-  [class*="col-"],[class*="columns"]{
+  /* Single column grids */
+  [class*="grid"],[class*="g2"],[class*="g3"],[class*="g4"],[class*="g5"]{
     grid-template-columns:1fr !important;
   }
-  
-  /* Tables scroll horizontally */
-  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;min-width:unset;width:100%}
-  
-  /* Header compact */
-  .hbar,.header,.topbar{padding:8px 12px !important;flex-wrap:wrap;gap:6px;height:auto !important}
-  .logo,.brand{font-size:13px !important}
-  
-  /* Tabs smaller */
-  .tab,.tab-btn,.nb{padding:7px 10px !important;font-size:12px !important}
-  
-  /* Cards */
-  .card,.kpi,.kpi-card,.stat-card,.metric-card{padding:12px !important}
-  
-  /* Content padding */
-  .content,.main,.body,.page,.view{padding:10px !important}
-  
-  /* Charts */
-  canvas{max-height:220px !important}
-  
-  /* Hide non-essential columns on very small screens */
-  .hide-mobile{display:none !important}
-  
-  /* Buttons full width in forms */
-  .btn-row,.btn-group{flex-wrap:wrap}
-  
-  /* Input fields */
-  input,select,textarea{font-size:16px !important} /* prevents zoom on iOS */
-  
-  /* KPI numbers */
-  .kpi-val,.stat-val,.big-num{font-size:1.4em !important}
-  
-  /* Section headings */
+  /* Tables scroll horizontally without breaking layout */
+  table{display:block;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:nowrap}
+  /* Compact padding */
+  .card,.kpi,.stat-card,.metric-card,.section,.panel{padding:12px !important}
+  .content,.main,.body,.page,.wrap{padding:10px !important}
+  /* Charts capped */
+  canvas{max-height:240px !important}
+  /* iOS zoom prevention */
+  input,select,textarea{font-size:16px !important}
+  /* Headings */
   h1{font-size:18px !important}
   h2{font-size:16px !important}
-  h3{font-size:14px !important}
-  
-  /* Overflow protection */
-  .section,.panel,.card-wrap{overflow-x:hidden;width:100%}
+  /* Tabs wrap naturally — NO sticky, NO overflow that blocks clicks */
+  .tabs{flex-wrap:wrap !important}
+  .tab{font-size:12px !important;padding:7px 10px !important}
 }
 
 @media(max-width:400px){
   body{font-size:12px}
-  .tab,.tab-btn,.nb{padding:6px 8px !important;font-size:11px !important}
-  canvas{max-height:180px !important}
+  .tab{font-size:11px !important;padding:6px 8px !important}
+  canvas{max-height:190px !important}
 }
 
 @media(min-width:601px) and (max-width:900px){
-  /* Tablet: 2-column grids where 4+ columns exist */
-  [class*="g4"],[class*="g5"],[class*="g6"]{
-    grid-template-columns:repeat(2,1fr) !important;
-  }
-  [class*="g3"]{
-    grid-template-columns:repeat(2,1fr) !important;
-  }
-  canvas{max-height:280px !important}
+  [class*="g4"],[class*="g5"],[class*="g6"]{grid-template-columns:repeat(2,1fr) !important}
 }
 
 </style>
@@ -167,7 +122,7 @@ table{min-width:500px}
     <div class="kpi"><div class="v">$2.75M</div><div class="l">Revenue · Jan–May</div><div class="d">GP 54% · $1.49M</div></div>
     <div class="kpi"><div class="v">$872K</div><div class="l">Cash (BoA $863K)</div></div>
     <div class="kpi"><div class="v">$795K</div><div class="l">A/R</div><div class="d" style="color:var(--muted)">A/P $18.9K</div></div>
-    <div class="kpi"><div class="v">160,967</div><div class="l">Units on hand</div><div class="d">$4.09M · reconciled ✓</div></div>
+    <div class="kpi"><div class="v">157,957</div><div class="l">Units on hand</div><div class="d">$4.09M · reconciled ✓</div></div>
     <div class="kpi"><div class="v">9</div><div class="l">SKUs need WIP this wk</div><div class="d" style="color:#ff7378">5 critical · 4 red</div></div>
     <div class="kpi"><div class="v">58 / 128</div><div class="l">Wholesale accts lapsed ≥45d</div><div class="d" style="color:#ffc35a">&gt;$500K idle</div></div>
   </div>
@@ -317,7 +272,7 @@ table{min-width:500px}
   <div class="grid2">
     <div class="card">
       <h3>P&amp;L &amp; balance sheet (Jan–May / as of 05-30)</h3>
-      <div class="two-line"><span>Revenue</span><span class="r">$4,586,457</span></div>
+      <div class="two-line"><span>Revenue</span><span class="r">$2,753,930</span></div>
       <div class="two-line"><span>Gross profit (54%)</span><span class="r">$1,487,822</span></div>
       <div class="two-line"><span>COGS</span><span class="r">$1,266,108</span></div>
       <div class="two-line"><span>Cash (BoA $863,487)</span><span class="r">$872,176</span></div>
