@@ -126,7 +126,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--ink);font
     <h1>Little Leaf Labs</h1>
     <p>Sign in to access your dashboards</p>
     <input type="text" id="lu" placeholder="Username" autocomplete="username">
-    <input type="password" id="lp" placeholder="Password" autocomplete="current-password">
+    <div style="position:relative"><input type="password" id="lp" placeholder="Password" autocomplete="current-password" style="padding-right:42px;width:100%;background:var(--p2);border:1px solid var(--ln);border-radius:9px;padding:11px 42px 11px 14px;color:var(--ink);font-size:14px;outline:none;display:block;box-sizing:border-box"><button type="button" id="lp-eye" onclick="(function(){var f=document.getElementById('lp');f.type=f.type==='password'?'text':'password';document.getElementById('lp-eye').innerHTML=f.type==='password'?'&#128065;':'&#128064;'})()" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--mu);font-size:16px;line-height:1;padding:0">&#128065;</button></div>
     <div id="lerr"></div>
     <button id="lbtn" onclick="doLogin()">Sign In</button>
   </div>
