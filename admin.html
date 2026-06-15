@@ -385,10 +385,25 @@ function startProcess() {
       setP(35,"Fetching dashboard templates...");
       var s3=step("Fetching all 7 templates from GitHub...");
       // Fetch templates via Apps Script (has GitHub token, server-side, no rate limit)
+      var base="https://raw.githubusercontent.com/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/main/";
+      function fetchRaw(fname){
+        return fetch(base+fname+"?v="+Date.now()+"_"+Math.random().toString(36).slice(2),
+          {cache:"no-store",headers:{"Cache-Control":"no-cache, no-store, must-revalidate","Pragma":"no-cache"}})
+          .then(function(r){if(!r.ok)throw new Error(fname+" HTTP "+r.status);return r.text();})
+          .then(function(t){return {name:fname,html:t};});
+      }
+      // Try Apps Script server-side fetch first (authenticated), fall back to raw CDN
       return api({action:"fetchTemplates"}).then(function(result){
-        if(!result.success) throw new Error("Template fetch failed: "+(result.error||"unknown"));
-        var templates=result.templates.filter(function(t){return t.html&&t.html.length>0;});
-        if(templates.length===0) throw new Error("No templates returned from server");
+        if(result.success && result.templates && result.templates.length>0){
+          return result.templates.filter(function(t){return t.html&&t.html.length>0;});
+        }
+        // Fallback: fetch directly from raw CDN
+        console.warn("fetchTemplates failed, using raw CDN fallback");
+        return Promise.all(DASH.map(fetchRaw));
+      }).catch(function(){
+        // Fallback: fetch directly from raw CDN
+        return Promise.all(DASH.map(fetchRaw));
+      }).then(function(templates){
         upd(s3,"All "+templates.length+" templates fetched","done");
         setP(55,"Injecting data...");
         var s4=step("Injecting data into all 7 dashboards...");
@@ -889,30 +904,30 @@ async function readDistruData(files) {
 }
 
 async function readMetrcData(files) {
+  const metrc = { packages:[], labStatus:{}, locations:{}, prod_stages:{} };
   try {
-  const metrc = { packages:[], labStatus:{}, locations:{} };
-  const pkgFile = findFile(files, 'metrc', ['packages', 'inventory', 'packagesinventory']);
-  if (pkgFile) {
-    metrc.packages = parseCSV(pkgFile.content);
-    for (const p of metrc.packages) {
-      const lab = (p['Lab Testing'] || '').trim();
-      const loc = (p['Location'] || '').trim();
-      metrc.labStatus[lab] = (metrc.labStatus[lab] || 0) + 1;
-      metrc.locations[loc] = (metrc.locations[loc] || 0) + 1;
+    const pkgFile = findFile(files, 'metrc', ['packages', 'inventory', 'packagesinventory']);
+    if (pkgFile) {
+      metrc.packages = parseCSV(pkgFile.content);
+      for (const p of metrc.packages) {
+        const lab = (p['Lab Testing'] || '').trim();
+        const loc = (p['Location'] || '').trim();
+        if (lab) metrc.labStatus[lab] = (metrc.labStatus[lab] || 0) + 1;
+        if (loc) metrc.locations[loc] = (metrc.locations[loc] || 0) + 1;
+      }
     }
-  }
-  metrc.prod_stages = {
-    newly_received: (metrc.locations['DISTRU NEWLY RECEIVED']||0) + (metrc.locations['NEWLY RECEIVED']||0),
-    in_testing: metrc.locations['DISTRU IN TESTING'] || 0,
-    stability: metrc.locations['DISTRU STABILITY TESTING'] || 0,
-    awaiting: (metrc.locations['AWAITING RELEASE']||0) + (metrc.locations['DISTRU AWAITING RELEASE']||0),
-    finished: metrc.locations['DISTRU FINISHED GOODS'] || 0,
-    test_passed: (metrc.labStatus['TestPassed']||0) + (metrc.labStatus['RetestPassed']||0),
-    submitted: (metrc.labStatus['SubmittedForTesting']||0) + (metrc.labStatus['TestingInProgress']||0),
-    not_submitted: metrc.labStatus['NotSubmitted'] || 0,
-    failed: metrc.labStatus['TestFailed'] || 0
-  };
-} catch(e) { console.warn("readMetrcData:", e.message); }
+    metrc.prod_stages = {
+      newly_received: (metrc.locations['DISTRU NEWLY RECEIVED']||0) + (metrc.locations['NEWLY RECEIVED']||0),
+      in_testing:     metrc.locations['DISTRU IN TESTING'] || 0,
+      stability:      metrc.locations['DISTRU STABILITY TESTING'] || 0,
+      awaiting:       (metrc.locations['AWAITING RELEASE']||0) + (metrc.locations['DISTRU AWAITING RELEASE']||0),
+      finished:       metrc.locations['DISTRU FINISHED GOODS'] || 0,
+      test_passed:    (metrc.labStatus['TestPassed']||0) + (metrc.labStatus['RetestPassed']||0),
+      submitted:      (metrc.labStatus['SubmittedForTesting']||0) + (metrc.labStatus['TestingInProgress']||0),
+      not_submitted:  metrc.labStatus['NotSubmitted'] || 0,
+      failed:         metrc.labStatus['TestFailed'] || 0
+    };
+  } catch(e) { console.warn("readMetrcData:", e.message); }
   return metrc;
 }
 
