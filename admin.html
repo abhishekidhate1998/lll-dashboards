@@ -380,18 +380,26 @@ function startProcess() {
         "master_dashboard.html","weekly_exec.html","retail_intel.html","weekly_refresh.html",
         "sales_dashboard.html","sales_action_form.html","lit_sales_command_center.html"
       ];
-      var base="https://raw.githubusercontent.com/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/main/";
+      // Templates fetched via GitHub API (no CDN cache)
 
       setP(35,"Fetching dashboard templates...");
       var s3=step("Fetching all 7 templates from GitHub...");
+      var apiBase="https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/";
+      var ghHeaders={"Accept":"application/vnd.github.v3+json"};
       return Promise.all(DASH.map(function(f){
-        return fetch(base+f+"?t="+Date.now())
+        return fetch(apiBase+f+"?ref=main&t="+Date.now(),{headers:ghHeaders})
           .then(function(res){
-            if(!res.ok) throw new Error(f+" failed (HTTP "+res.status+"). Make sure files are uploaded to GitHub.");
-            return res.text().then(function(t){return {name:f,html:t};});
+            if(!res.ok) throw new Error(f+" failed (HTTP "+res.status+"). Check GitHub token.");
+            return res.json();
+          })
+          .then(function(data){
+            // Decode base64 content from GitHub API - always fresh, no CDN cache
+            var b64=data.content.replace(/\n/g,"");
+            var html=decodeURIComponent(escape(atob(b64)));
+            return {name:f,html:html};
           });
       })).then(function(templates){
-        upd(s3,"All 7 templates fetched","done");
+        upd(s3,"All 7 templates fetched fresh from GitHub","done");
         setP(55,"Injecting data...");
         var s4=step("Injecting data into all 7 dashboards...");
         var built={};
