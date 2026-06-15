@@ -423,22 +423,75 @@ function startProcess() {
         });
         upd(s4,"Data injected into all 7 dashboards","done");
 
-        setP(72,"Deploying set 1...");
-        var s5a=step("Deploying dashboards (set 1 of 2)...");
-        var keys=Object.keys(built);
-        var set1={},set2={};
-        keys.forEach(function(k,i){if(i<4)set1[k]=built[k];else set2[k]=built[k];});
+        setP(72,"Deploying to GitHub...");
+        var s5=step("Deploying all 7 dashboards to GitHub...");
 
-        return api({action:"deployDashboards",set:1,dashboardContent:set1,lastUpdated:now.toISOString()}).then(function(r1){
-          if(r1.failed&&r1.failed.length) throw new Error("Set 1 failed: "+r1.failed.join(", "));
-          upd(s5a,"Set 1 deployed: 4 dashboards","done");
-          setP(88,"Deploying set 2...");
-          var s5b=step("Deploying dashboards (set 2 of 2)...");
+        // Get GitHub token from Apps Script config (one time)
+        return api({action:"getConfig"}).then(function(cfg){
+          var ghToken = cfg && cfg.githubToken ? cfg.githubToken : null;
+          if(!ghToken) throw new Error("GitHub token not available from server. Set GITHUB_TOKEN in Apps Script Script Properties and redeploy.");
 
-          return api({action:"deployDashboards",set:2,dashboardContent:set2,lastUpdated:now.toISOString()}).then(function(r2){
-            if(r2.failed&&r2.failed.length) throw new Error("Set 2 failed: "+r2.failed.join(", "));
-            upd(s5b,"Set 2 deployed: 3 dashboards","done");
+          var apiBase = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/";
+          var ghHdrs  = {"Authorization":"token "+ghToken,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"};
+          var fileList = Object.keys(built);
+          var deployed = [];
+          var deployFailed = [];
+
+          // Deploy ONE file at a time, fully sequential, with fresh SHA each time
+          function deployOne(idx){
+            if(idx >= fileList.length) return Promise.resolve();
+            var fname = fileList[idx];
+            var content = built[fname];
+            setP(72 + Math.round((idx/fileList.length)*26), "Deploying "+fname+" ("+(idx+1)+"/"+fileList.length+")...");
+
+            // Step A: get current SHA
+            return fetch(apiBase+fname+"?ref=main&t="+Date.now(), {headers:ghHdrs, cache:"no-store"})
+              .then(function(r){ return r.ok ? r.json() : null; })
+              .then(function(meta){
+                // Step B: PUT new content
+                var payload = {
+                  message: "LLL Dashboard Update - "+fname,
+                  content: btoa(unescape(encodeURIComponent(content))),
+                  branch: "main"
+                };
+                if(meta && meta.sha) payload.sha = meta.sha;
+                return fetch(apiBase+fname, {method:"PUT", headers:ghHdrs, body:JSON.stringify(payload)});
+              })
+              .then(function(r){
+                if(r.ok){ deployed.push(fname); return; }
+                return r.json().then(function(err){
+                  // 409 conflict -> retry once with fresh SHA
+                  if(r.status===409){
+                    return fetch(apiBase+fname+"?ref=main&t="+Date.now(), {headers:ghHdrs, cache:"no-store"})
+                      .then(function(rr){return rr.json();})
+                      .then(function(m2){
+                        var pl = {message:"LLL Dashboard Update - "+fname, content:btoa(unescape(encodeURIComponent(content))), branch:"main", sha:m2.sha};
+                        return fetch(apiBase+fname, {method:"PUT", headers:ghHdrs, body:JSON.stringify(pl)});
+                      })
+                      .then(function(rr){ if(rr.ok) deployed.push(fname); else deployFailed.push(fname); });
+                  }
+                  deployFailed.push(fname+": "+(err.message||r.status));
+                });
+              })
+              .catch(function(e){ deployFailed.push(fname+": "+e.message); })
+              .then(function(){
+                // Always continue to next file regardless of success/failure
+                return deployOne(idx+1);
+              });
+          }
+
+          return deployOne(0).then(function(){
+            if(deployed.length===0) throw new Error("No files deployed. "+deployFailed.join("; "));
+            if(deployFailed.length){
+              upd(s5, deployed.length+" deployed, "+deployFailed.length+" failed", "done");
+              deployFailed.forEach(function(f){toast(f,"err");});
+            } else {
+              upd(s5, "All "+deployed.length+" dashboards deployed", "done");
+            }
             setP(100,"Complete!");
+
+            // Save lastUpdated timestamp
+            api({action:"saveLastUpdated",lastUpdated:now.toISOString()}).catch(function(){});
 
             document.getElementById("success-wrap").style.display="block";
             document.getElementById("success-time").textContent="Deployed: "+timeStr+" | Live in 1-2 minutes";
