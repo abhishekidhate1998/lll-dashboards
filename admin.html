@@ -130,7 +130,6 @@ body{background:var(--bg);color:var(--ink);font:14px/1.6 -apple-system,BlinkMacS
       <div class="proc-box">
         <h3>Process &amp; Deploy All Dashboards</h3>
         <p>Upload CSV files to Google Drive first. Then click below to read all data, build all 7 dashboards, and deploy live.</p>
-        <button class="proc-btn" id="tmpl-btn" onclick="pushTemplates()" style="background:#2563a8;margin-right:10px" title="Push correct base files to GitHub first">&#8679; Push Base Files</button>
         <button class="proc-btn" id="proc-btn" onclick="startProcess()">&#128640; Process &amp; Deploy</button>
         <div class="prog-wrap" id="prog-wrap">
           <div class="prog-bg"><div class="prog-bar" id="prog-bar"></div></div>
@@ -381,14 +380,14 @@ function startProcess() {
         "master_dashboard.html","weekly_exec.html","retail_intel.html","weekly_refresh.html",
         "sales_dashboard.html","sales_action_form.html","lit_sales_command_center.html"
       ];
-      var base="https://raw.githubusercontent.com/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/main/";
+      var base="https://"+GITHUB_OWNER+".github.io/"+GITHUB_REPO+"/";
 
       setP(35,"Fetching dashboard templates...");
       var s3=step("Fetching all 7 templates from GitHub...");
       return Promise.all(DASH.map(function(f){
         return fetch(base+f+"?t="+Date.now())
           .then(function(res){
-            if(!res.ok) throw new Error(f+" not found (HTTP "+res.status+") — upload all files to GitHub first");
+            if(!res.ok) throw new Error(f+" failed (HTTP "+res.status+"). Make sure files are uploaded to GitHub.");
             return res.text().then(function(t){return {name:f,html:t};});
           });
       })).then(function(templates){
@@ -1002,42 +1001,29 @@ async function readLitData(files) {
 
 function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
   let h = html;
-  
-  // KPI replacements
-  const revOld = h.match(/\$[\d,]+( =<div class="l">.* Revenue)/s)?.[0] || '';
-  h = h.replace(/\$2,753,930( =<div)/, fmtD(qb.rev));
-  h = h.replace(/GP \d+%/, `GP ${qb.gp_pct}%`);
-  h = h.replace(/\$1,487,822/, fmtD(qb.gp));
-  h = h.replace(/\$872,176/, fmtD(qb.cash));
-  h = h.replace(/\$795,463/, fmtD(qb.ar));
-  h = h.replace(/157,957/, fmt(apex.total_units));
-  h = h.replace(/\$4,086,944/, fmtD(apex.total_val));
-  h = h.replace(/\$1,266,108/, fmtD(qb.cogs));
-
-  // Update inventory SKU table
-  if (apex.skuTable.length > 0) {
-    const skuRows = apex.skuTable.slice(0, 16).map(s => {
-      const statusClass = s.status === 'CRITICAL'?'pill s-CRITICAL': s.status === 'RED'?'pill s-RED':'pill s-ORANGE';
-      return `<tr><td class="n">${s.name}</td><td class="r">${fmt(s.on_hand)}</td><td class="r">${s.weekly_vel}</td><td class="r">${s.weeks_left}</td><td><span class="${statusClass}">${s.status}</span></td></tr>`;
-    }).join('\n');
-    h = h.replace(/<tr><td class="n">Dr\. Zodiak[^<]*[\s\S]* <\/tr>( =\s*<tr><td class="n">Account)/, skuRows);
+  // Replace using HTML comment markers — works every time regardless of current values
+  function rm(src, tag, val) {
+    const re = new RegExp("<!--" + tag + "-->[^<]*<!--/" + tag + "-->");
+    return re.test(src) ? src.replace(re, "<!--" + tag + "-->" + val + "<!--/" + tag + "-->") : src;
   }
-
-  // Update lapsed accounts table
+  h = rm(h, "WE_REV",      fmtD(qb.rev));
+  h = rm(h, "WE_GP",       fmtD(qb.gp));
+  h = rm(h, "WE_GP_PCT",   String(qb.gp_pct));
+  h = rm(h, "WE_CASH",     fmtD(qb.cash));
+  h = rm(h, "WE_AR",       fmtD(qb.ar));
+  h = rm(h, "WE_UNITS",    fmt(Math.round(apex.total_units)));
+  h = rm(h, "WE_INV",      fmt(Math.round(apex.total_val)));
+  h = rm(h, "WE_COGS",     fmtD(qb.cogs));
+  h = rm(h, "WE_PROD_FIN", String(metrc.prod_stages.finished));
+  h = rm(h, "WE_PROD_TEST",String(metrc.prod_stages.in_testing));
+  h = rm(h, "WE_DOORS",    String(lit.total_doors));
+  // Lapsed accounts table
   if (apex.lapsed.length > 0) {
-    const lapsedRows = apex.lapsed.slice(0, 6).map(l =>
-      `<tr><td>${l.name}</td><td class="r">${l.days}</td><td class="r">${fmtD(l.rev)}</td></tr>`
-    ).join('\n');
-    h = h.replace(/<tr><td>Blulight Woodbury[\s\S]* ( =<tr><td>Door)/, lapsedRows + '\n');
+    const rows = apex.lapsed.slice(0,6).map(l =>
+      `<tr><td>${l.name}</td><td class="n">${l.days}</td><td class="n">${fmtD(l.rev)}</td></tr>`
+    ).join("");
+    h = rm(h, "WE_LAPSED", rows);
   }
-
-  // Update production stages
-  h = h.replace(/DISTRU FINISHED GOODS.* (\d+)/, `DISTRU FINISHED GOODS: ${metrc.prod_stages.finished}`);
-  h = h.replace(/DISTRU IN TESTING.* (\d+)/, `DISTRU IN TESTING: ${metrc.prod_stages.in_testing}`);
-
-  // Update shelf presence
-  h = h.replace(/\b78\b( =.*doors)/, String(lit.total_doors));
-  
   h = injectLastUpdated(h, timeStr);
   return h;
 }
@@ -1111,20 +1097,20 @@ function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
 
 function buildWeeklyRefresh(html, qb, apex, metrc, timeStr) {
   let h = html;
-  h = h.replace(/\$[\d.]+M( =<\/span>[\s\S]{0,50}Revenue)/, fmtM(qb.rev));
-  h = h.replace(/\$2,753,930/, fmtD(qb.rev));
-  h = h.replace(/\$4,586,457/, fmtD(qb.rev));
-  h = h.replace(/\$872K/, fmtK(qb.cash));
-  h = h.replace(/\$872,176/, fmtD(qb.cash));
-  h = h.replace(/\$795K/, fmtK(qb.ar));
-  h = h.replace(/\$795,463/, fmtD(qb.ar));
-  h = h.replace(/157,957|160,967/, fmt(Math.round(apex.total_units)));
-
-  // Lapsed count update
+  function rm(src, tag, val) {
+    const re = new RegExp("<!--" + tag + "-->[^<]*<!--/" + tag + "-->");
+    return re.test(src) ? src.replace(re, "<!--" + tag + "-->" + val + "<!--/" + tag + "-->") : src;
+  }
+  h = rm(h, "WR_REV_M",    fmtM(qb.rev));
+  h = rm(h, "WR_REV",      fmtD(qb.rev));
+  h = rm(h, "WR_CASH_K",   fmtK(qb.cash));
+  h = rm(h, "WR_CASH",     fmtD(qb.cash));
+  h = rm(h, "WR_AR_K",     fmtK(qb.ar));
+  h = rm(h, "WR_AR",       fmtD(qb.ar));
+  h = rm(h, "WR_UNITS",    fmt(Math.round(apex.total_units)));
   const lapsedCount = apex.lapsed.length;
-  const activeCount = apex.buyers.filter(b => num(b['Total Value of Orders']||0) > 0).length;
-  h = h.replace(/\d+ of \d+ accounts/, `${lapsedCount} of ${activeCount} accounts`);
-
+  const activeCount = apex.buyers.filter(b => num(b["Total Value of Orders"]||0) > 0).length;
+  h = rm(h, "WR_LAPSED_CT", lapsedCount + " of " + activeCount + " accounts");
   h = injectLastUpdated(h, timeStr);
   return h;
 }
@@ -1201,45 +1187,8 @@ function togglePw(btn,uname,prefix){
   }
 }
 
-function pushTemplates() {
-  var btn = document.getElementById("tmpl-btn");
-  btn.disabled = true;
-  btn.textContent = "Pushing...";
-  toast("Pushing base dashboard files to GitHub...", "ok");
-  api({action:"pushBaseTemplates"}).then(function(d){
-    if(d.success){
-      toast("Base files pushed! Now run Process & Deploy.", "ok");
-      btn.textContent = "OK ✓ Base Files Pushed";
-    } else {
-      toast("Push failed: "+(d.error||"unknown"), "err");
-      btn.disabled = false;
-      btn.textContent = "&#8593; Push Base Files to GitHub";
-    }
-  }).catch(function(e){
-    toast("Error: "+e.message, "err");
-    btn.disabled = false;
-    btn.textContent = "&#8593; Push Base Files to GitHub";
-  });
-}
 
 
-function pushTemplates(){
-  var btn=document.getElementById("tmpl-btn");
-  btn.disabled=true;btn.textContent="Pushing...";
-  toast("Pushing base dashboard files to GitHub...","ok");
-  api({action:"pushBaseTemplates"}).then(function(d){
-    if(d.success){
-      toast("Base files pushed! Now run Process & Deploy.","ok");
-      btn.textContent="&#10003; Base Files Pushed";
-    } else {
-      toast("Push failed: "+(d.error||"unknown"),"err");
-      btn.disabled=false;btn.textContent="&#8679; Push Base Files";
-    }
-  }).catch(function(e){
-    toast("Error: "+e.message,"err");
-    btn.disabled=false;btn.textContent="&#8679; Push Base Files";
-  });
-}
 </script>
 </body>
 </html>
