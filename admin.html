@@ -766,32 +766,25 @@ function findFile(files, category, keywords) {
 
 async function readQBData(files) {
   const qb = { rev:0, gp:0, cogs:0, net:0, gp_pct:0, cash:0, ar:0, ap:0 };
-  
-  const plFile = findFile(files, 'quickbooks', ['profit', 'loss', 'p&l', 'pl']);
-  if (plFile) {
-    const rows = parseCSV(plFile.content);
-    for (const r of rows) {
-      const k = (r[Object.keys(r)[0]] || '').toLowerCase().trim();
-      const val = num(r[Object.keys(r)[Object.keys(r).length-1]]);
-      if (k === 'total for income') qb.rev = val;
-      else if (k === 'gross profit') qb.gp = val;
-      else if (k === 'total for cost of goods sold') qb.cogs = val;
-      else if (k === 'net income') qb.net = val;
+  try {
+    const plFile = findFile(files, "quickbooks", ["profit", "loss", "p&l", "pl"]);
+    if (plFile) {
+      const rows = parseCSV(plFile.content);
+      for (const r of rows) {
+        const k = (r[Object.keys(r)[0]]||"").toLowerCase();
+        const val = num(r[Object.keys(r)[1]]||0);
+        if (!val) continue;
+        if (k.includes("total income") || k.includes("total revenue")) qb.rev = val;
+        else if (k.includes("gross profit")) qb.gp = val;
+        else if (k.includes("cost of goods sold") || k.includes("cost of sales")) qb.cogs = val;
+        else if (k.includes("net income") || k.includes("net profit")) qb.net = val;
+        else if (k.includes("cash") && k.includes("bank")) qb.cash = val;
+        else if (k.includes("accounts receivable") && !qb.ar) qb.ar = val;
+        else if (k.includes("accounts payable") && !qb.ap) qb.ap = val;
+      }
     }
-    qb.gp_pct = qb.rev?Math.round(100 * qb.gp / qb.rev) : 0;
-  }
-
-  const bsFile = findFile(files, 'quickbooks', ['balance', 'sheet', 'bs']);
-  if (bsFile) {
-    const rows = parseCSV(bsFile.content);
-    for (const r of rows) {
-      const k = (r[Object.keys(r)[0]] || '').toLowerCase().trim();
-      const val = Math.abs(num(r[Object.keys(r)[Object.keys(r).length-1]]));
-      if (k === 'total for bank accounts') qb.cash = val;
-      else if (k.includes('accounts receivable') && !qb.ar) qb.ar = val;
-      else if (k.includes('accounts payable') && !qb.ap) qb.ap = val;
-    }
-  }
+    if (qb.rev && qb.gp) qb.gp_pct = Math.round(qb.gp / qb.rev * 100);
+  } catch(e) { console.warn("readQBData:", e.message); }
   return qb;
 }
 
@@ -876,6 +869,7 @@ async function readApexData(files) {
 }
 
 async function readDistruData(files) {
+  try {
   const distru = { orders:[], monthly:{} };
   const orderFile = findFile(files, 'distru', ['sales-orders', 'sales_orders', 'distru-sales']);
   if (orderFile) {
@@ -892,9 +886,12 @@ async function readDistruData(files) {
   }
   distru.total_orders = distru.orders.length;
   return distru;
+} catch(e) { console.warn("readDistruData:", e.message); }
+  return distru;
 }
 
 async function readMetrcData(files) {
+  try {
   const metrc = { packages:[], labStatus:{}, locations:{} };
   const pkgFile = findFile(files, 'metrc', ['packages', 'inventory', 'packagesinventory']);
   if (pkgFile) {
@@ -917,6 +914,7 @@ async function readMetrcData(files) {
     not_submitted: metrc.labStatus['NotSubmitted'] || 0,
     failed: metrc.labStatus['TestFailed'] || 0
   };
+} catch(e) { console.warn("readMetrcData:", e.message); }
   return metrc;
 }
 
@@ -1000,6 +998,8 @@ async function readLitData(files) {
 }
 
 function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
+  try {
+  
   let h = html;
   // Replace using HTML comment markers — works every time regardless of current values
   function rm(src, tag, val) {
@@ -1025,10 +1025,14 @@ function buildWeeklyExec(html, qb, apex, metrc, lit, timeStr) {
     h = rm(h, "WE_LAPSED", rows);
   }
   h = injectLastUpdated(h, timeStr);
+  } catch(e) { console.warn("buildWeeklyExec:", e.message); }
+
   return h;
 }
 
 function buildRetailIntel(html, apex, lit, timeStr) {
+  try {
+  
   let h = html;
   
   // Build const D from Lit data + Apex lapsed
@@ -1042,6 +1046,8 @@ function buildRetailIntel(html, apex, lit, timeStr) {
   if (result.success) h = result.html;
   
   h = injectLastUpdated(h, timeStr);
+  } catch(e) { console.warn("buildRetailIntel:", e.message); }
+
   return h;
 }
 
@@ -1049,7 +1055,7 @@ function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
   let h = html;
 
   // SEED_CUST
-  const custArr = apex.buyers
+  const custArr = (apex.buyers||[])
     .filter(b => num(b['Total Value of Orders']||0) > 0)
     .map(b => ({
       name: (b['Buyer']||'').replace(/'/g,"\\'"),
@@ -1066,7 +1072,7 @@ function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
 
   // SEED_SKU
   const LLB = ['The Growfather','Dr. Zodiak','Little Leaf','Octane','Sugar High','Illadelph'];
-  const skuArr = apex.products.map(p => {
+  const skuArr = (apex.products||[]).map(p => {
     const name = (p['Name']||'').trim();
     const brand = LLB.find(lb => name.toLowerCase().includes(lb.toLowerCase())) || 'Little Leaf';
     return { brand, name: name.slice(0,60), rev: String(Math.round(num(p['Total Value']||0))), units: String(Math.round(num(p['Total Quantity']||0))) };
@@ -1076,7 +1082,7 @@ function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
   if (r2.success) h = r2.html;
 
   // SEED_SALES
-  const salesArr = Object.entries(distru.monthly)
+  const salesArr = Object.entries(distru.monthly||{})
     .sort(([a],[b]) => a.localeCompare(b))
     .filter(([,v]) => v.rev > 0)
     .map(([m,v]) => `{m:'${m}',rev:'${Math.round(v.rev)}',units:'${v.orders}'}`);
@@ -1087,7 +1093,7 @@ function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
   // FOUND
   const totalRev = Object.values(distru.monthly).reduce((s,v) => s+v.rev, 0);
   const ytdRev = Object.entries(distru.monthly).filter(([m]) => m.startsWith('2026')).reduce((s,[,v]) => s+v.rev, 0);
-  const foundStr = `{rev:'${(totalRev/1e6).toFixed(2)}',ytd:'${(ytdRev/1e6).toFixed(2)}',orders:${distru.total_orders},batches:207,apexInv:'${(apex.total_val/1e6).toFixed(2)}',apexUnits:${Math.round(apex.total_units)},ar:'${fmt(Math.round(qb.ar))}',readyLabel:${metrc.prod_stages.finished},brands:5,missName:448,missCost:280}`;
+  const foundStr = `{rev:'${(totalRev/1e6).toFixed(2)}',ytd:'${(ytdRev/1e6).toFixed(2)}',orders:${distru.total_orders},batches:207,apexInv:'${((apex.total_val||0)/1e6).toFixed(2)}',apexUnits:${Math.round((apex.total_units||0))},ar:'${fmt(Math.round((qb.ar||0)))}',readyLabel:${((metrc.prod_stages||{}).finished||0)},brands:5,missName:448,missCost:280}`;
   const r4 = injectVar(h, 'FOUND', foundStr);
   if (r4.success) h = r4.html;
 
@@ -1096,6 +1102,8 @@ function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
 }
 
 function buildWeeklyRefresh(html, qb, apex, metrc, timeStr) {
+  try {
+  
   let h = html;
   function rm(src, tag, val) {
     const re = new RegExp("<!--" + tag + "-->[^<]*<!--/" + tag + "-->");
@@ -1112,18 +1120,26 @@ function buildWeeklyRefresh(html, qb, apex, metrc, timeStr) {
   const activeCount = apex.buyers.filter(b => num(b["Total Value of Orders"]||0) > 0).length;
   h = rm(h, "WR_LAPSED_CT", lapsedCount + " of " + activeCount + " accounts");
   h = injectLastUpdated(h, timeStr);
+  } catch(e) { console.warn("buildWeeklyRefresh:", e.message); }
+
   return h;
 }
 
 function buildSalesDashboard(html, lit, timeStr) {
+  try {
+  
   let h = html;
   const result = injectVar(h, 'const D', JSON.stringify(lit.marketData));
   if (result.success) h = result.html;
   h = injectLastUpdated(h, timeStr);
+  } catch(e) { console.warn("buildSalesDashboard:", e.message); }
+
   return h;
 }
 
 function buildSalesActionForm(html, apex, timeStr) {
+  try {
+  
   let h = html;
 
   const actionData = apex.buyers
@@ -1153,14 +1169,20 @@ function buildSalesActionForm(html, apex, timeStr) {
   const result = injectVar(h, 'DATA', JSON.stringify(actionData));
   if (result.success) h = result.html;
   h = injectLastUpdated(h, timeStr);
+  } catch(e) { console.warn("buildSalesActionForm:", e.message); }
+
   return h;
 }
 
 function buildLitCommandCenter(html, lit, apex, timeStr) {
+  try {
+  
   let h = html;
   const result = injectVar(h, 'const MKT', JSON.stringify(lit.marketData));
   if (result.success) h = result.html;
   h = injectLastUpdated(h, timeStr);
+  } catch(e) { console.warn("buildLitCommandCenter:", e.message); }
+
   return h;
 }
 

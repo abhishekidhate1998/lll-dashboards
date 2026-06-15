@@ -3,40 +3,52 @@
 <head><!-- LLL_VIEWER_START --><script>const store = (function(){
   var SK="lll_vs";
   var SU="https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec";
-  function getUser(){try{return JSON.parse(sessionStorage.getItem(SK)||"{}").username||"";}catch(e){return "";}}
+  var _cache = null;  // in-memory cache of all user data
+  var _loaded = false;
+  var _loading = null; // promise
   function getToken(){try{return JSON.parse(sessionStorage.getItem(SK)||"{}").token||"";}catch(e){return "";}}
+  function getUser(){try{return JSON.parse(sessionStorage.getItem(SK)||"{}").username||"";}catch(e){return "";}}
   function localKey(k){return "lll_"+getUser()+"_"+k;}
-  function callGS(p,cb){
-    var enc=btoa(unescape(encodeURIComponent(JSON.stringify(p))));
-    fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"})
-      .then(function(r){return r.json();})
-      .then(function(d){cb(null,d);})
-      .catch(function(e){cb(e,null);});
+
+  // Load ALL user data in one single API call
+  function loadAll(){
+    if(_loading) return _loading;
+    _loading = new Promise(function(resolve){
+      var tok = getToken();
+      if(!tok){ _cache={}; _loaded=true; resolve(); return; }
+      var enc = btoa(unescape(encodeURIComponent(JSON.stringify({action:"getUserDataAll",token:tok}))));
+      fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"})
+        .then(function(r){return r.json();})
+        .then(function(d){ _cache = (d.success && d.data) ? d.data : {}; _loaded=true; resolve(); })
+        .catch(function(){
+          // Fallback: load from localStorage
+          _cache={}; _loaded=true; resolve();
+        });
+    });
+    return _loading;
   }
+
   return {
-    async get(k,def){
-      var tok=getToken();
-      if(tok){
-        try{
-          var enc=btoa(unescape(encodeURIComponent(JSON.stringify({action:"getUserData",token:tok,key:k}))));
-          var r=await fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"});
-          var d=await r.json();
-          if(d.success && d.value!=null) return d.value;
-        }catch(e){}
-      }
-      // fallback: localStorage
-      try{var v=localStorage.getItem(localKey(k));return v!=null?JSON.parse(v):def;}catch(e){return def;}
+    async get(k, def){
+      if(!_loaded) await loadAll();
+      // Check memory cache first
+      if(_cache && _cache.hasOwnProperty(k)) return _cache[k];
+      // Fallback to localStorage
+      try{ var v=localStorage.getItem(localKey(k)); if(v!=null) return JSON.parse(v); }catch(e){}
+      return def;
     },
-    async set(k,v){
-      var tok=getToken();
+    async set(k, v){
+      // Update memory cache immediately
+      if(!_cache) _cache={};
+      _cache[k] = v;
+      // Save to localStorage immediately (instant, no network)
+      try{ localStorage.setItem(localKey(k), JSON.stringify(v)); }catch(e){}
+      // Background sync to Drive (fire and forget)
+      var tok = getToken();
       if(tok){
-        try{
-          var enc=btoa(unescape(encodeURIComponent(JSON.stringify({action:"saveUserData",token:tok,key:k,value:v}))));
-          fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"}).catch(function(){});
-        }catch(e){}
+        var enc = btoa(unescape(encodeURIComponent(JSON.stringify({action:"saveUserData",token:tok,key:k,value:v}))));
+        fetch(SU+"?p="+encodeURIComponent(enc),{method:"GET"}).catch(function(){});
       }
-      // always also save to localStorage as offline backup
-      try{localStorage.setItem(localKey(k),JSON.stringify(v));}catch(e){}
     }
   };
 })();
@@ -106,44 +118,45 @@
   .two-line .r{color:var(--muted);font-variant-numeric:tabular-nums}
 
 /* ══ LLL NAV SIDEBAR ══ */
-#lll-nav{position:fixed;top:0;left:0;height:100vh;width:220px;
-  background:linear-gradient(180deg,#0e2018,#0b1a14);
-  border-right:1px solid #1e3028;z-index:9000;
-  display:flex;flex-direction:column;
-  transform:translateX(-100%);transition:transform .25s ease;
-  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
+#lll-nav{position:fixed;top:0;left:0;height:100vh;width:220px;background:linear-gradient(180deg,#0e2018,#0b1a14);border-right:1px solid #1e3028;z-index:9000;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .25s ease;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
 #lll-nav.open{transform:translateX(0);}
-#lll-nav-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);
-  z-index:8999;display:none;opacity:0;transition:opacity .25s;
-  pointer-events:none;}
+#lll-nav-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:8999;display:none;opacity:0;transition:opacity .25s;pointer-events:none;}
 #lll-nav-backdrop.show{opacity:1;pointer-events:auto;}
-/* Toggle button — inline in header, NOT floating fixed */
-.lll-nav-btn{background:none;border:1px solid #283533;border-radius:7px;
-  color:#92a39c;font-size:17px;cursor:pointer;padding:5px 9px;
-  line-height:1;transition:all .15s;flex-shrink:0;}
+.lll-nav-btn{background:none;border:1px solid #283533;border-radius:7px;color:#92a39c;font-size:17px;cursor:pointer;padding:5px 9px;line-height:1;transition:all .15s;flex-shrink:0;margin-right:8px;}
 .lll-nav-btn:hover{background:#1e2e28;color:#e8efe9;border-color:#3fae6b;}
 .lll-nav-head{padding:18px 16px 10px;flex-shrink:0;}
 .lll-nav-brand{display:flex;align-items:center;gap:9px;margin-bottom:4px;}
-.lll-nav-dot{width:28px;height:28px;border-radius:7px;
-  background:linear-gradient(135deg,#3fae6b,#2c7d4c);
-  display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.lll-nav-dot{width:28px;height:28px;border-radius:7px;background:linear-gradient(135deg,#3fae6b,#2c7d4c);display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
 .lll-nav-title{font-size:13px;font-weight:700;color:#e8efe9;}
 .lll-nav-user{font-size:11px;color:#3fae6b;padding-left:37px;margin-top:2px;}
 .lll-nav-sep{height:1px;background:#1e3028;margin:8px 16px;}
-.lll-nav-label{font-size:10px;color:#4a6358;text-transform:uppercase;
-  letter-spacing:1px;font-weight:700;padding:4px 16px;}
+.lll-nav-label{font-size:10px;color:#4a6358;text-transform:uppercase;letter-spacing:1px;font-weight:700;padding:4px 16px;}
 .lll-nav-items{flex:1;overflow-y:auto;padding-bottom:12px;}
-.lll-nav-item{display:flex;align-items:center;gap:9px;padding:10px 16px;
-  color:#92a39c;font-size:13px;font-weight:500;
-  text-decoration:none;border-left:3px solid transparent;transition:all .15s;}
+.lll-nav-item{display:flex;align-items:center;gap:9px;padding:10px 16px;color:#92a39c;font-size:13px;font-weight:500;text-decoration:none;border-left:3px solid transparent;transition:all .15s;}
 .lll-nav-item:hover{background:rgba(63,174,107,.08);color:#e8efe9;}
 .lll-nav-item.active{background:rgba(63,174,107,.12);color:#3fae6b;border-left-color:#3fae6b;}
 .lll-nav-item .lll-ico{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
 .lll-nav-foot{padding:10px 16px;border-top:1px solid #1e3028;flex-shrink:0;}
-.lll-nav-logout{width:100%;background:rgba(229,72,77,.1);border:1px solid rgba(229,72,77,.3);
-  color:#e5484d;border-radius:8px;padding:8px;font-size:12px;font-weight:600;
-  cursor:pointer;transition:all .15s;}
+.lll-nav-logout{width:100%;background:rgba(229,72,77,.1);border:1px solid rgba(229,72,77,.3);color:#e5484d;border-radius:8px;padding:8px;font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
 .lll-nav-logout:hover{background:rgba(229,72,77,.2);}
+
+
+/* ══ LLL LOADING OVERLAY ══ */
+#lll-loader{position:fixed;inset:0;background:#0e1414;z-index:88888;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  transition:opacity .4s ease;}
+#lll-loader.hide{opacity:0;pointer-events:none;}
+.lll-loader-dot{width:44px;height:44px;border-radius:12px;
+  background:linear-gradient(135deg,#3fae6b,#2c7d4c);
+  display:flex;align-items:center;justify-content:center;
+  font-size:24px;animation:lll-pulse 1.4s ease-in-out infinite;}
+@keyframes lll-pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.12);opacity:.8;}}
+.lll-loader-bar{width:180px;height:3px;background:#1e3028;border-radius:2px;overflow:hidden;}
+.lll-loader-fill{height:100%;width:0%;background:linear-gradient(90deg,#3fae6b,#5dd68c);
+  border-radius:2px;transition:width .3s ease;animation:lll-progress 1.8s ease-in-out infinite;}
+@keyframes lll-progress{0%{width:0%;margin-left:0}60%{width:70%;margin-left:0}100%{width:70%;margin-left:100%}}
+.lll-loader-text{color:#92a39c;font-size:13px;letter-spacing:.5px;}
 
 
 /* ══ MOBILE RESPONSIVE ══ */
@@ -154,24 +167,21 @@
 
 </style>
 </head>
-<body>
+<body><div id="lll-loader"><div class="lll-loader-dot">&#127807;</div><div class="lll-loader-bar"><div class="lll-loader-fill"></div></div><div class="lll-loader-text" id="lll-loader-msg">Loading dashboard...</div></div>
 <div id="lll-nav-backdrop" onclick="lllCloseNav()"></div>
 <div id="lll-nav">
-  <div class="lll-nav-head">
-    <div class="lll-nav-brand"><div class="lll-nav-dot">&#127807;</div><span class="lll-nav-title">Little Leaf Labs</span></div>
-    <div class="lll-nav-user" id="lll-nav-user"></div>
-  </div>
+  <div class="lll-nav-head"><div class="lll-nav-brand"><div class="lll-nav-dot">&#127807;</div><span class="lll-nav-title">Little Leaf Labs</span></div>
+    <div class="lll-nav-user" id="lll-nav-user"></div></div>
   <div class="lll-nav-sep"></div>
   <div class="lll-nav-label">Dashboards</div>
-  <div class="lll-nav-items">
-    <a class="lll-nav-item" href="#" data-dash="master_dashboard.html"><span class="lll-ico">📊</span>Master Dashboard</a>
+  <div class="lll-nav-items">    <a class="lll-nav-item" href="#" data-dash="master_dashboard.html"><span class="lll-ico">📊</span>Master Dashboard</a>
     <a class="lll-nav-item" href="#" data-dash="weekly_exec.html"><span class="lll-ico">📋</span>Weekly Exec</a>
     <a class="lll-nav-item" href="#" data-dash="retail_intel.html"><span class="lll-ico">🛒</span>Retail Intel</a>
     <a class="lll-nav-item active" href="#" data-dash="weekly_refresh.html"><span class="lll-ico">🔄</span>Weekly Refresh</a>
     <a class="lll-nav-item" href="#" data-dash="sales_dashboard.html"><span class="lll-ico">📈</span>Sales Dashboard</a>
     <a class="lll-nav-item" href="#" data-dash="sales_action_form.html"><span class="lll-ico">✅</span>Action Form</a>
     <a class="lll-nav-item" href="#" data-dash="lit_sales_command_center.html"><span class="lll-ico">⚡</span>Command Center</a>
-  </div>
+</div>
   <div class="lll-nav-foot"><button class="lll-nav-logout" onclick="lllLogout()">&#x2715; Sign Out</button></div>
 </div>
 
@@ -194,7 +204,7 @@
     <div class="kpi"><div class="v">$2.75M</div><div class="l">Revenue · Jan–May</div><div class="d">GP 54% · $1.49M</div></div>
     <div class="kpi"><div class="v"><!--WR_CASH_K-->$872K<!--/WR_CASH_K--></div><div class="l">Cash (BoA $863K)</div></div>
     <div class="kpi"><div class="v"><!--WR_AR_K-->$795K<!--/WR_AR_K--></div><div class="l">A/R</div><div class="d" style="color:var(--muted)">A/P $18.9K</div></div>
-    <div class="kpi"><div class="v"><!--WR_UNITS-->160,967<!--/WR_UNITS--></div><div class="l">Units on hand</div><div class="d">$4.09M · reconciled ✓</div></div>
+    <div class="kpi"><div class="v"><!--WR_UNITS-->157,957<!--/WR_UNITS--></div><div class="l">Units on hand</div><div class="d">$4.09M · reconciled ✓</div></div>
     <div class="kpi"><div class="v">9</div><div class="l">SKUs need WIP this wk</div><div class="d" style="color:#ff7378">5 critical · 4 red</div></div>
     <div class="kpi"><div class="v">58 / 128</div><div class="l">Wholesale accts lapsed ≥45d</div><div class="d" style="color:#ffc35a">&gt;$500K idle</div></div>
   </div>
@@ -344,7 +354,7 @@
   <div class="grid2">
     <div class="card">
       <h3>P&amp;L &amp; balance sheet (Jan–May / as of 05-30)</h3>
-      <div class="two-line"><span>Revenue</span><span class="r"><!--WR_REV-->$4,586,457<!--/WR_REV--></span></div>
+      <div class="two-line"><span>Revenue</span><span class="r"><!--WR_REV-->$2,753,930<!--/WR_REV--></span></div>
       <div class="two-line"><span>Gross profit (54%)</span><span class="r">$1,487,822</span></div>
       <div class="two-line"><span>COGS</span><span class="r">$1,266,108</span></div>
       <div class="two-line"><span>Cash (BoA $863,487)</span><span class="r"><!--WR_CASH-->$872,176<!--/WR_CASH--></span></div>
@@ -387,14 +397,30 @@
   </footer>
 
 </div>
+<script>if(document.readyState!=="loading"){lllHideLoader();}else{document.addEventListener("DOMContentLoaded",function(){lllHideLoader();});}</script>
 <script id="lll-nav-js">
+
+/* ══ LOADER CONTROL ══ */
+function lllShowLoader(msg){
+  var el=document.getElementById('lll-loader');
+  var tx=document.getElementById('lll-loader-msg');
+  if(el){el.classList.remove('hide');el.style.opacity='';}
+  if(tx&&msg) tx.textContent=msg;
+}
+function lllHideLoader(){
+  var el=document.getElementById('lll-loader');
+  if(!el) return;
+  el.classList.add('hide');
+  setTimeout(function(){el.style.display='none';},450);
+}
+
 (function(){
   var SK="lll_vs";var BASE="https://abhishekidhate1998.github.io/lll-dashboards";
   function sess(){try{return JSON.parse(sessionStorage.getItem(SK)||"{}");}catch(e){return {};}}
   function tok(){return sess().token||null;}
   function user(){return sess().username||"";}
   function navTo(f){var t=tok();window.location.href=BASE+"/"+f+(t?"#token="+encodeURIComponent(t):"");}
-  function init(){
+  function init_nav(){
     var u=document.getElementById("lll-nav-user");if(u&&user())u.textContent="Signed in as "+user();
     document.querySelectorAll(".lll-nav-item[data-dash]").forEach(function(a){
       a.addEventListener("click",function(e){e.preventDefault();lllCloseNav();navTo(a.getAttribute("data-dash"));});
@@ -412,7 +438,7 @@
     setTimeout(function(){b.style.display="none";},260);
   };
   window.lllLogout=function(){sessionStorage.removeItem("lll_vs");window.location.href=BASE+"/portal.html";};
-  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init);}else{init();}
+  if(document.readyState==="loading"){document.addEventListener("DOMContentLoaded",init_nav);}else{init_nav();}
 })();
 </script>
 </body>
