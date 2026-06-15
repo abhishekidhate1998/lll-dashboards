@@ -53,7 +53,11 @@
   };
 })();
 
-(function(){var SU='https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec';var SK='lll_vs';function hashTok(){try{var h=location.hash;if(h.indexOf('token=')>-1)return decodeURIComponent(h.split('token=')[1]);}catch(e){}return null;}function storedTok(){try{var d=JSON.parse(sessionStorage.getItem(SK)||'{}');return d.token||null;}catch(e){return null;}}function call(p,cb){var enc=btoa(unescape(encodeURIComponent(JSON.stringify(p))));fetch(SU+'?p='+encodeURIComponent(enc),{method:'GET'}).then(function(r){return r.json();}).then(cb).catch(function(){cb({success:false,error:'Connection error'});});}function showLogin(){var o=document.createElement('div');o.id='_lll_ov';o.style='position:fixed;inset:0;background:#0e1414;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif';o.innerHTML='<div style="background:#16201f;border:1px solid #283533;border-radius:18px;padding:40px 36px;width:340px;max-width:90vw;text-align:center"><div style="font-size:36px;margin-bottom:14px">&#127807;</div><h2 style="color:#e8efe9;font-size:20px;font-weight:700;margin-bottom:6px">Little Leaf Labs</h2><p style="color:#92a39c;font-size:13px;margin-bottom:24px">Enter your credentials</p><input id="_lll_u" type="text" placeholder="Username" style="width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 14px;color:#e8efe9;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box"><div style="position:relative;margin-bottom:12px"><input id="_lll_p" type="password" placeholder="Password" style="width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 40px 10px 14px;color:#e8efe9;font-size:14px;outline:none;box-sizing:border-box"><button id="_lll_eye" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#92a39c;font-size:16px;line-height:1">&#128065;</button></div><div id="_lll_e" style="color:#ff7378;font-size:12px;min-height:18px;margin-bottom:10px"></div><button id="_lll_b" style="width:100%;background:#3fae6b;color:#0e1414;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none">Sign In</button></div>';document.body.appendChild(o);document.getElementById('_lll_eye').addEventListener('click',function(){var f=document.getElementById('_lll_p');f.type=f.type==='password'?'text':'password';this.innerHTML=f.type==='password'?'&#128065;':'&#128064;';});function go(){var u=document.getElementById('_lll_u').value.trim(),p=document.getElementById('_lll_p').value,e=document.getElementById('_lll_e');if(!u||!p){e.textContent='Please enter credentials.';return;}document.getElementById('_lll_b').disabled=true;e.textContent='Verifying...';call({action:'viewerLogin',username:u,password:p},function(d){if(d.success){sessionStorage.setItem(SK,JSON.stringify({token:d.token,username:d.username}));document.getElementById('_lll_ov').remove();var nu=document.getElementById('lll-nav-user');if(nu)nu.textContent='Signed in as '+d.username;}else{e.textContent=d.error||'Incorrect credentials';document.getElementById('_lll_p').value='';document.getElementById('_lll_b').disabled=false;}});}document.getElementById('_lll_b').addEventListener('click',go);document.getElementById('_lll_p').addEventListener('keydown',function(ev){if(ev.key==='Enter')go();});document.getElementById('_lll_u').addEventListener('keydown',function(ev){if(ev.key==='Enter')go();});setTimeout(function(){var i=document.getElementById('_lll_u');if(i)i.focus();},100);}var ht=hashTok();if(ht){var _s=sessionStorage.getItem(SK);var _u=_s?JSON.parse(_s).username||'viewer':'viewer';sessionStorage.setItem(SK,JSON.stringify({token:ht,username:_u}));}else{var t=storedTok();if(!t){if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}}else{call({action:'verifyToken',token:t,role:'viewer'},function(d){if(!d.success){sessionStorage.removeItem(SK);if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}}});}}})();</script><!-- LLL_VIEWER_END -->
+function lllHideLoader(){var el=document.getElementById("lll-loader");if(!el)return;el.classList.add("done");setTimeout(function(){el.style.display="none";},450);}
+
+(function(){var SU='https://script.google.com/macros/s/AKfycbwUgf728sst5z8MUxqRCmt_0IIAIHLuQx0cPwIkjGis543cnP7pR-9Ezl3wql67oDo8Dw/exec';var SK='lll_vs';function hashTok(){try{var h=location.hash;if(h.indexOf('token=')>-1)return decodeURIComponent(h.split('token=')[1]);}catch(e){}return null;}function storedTok(){try{var d=JSON.parse(sessionStorage.getItem(SK)||'{}');return d.token||null;}catch(e){return null;}}function call(p,cb){var enc=btoa(unescape(encodeURIComponent(JSON.stringify(p))));fetch(SU+'?p='+encodeURIComponent(enc),{method:'GET'}).then(function(r){return r.json();}).then(cb).catch(function(){cb({success:false,error:'Connection error'});});}function showLogin(){var o=document.createElement('div');o.id='_lll_ov';o.style='position:fixed;inset:0;background:#0e1414;z-index:99999;display:flex;align-items:center;justify-content:center;font-family:-apple-system,sans-serif';o.innerHTML='<div style="background:#16201f;border:1px solid #283533;border-radius:18px;padding:40px 36px;width:340px;max-width:90vw;text-align:center"><div style="font-size:36px;margin-bottom:14px">&#127807;</div><h2 style="color:#e8efe9;font-size:20px;font-weight:700;margin-bottom:6px">Little Leaf Labs</h2><p style="color:#92a39c;font-size:13px;margin-bottom:24px">Enter your credentials</p><input id="_lll_u" type="text" placeholder="Username" style="width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 14px;color:#e8efe9;font-size:14px;outline:none;margin-bottom:10px;box-sizing:border-box"><div style="position:relative;margin-bottom:12px"><input id="_lll_p" type="password" placeholder="Password" style="width:100%;background:#1c2826;border:1px solid #283533;border-radius:9px;padding:10px 40px 10px 14px;color:#e8efe9;font-size:14px;outline:none;box-sizing:border-box"><button id="_lll_eye" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#92a39c;font-size:16px;line-height:1">&#128065;</button></div><div id="_lll_e" style="color:#ff7378;font-size:12px;min-height:18px;margin-bottom:10px"></div><button id="_lll_b" style="width:100%;background:#3fae6b;color:#0e1414;padding:12px;border-radius:9px;font-size:14px;font-weight:700;cursor:pointer;border:none">Sign In</button></div>';document.body.appendChild(o);document.getElementById('_lll_eye').addEventListener('click',function(){var f=document.getElementById('_lll_p');f.type=f.type==='password'?'text':'password';this.innerHTML=f.type==='password'?'&#128065;':'&#128064;';});function go(){var u=document.getElementById('_lll_u').value.trim(),p=document.getElementById('_lll_p').value,e=document.getElementById('_lll_e');if(!u||!p){e.textContent='Please enter credentials.';return;}document.getElementById('_lll_b').disabled=true;e.textContent='Verifying...';call({action:'viewerLogin',username:u,password:p},function(d){if(d.success){sessionStorage.setItem(SK,JSON.stringify({token:d.token,username:d.username}));document.getElementById('_lll_ov').remove();var nu=document.getElementById('lll-nav-user');if(nu)nu.textContent='Signed in as '+d.username;}else{e.textContent=d.error||'Incorrect credentials';document.getElementById('_lll_p').value='';document.getElementById('_lll_b').disabled=false;}});}document.getElementById('_lll_b').addEventListener('click',go);document.getElementById('_lll_p').addEventListener('keydown',function(ev){if(ev.key==='Enter')go();});document.getElementById('_lll_u').addEventListener('keydown',function(ev){if(ev.key==='Enter')go();});setTimeout(function(){var i=document.getElementById('_lll_u');if(i)i.focus();},100);}var ht=hashTok();if(ht){var _s=sessionStorage.getItem(SK);var _u=_s?JSON.parse(_s).username||'viewer':'viewer';sessionStorage.setItem(SK,JSON.stringify({token:ht,username:_u}));}else{var t=storedTok();if(!t){if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}}else{call({action:'verifyToken',token:t,role:'viewer'},function(d){if(!d.success){sessionStorage.removeItem(SK);if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',showLogin);}else{showLogin();}}});}}
+  lllHideLoader();
+})();</script><!-- LLL_VIEWER_END -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Little Leaf Labs — Weekly Refresh · Jun 1, 2026</title>
@@ -142,20 +146,13 @@
 
 
 /* ══ LLL LOADING OVERLAY ══ */
-#lll-loader{position:fixed;inset:0;background:#0e1414;z-index:88888;
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  gap:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
-  transition:opacity .4s ease;}
-#lll-loader.hide{opacity:0;pointer-events:none;}
-.lll-loader-dot{width:44px;height:44px;border-radius:12px;
-  background:linear-gradient(135deg,#3fae6b,#2c7d4c);
-  display:flex;align-items:center;justify-content:center;
-  font-size:24px;animation:lll-pulse 1.4s ease-in-out infinite;}
+#lll-loader{position:fixed;inset:0;background:#0e1414;z-index:88888;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;transition:opacity .4s ease;}
+#lll-loader.done{opacity:0;pointer-events:none;}
+.lll-loader-dot{width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#3fae6b,#2c7d4c);display:flex;align-items:center;justify-content:center;font-size:24px;animation:lll-pulse 1.4s ease-in-out infinite;}
 @keyframes lll-pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.12);opacity:.8;}}
 .lll-loader-bar{width:180px;height:3px;background:#1e3028;border-radius:2px;overflow:hidden;}
-.lll-loader-fill{height:100%;width:0%;background:linear-gradient(90deg,#3fae6b,#5dd68c);
-  border-radius:2px;transition:width .3s ease;animation:lll-progress 1.8s ease-in-out infinite;}
-@keyframes lll-progress{0%{width:0%;margin-left:0}60%{width:70%;margin-left:0}100%{width:70%;margin-left:100%}}
+.lll-loader-fill{height:100%;background:linear-gradient(90deg,#3fae6b,#5dd68c);border-radius:2px;animation:lll-bar 1.6s ease-in-out infinite;}
+@keyframes lll-bar{0%{width:0%;margin-left:0%}60%{width:65%;margin-left:0%}100%{width:65%;margin-left:100%}}
 .lll-loader-text{color:#92a39c;font-size:13px;letter-spacing:.5px;}
 
 
@@ -167,7 +164,7 @@
 
 </style>
 </head>
-<body><div id="lll-loader"><div class="lll-loader-dot">&#127807;</div><div class="lll-loader-bar"><div class="lll-loader-fill"></div></div><div class="lll-loader-text" id="lll-loader-msg">Loading dashboard...</div></div>
+<body><div id="lll-loader"><div class="lll-loader-dot">&#127807;</div><div class="lll-loader-bar"><div class="lll-loader-fill"></div></div><div class="lll-loader-text">Loading your dashboard...</div></div>
 <div id="lll-nav-backdrop" onclick="lllCloseNav()"></div>
 <div id="lll-nav">
   <div class="lll-nav-head"><div class="lll-nav-brand"><div class="lll-nav-dot">&#127807;</div><span class="lll-nav-title">Little Leaf Labs</span></div>
@@ -397,23 +394,8 @@
   </footer>
 
 </div>
-<script>if(document.readyState!=="loading"){lllHideLoader();}else{document.addEventListener("DOMContentLoaded",function(){lllHideLoader();});}</script>
 <script id="lll-nav-js">
-
-/* ══ LOADER CONTROL ══ */
-function lllShowLoader(msg){
-  var el=document.getElementById('lll-loader');
-  var tx=document.getElementById('lll-loader-msg');
-  if(el){el.classList.remove('hide');el.style.opacity='';}
-  if(tx&&msg) tx.textContent=msg;
-}
-function lllHideLoader(){
-  var el=document.getElementById('lll-loader');
-  if(!el) return;
-  el.classList.add('hide');
-  setTimeout(function(){el.style.display='none';},450);
-}
-
+function lllHideLoader(){var el=document.getElementById("lll-loader");if(!el)return;el.classList.add("done");setTimeout(function(){el.style.display="none";},450);}
 (function(){
   var SK="lll_vs";var BASE="https://abhishekidhate1998.github.io/lll-dashboards";
   function sess(){try{return JSON.parse(sessionStorage.getItem(SK)||"{}");}catch(e){return {};}}
