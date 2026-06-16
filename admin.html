@@ -426,10 +426,15 @@ function startProcess() {
         setP(72,"Deploying to GitHub...");
         var s5=step("Deploying all 7 dashboards to GitHub...");
 
-        // Get GitHub token from Apps Script config (one time)
-        return api({action:"getConfig"}).then(function(cfg){
-          var ghToken = cfg && cfg.githubToken ? cfg.githubToken : null;
-          if(!ghToken) throw new Error("GitHub token not available from server. Set GITHUB_TOKEN in Apps Script Script Properties and redeploy.");
+        // Get GitHub token from browser storage (prompt once, no Apps Script dependency)
+        var ghToken = localStorage.getItem("lll_gh_token") || "";
+        if(!ghToken){
+          ghToken = prompt("Enter your GitHub Personal Access Token (with repo scope).\n\nThis is stored only in this browser and used to deploy dashboards directly to GitHub.\n\nGet one at: github.com/settings/tokens");
+          if(!ghToken) throw new Error("GitHub token required to deploy.");
+          ghToken = ghToken.trim();
+          localStorage.setItem("lll_gh_token", ghToken);
+        }
+        return Promise.resolve().then(function(){
 
           var apiBase = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/";
           var ghHdrs  = {"Authorization":"token "+ghToken,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"};
@@ -470,7 +475,8 @@ function startProcess() {
                       })
                       .then(function(rr){ if(rr.ok) deployed.push(fname); else deployFailed.push(fname); });
                   }
-                  deployFailed.push(fname+": "+(err.message||r.status));
+                  if(r.status===401){localStorage.removeItem("lll_gh_token");deployFailed.push(fname+": Bad token (cleared, re-run to re-enter)");}
+                  else deployFailed.push(fname+": "+(err.message||r.status));
                 });
               })
               .catch(function(e){ deployFailed.push(fname+": "+e.message); })
