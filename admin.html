@@ -769,7 +769,7 @@ function showConfirm(title,msg,cb) {
   confirmCb=cb;
 }
 function closeConfirm(){document.getElementById("confirm").classList.remove("show");confirmCb=null;}
-document.addEventListener("DOMContentLoaded",function(){var bok=document.getElementById("c-ok");if(bok)bok.onclick=function(){closeConfirm();if(confirmCb)confirmCb();};});
+document.addEventListener("DOMContentLoaded",function(){var bok=document.getElementById("c-ok");if(bok)bok.onclick=function(){var cb=confirmCb;closeConfirm();if(cb)cb();};});
 
 (function(){
   var tok=sessionStorage.getItem("lll_tok");
