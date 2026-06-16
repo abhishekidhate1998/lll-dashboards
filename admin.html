@@ -830,16 +830,26 @@ function fmtD(n) { return '$' + fmt(Math.round(n)); }
 
 function injectVar(html, varPattern, newValue) {
   // Find the variable and replace its value using brace matching
+  // IMPORTANT: skips bracket counting inside JSON strings to avoid
+  // false matches on product names like "[High Potency]" or "[100mg]"
   const re = new RegExp(varPattern + '\\s*=\\s*([\\[\\{])');
   const match = re.exec(html);
   if (!match) return { html, success: false };
   const startPos = match.index + match[0].length - 1;
   const openChar = match[1];
-  const closeChar = openChar === '['?']':'}';
-  let depth = 0, endPos = startPos;
+  const closeChar = openChar === '[' ? ']' : '}';
+  let depth = 0, endPos = startPos, inStr = false, strChar = '';
   for (let i = startPos; i < html.length; i++) {
-    if (html[i] === openChar) depth++;
-    else if (html[i] === closeChar) { depth--; if (depth === 0) { endPos = i + 1; break; } }
+    const ch = html[i];
+    // Track whether we are inside a JSON string value
+    if (inStr) {
+      if (ch === '\\') { i++; continue; }  // skip escaped char
+      if (ch === strChar) inStr = false;
+    } else {
+      if (ch === '"' || ch === "'") { inStr = true; strChar = ch; continue; }
+      if (ch === openChar) depth++;
+      else if (ch === closeChar) { depth--; if (depth === 0) { endPos = i + 1; break; } }
+    }
   }
   return { html: html.slice(0, startPos) + newValue + html.slice(endPos), success: true };
 }
@@ -1211,7 +1221,7 @@ function buildMasterDashboard(html, qb, apex, distru, metrc, lit, timeStr) {
   const skuArr = (apex.products||[]).map(p => {
     const name = (p['Name']||'').trim();
     const brand = LLB.find(lb => name.toLowerCase().includes(lb.toLowerCase())) || 'Little Leaf';
-    return { brand, name: name.slice(0,60), rev: String(Math.round(num(p['Total Value']||0))), units: String(Math.round(num(p['Total Quantity']||0))) };
+    return { brand, name: name.slice(0,60).replace(/[\[\]{}]/g,''), rev: String(Math.round(num(p['Total Value']||0))), units: String(Math.round(num(p['Total Quantity']||0))) };
   }).sort((a,b) => num(b.rev) - num(a.rev));
   const seedSku = JSON.stringify(skuArr);
   const r2 = injectVar(h, 'SEED_SKU', seedSku);
