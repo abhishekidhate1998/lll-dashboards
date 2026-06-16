@@ -875,21 +875,68 @@ function findFile(files, category, keywords) {
   return catFiles[0] || null;
 }
 
+function findAllFiles(files, category, keywords) {
+  // Returns ALL files in category whose name matches ANY keyword
+  // Used to combine multiple exports of the same type (e.g. 3 months of orders)
+  const catFiles = files[category] || [];
+  const matched = [];
+  for (const f of catFiles) {
+    const clean = f.name.toLowerCase().replace(/[^a-z0-9]/g,'');
+    for (const kw of keywords) {
+      if (clean.includes(kw.replace(/[^a-z0-9]/g,''))) {
+        matched.push(f); break;
+      }
+    }
+  }
+  return matched.length > 0 ? matched : (catFiles.length > 0 ? [catFiles[0]] : []);
+}
+
+function combineCSV(files, category, keywords, dedupeKey) {
+  // Parse and combine rows from ALL matching files
+  // dedupeKey: optional column name to deduplicate on (e.g. 'Order Number')
+  const allFiles = findAllFiles(files, category, keywords);
+  let combined = [];
+  const seen = new Set();
+  for (const f of allFiles) {
+    const rows = parseCSV(f.content);
+    for (const row of rows) {
+      if (dedupeKey) {
+        const key = row[dedupeKey] || JSON.stringify(row);
+        if (seen.has(key)) continue;
+        seen.add(key);
+      }
+      combined.push(row);
+    }
+  }
+  return combined;
+}
+
 async function readQBData(files) {
   const qb = { rev:0, gp:0, cogs:0, net:0, gp_pct:0, cash:0, ar:0, ap:0 };
   try {
-    const plFile = findFile(files, "quickbooks", ["profit", "loss", "p&l", "pl"]);
-    if (plFile) {
+    // Combine ALL P&L files (sums revenue/profit across multiple periods)
+    const plFiles = findAllFiles(files, "quickbooks", ["profit", "loss", "p&l", "pl"]);
+    for (const plFile of plFiles) {
       const rows = parseCSV(plFile.content);
       for (const r of rows) {
         const k = (r[Object.keys(r)[0]]||"").toLowerCase();
         const val = num(r[Object.keys(r)[1]]||0);
         if (!val) continue;
-        if (k.includes("total income") || k.includes("total revenue")) qb.rev = val;
-        else if (k.includes("gross profit")) qb.gp = val;
-        else if (k.includes("cost of goods sold") || k.includes("cost of sales")) qb.cogs = val;
-        else if (k.includes("net income") || k.includes("net profit")) qb.net = val;
-        else if (k.includes("cash") && k.includes("bank")) qb.cash = val;
+        if (k.includes("total income") || k.includes("total revenue")) qb.rev += val;
+        else if (k.includes("gross profit")) qb.gp += val;
+        else if (k.includes("cost of goods sold") || k.includes("cost of sales")) qb.cogs += val;
+        else if (k.includes("net income") || k.includes("net profit")) qb.net += val;
+      }
+    }
+    // Balance sheet: use LATEST file only (point-in-time snapshot, not cumulative)
+    const bsFile = findFile(files, "quickbooks", ["balance"]);
+    if (bsFile) {
+      const rows = parseCSV(bsFile.content);
+      for (const r of rows) {
+        const k = (r[Object.keys(r)[0]]||"").toLowerCase();
+        const val = num(r[Object.keys(r)[1]]||0);
+        if (!val) continue;
+        if (k.includes("cash") && k.includes("bank")) qb.cash = val;
         else if (k.includes("accounts receivable") && !qb.ar) qb.ar = val;
         else if (k.includes("accounts payable") && !qb.ap) qb.ap = val;
       }
@@ -903,48 +950,90 @@ async function readApexData(files) {
   const apex = { buyers:[], products:[], inventory:[], contacts:[] };
 
   // Find buyer file by name first, then by column content (resilient to renames)
-  let buyerFile = findFile(files, 'apex', ['buyer_perf', 'buyer performance', 'buyer_performance']);
-  if (buyerFile) {
-    let parsed = parseCSV(buyerFile.content);
-    // Verify it has a Buyer column - if not, search all apex files for the right one
-    if (!parsed.length || !(parsed[0]['Buyer'] || parsed[0]['Total Value of Orders'])) {
-      const apexFiles = files['apex'] || [];
-      for (const f of apexFiles) {
-        const test = parseCSV(f.content);
-        if (test.length && (test[0]['Buyer'] || test[0]['Total Value of Orders'])) {
-          parsed = test; break;
-        }
-      }
-    }
-    apex.buyers = parsed;
-  } else {
-    // No filename match - find by column content
+  // Combine ALL buyer performance files (dedupe by Buyer name, sum revenues)
+  const buyerFiles = findAllFiles(files, 'apex', ['buyer_perf', 'buyer performance', 'buyer_performance']);
+  // Validate each file has the right columns; fallback to column-scan if not
+  const validBuyerFiles = buyerFiles.filter(f => {
+    const rows = parseCSV(f.content);
+    return rows.length && (rows[0]['Buyer'] || rows[0]['Total Value of Orders']);
+  });
+  if (!validBuyerFiles.length) {
+    // Column scan fallback
     const apexFiles = files['apex'] || [];
     for (const f of apexFiles) {
       const test = parseCSV(f.content);
       if (test.length && (test[0]['Buyer'] || test[0]['Total Value of Orders'])) {
-        apex.buyers = test; break;
+        validBuyerFiles.push(f); break;
       }
     }
   }
-
-  let prodFile = findFile(files, 'apex', ['product_perf', 'product performance', 'product_performance']);
-  if (prodFile) {
-    let parsed = parseCSV(prodFile.content);
-    if (!parsed.length || !(parsed[0]['Name'] || parsed[0]['Quantity In Range'])) {
-      const apexFiles = files['apex'] || [];
-      for (const f of apexFiles) {
-        const test = parseCSV(f.content);
-        if (test.length && parsed[0] !== test[0] && (test[0]['Quantity In Range'] || (test[0]['Name'] && test[0]['Quantity Sold']))) {
-          parsed = test; break;
+  if (validBuyerFiles.length === 1) {
+    apex.buyers = parseCSV(validBuyerFiles[0].content);
+  } else if (validBuyerFiles.length > 1) {
+    // Merge: combine by buyer name, sum order values and counts
+    const buyerMap = {};
+    for (const f of validBuyerFiles) {
+      for (const row of parseCSV(f.content)) {
+        const name = (row['Buyer'] || '').trim();
+        if (!name) continue;
+        if (!buyerMap[name]) {
+          buyerMap[name] = { ...row };
+        } else {
+          // Sum numeric fields
+          buyerMap[name]['Total Value of Orders'] = num(buyerMap[name]['Total Value of Orders']||0) + num(row['Total Value of Orders']||0);
+          buyerMap[name]['Total Number of Orders'] = num(buyerMap[name]['Total Number of Orders']||0) + num(row['Total Number of Orders']||0);
+          // Keep the most recent last order date
+          const d1 = new Date(buyerMap[name]['Last Order Date']||0);
+          const d2 = new Date(row['Last Order Date']||0);
+          if (d2 > d1) {
+            buyerMap[name]['Last Order Date'] = row['Last Order Date'];
+            buyerMap[name]['Days Since Last Order'] = row['Days Since Last Order'];
+          }
         }
       }
     }
-    apex.products = parsed;
+    apex.buyers = Object.values(buyerMap);
   }
 
-  const invFile = findFile(files, 'apex', ['inventory_report', 'inventory report']);
-  if (invFile) apex.inventory = parseCSV(invFile.content);
+  // Combine ALL product performance files (dedupe by Name, sum quantities)
+  const prodFiles = findAllFiles(files, 'apex', ['product_perf', 'product performance', 'product_performance']);
+  const validProdFiles = prodFiles.filter(f => {
+    const rows = parseCSV(f.content);
+    return rows.length && (rows[0]['Quantity In Range'] || (rows[0]['Name'] && rows[0]['Quantity Sold']));
+  });
+  if (validProdFiles.length === 1) {
+    apex.products = parseCSV(validProdFiles[0].content);
+  } else if (validProdFiles.length > 1) {
+    const prodMap = {};
+    for (const f of validProdFiles) {
+      for (const row of parseCSV(f.content)) {
+        const name = (row['Name'] || '').trim();
+        if (!name) continue;
+        if (!prodMap[name]) {
+          prodMap[name] = { ...row };
+        } else {
+          prodMap[name]['Quantity In Range'] = num(prodMap[name]['Quantity In Range']||0) + num(row['Quantity In Range']||0);
+          prodMap[name]['Total Value'] = num(prodMap[name]['Total Value']||0) + num(row['Total Value']||0);
+        }
+      }
+    }
+    apex.products = Object.values(prodMap);
+  }
+
+  // Combine ALL inventory files (dedupe by Product Name, sum quantities)
+  apex.inventory = combineCSV(files, 'apex', ['inventory_report', 'inventory report', 'inventory'], 'Product Name');
+  // If product appears in multiple files, sum its quantities
+  const invMap = {};
+  for (const row of apex.inventory) {
+    const name = (row['Product Name'] || '').trim();
+    if (!name) continue;
+    if (!invMap[name]) { invMap[name] = { ...row }; }
+    else {
+      invMap[name]['Product Total Quantity'] = num(invMap[name]['Product Total Quantity']||0) + num(row['Product Total Quantity']||0);
+      invMap[name]['Product Total Value'] = num(invMap[name]['Product Total Value']||0) + num(row['Product Total Value']||0);
+    }
+  }
+  apex.inventory = Object.values(invMap);
 
   const contactFile = findFile(files, 'apex', ['buyer contact', 'contact export', 'contact_export']);
   if (contactFile) apex.contacts = parseCSV(contactFile.content);
@@ -1017,9 +1106,10 @@ async function readApexData(files) {
 async function readDistruData(files) {
   try {
   const distru = { orders:[], monthly:{} };
-  const orderFile = findFile(files, 'distru', ['sales-orders', 'sales_orders', 'distru-sales']);
-  if (orderFile) {
-    distru.orders = parseCSV(orderFile.content).filter(r => 
+  // Combine ALL distru sales-order files (deduped by Order Number)
+  const allOrders = combineCSV(files, 'distru', ['sales-orders', 'sales_orders', 'distru-sales', 'orders'], 'Order Number');
+  if (allOrders.length) {
+    distru.orders = allOrders.filter(r =>
       ['Completed','Delivered','Paid'].includes(r['Status'] || ''));
     
     for (const row of distru.orders) {
@@ -1039,9 +1129,9 @@ async function readDistruData(files) {
 async function readMetrcData(files) {
   const metrc = { packages:[], labStatus:{}, locations:{}, prod_stages:{} };
   try {
-    const pkgFile = findFile(files, 'metrc', ['packages', 'inventory', 'packagesinventory']);
-    if (pkgFile) {
-      metrc.packages = parseCSV(pkgFile.content);
+    // Combine ALL Metrc packages files (deduped by Package Label)
+    metrc.packages = combineCSV(files, 'metrc', ['packages', 'inventory', 'packagesinventory'], 'Package Label');
+    if (metrc.packages.length) {
       for (const p of metrc.packages) {
         const lab = (p['Lab Testing'] || '').trim();
         const loc = (p['Location'] || '').trim();
@@ -1067,20 +1157,20 @@ async function readMetrcData(files) {
 async function readLitData(files) {
   const lit = { brands:[], dispensaries:[], categories:[], daily:[], menu:[] };
 
-  const brandFile = findFile(files, 'lit_alerts', ['brandsanalytics', 'brands_analytics', 'overallbrands']);
-  if (brandFile) lit.brands = parseCSV(brandFile.content);
+  // Combine ALL brand analytics files (dedupe by Brand name)
+  lit.brands = combineCSV(files, 'lit_alerts', ['brandsanalytics', 'brands_analytics', 'overallbrands'], 'Brand');
 
-  const dispFile = findFile(files, 'lit_alerts', ['dispensariesanalytics', 'dispensary_analytics', 'overalldispensaries']);
-  if (dispFile) lit.dispensaries = parseCSV(dispFile.content);
+  // Combine ALL dispensary analytics files (dedupe by Dispensary)
+  lit.dispensaries = combineCSV(files, 'lit_alerts', ['dispensariesanalytics', 'dispensary_analytics', 'overalldispensaries'], 'Dispensary');
 
-  const catFile = findFile(files, 'lit_alerts', ['categoriesanalytics', 'category_analytics', 'overallcategories']);
-  if (catFile) lit.categories = parseCSV(catFile.content);
+  // Combine ALL category analytics files (dedupe by Category)
+  lit.categories = combineCSV(files, 'lit_alerts', ['categoriesanalytics', 'category_analytics', 'overallcategories'], 'Category');
 
-  const dailyFile = findFile(files, 'lit_alerts', ['dailysummary', 'daily_summary', 'overalldaily']);
-  if (dailyFile) lit.daily = parseCSV(dailyFile.content);
+  // Combine ALL daily summary files (dedupe by Date for clean trend line)
+  lit.daily = combineCSV(files, 'lit_alerts', ['dailysummary', 'daily_summary', 'overalldaily'], 'Date');
 
-  const menuFile = findFile(files, 'lit_alerts', ['chris.littleleaflabs', 'menu_snapshot', 'littleleaflabs_0']);
-  if (menuFile) lit.menu = parseCSV(menuFile.content);
+  // Combine ALL menu snapshot files (no dedupe — different dates = different rows)
+  lit.menu = combineCSV(files, 'lit_alerts', ['chris.littleleaflabs', 'menu_snapshot', 'littleleaflabs_0', 'littleleaflabs']);
 
   // Compute shelf stats
   lit.total_doors = new Set(lit.menu.map(r => r['Dispensary'] || '')).size;
