@@ -864,11 +864,46 @@ async function readQBData(files) {
 async function readApexData(files) {
   const apex = { buyers:[], products:[], inventory:[], contacts:[] };
 
-  const buyerFile = findFile(files, 'apex', ['buyer_perf', 'buyer performance', 'buyer_performance']);
-  if (buyerFile) apex.buyers = parseCSV(buyerFile.content);
+  // Find buyer file by name first, then by column content (resilient to renames)
+  let buyerFile = findFile(files, 'apex', ['buyer_perf', 'buyer performance', 'buyer_performance']);
+  if (buyerFile) {
+    let parsed = parseCSV(buyerFile.content);
+    // Verify it has a Buyer column - if not, search all apex files for the right one
+    if (!parsed.length || !(parsed[0]['Buyer'] || parsed[0]['Total Value of Orders'])) {
+      const apexFiles = files['apex'] || [];
+      for (const f of apexFiles) {
+        const test = parseCSV(f.content);
+        if (test.length && (test[0]['Buyer'] || test[0]['Total Value of Orders'])) {
+          parsed = test; break;
+        }
+      }
+    }
+    apex.buyers = parsed;
+  } else {
+    // No filename match - find by column content
+    const apexFiles = files['apex'] || [];
+    for (const f of apexFiles) {
+      const test = parseCSV(f.content);
+      if (test.length && (test[0]['Buyer'] || test[0]['Total Value of Orders'])) {
+        apex.buyers = test; break;
+      }
+    }
+  }
 
-  const prodFile = findFile(files, 'apex', ['product_perf', 'product performance', 'product_performance']);
-  if (prodFile) apex.products = parseCSV(prodFile.content);
+  let prodFile = findFile(files, 'apex', ['product_perf', 'product performance', 'product_performance']);
+  if (prodFile) {
+    let parsed = parseCSV(prodFile.content);
+    if (!parsed.length || !(parsed[0]['Name'] || parsed[0]['Quantity In Range'])) {
+      const apexFiles = files['apex'] || [];
+      for (const f of apexFiles) {
+        const test = parseCSV(f.content);
+        if (test.length && parsed[0] !== test[0] && (test[0]['Quantity In Range'] || (test[0]['Name'] && test[0]['Quantity Sold']))) {
+          parsed = test; break;
+        }
+      }
+    }
+    apex.products = parsed;
+  }
 
   const invFile = findFile(files, 'apex', ['inventory_report', 'inventory report']);
   if (invFile) apex.inventory = parseCSV(invFile.content);
