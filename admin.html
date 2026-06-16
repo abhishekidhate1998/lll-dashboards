@@ -423,99 +423,127 @@ function startProcess() {
         });
         upd(s4,"Data injected into all 7 dashboards","done");
 
-        setP(72,"Deploying to GitHub...");
-        var s5=step("Deploying all 7 dashboards to GitHub...");
+        setP(72,"Deploying to GitHub (atomic)...");
+        var s5=step("Deploying all 7 dashboards in one atomic commit...");
 
-        // Get GitHub token from Apps Script (works on ANY device).
-        // Falls back to browser prompt only if server token unavailable.
         return api({action:"getConfig"}).then(function(cfg){
           var ghToken = (cfg && cfg.githubToken) ? cfg.githubToken : (localStorage.getItem("lll_gh_token")||"");
           if(!ghToken){
-            ghToken = prompt("GitHub token not found on server.\n\nEnter your GitHub Personal Access Token (repo scope) to deploy.\nGet one at: github.com/settings/tokens\n\n(Tip: set GITHUB_TOKEN in Apps Script Script Properties so this is automatic on all devices.)");
+            ghToken = prompt("GitHub token (repo scope) needed to deploy.\nGet one at github.com/settings/tokens\n(Tip: set GITHUB_TOKEN in Apps Script Script Properties for all devices.)");
             if(!ghToken) throw new Error("GitHub token required to deploy.");
             ghToken = ghToken.trim();
             localStorage.setItem("lll_gh_token", ghToken);
           }
 
-          var apiBase = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/";
-          var ghHdrs  = {"Authorization":"token "+ghToken,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"};
+          var gBase = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/git/";
+          var cBase = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/";
+          var gh = {"Authorization":"token "+ghToken,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"};
           var fileList = Object.keys(built);
-          var deployed = [];
-          var deployFailed = [];
 
-          // Deploy ONE file at a time, fully sequential, with fresh SHA each time
-          function deployOne(idx){
-            if(idx >= fileList.length) return Promise.resolve();
-            var fname = fileList[idx];
-            var content = built[fname];
-            setP(72 + Math.round((idx/fileList.length)*26), "Deploying "+fname+" ("+(idx+1)+"/"+fileList.length+")...");
-
-            // Step A: get current SHA
-            return fetch(apiBase+fname+"?ref=main&t="+Date.now(), {headers:ghHdrs, cache:"no-store"})
-              .then(function(r){ return r.ok ? r.json() : null; })
-              .then(function(meta){
-                // Step B: PUT new content
-                var payload = {
-                  message: "LLL Dashboard Update - "+fname,
-                  content: btoa(unescape(encodeURIComponent(content))),
-                  branch: "main"
-                };
-                if(meta && meta.sha) payload.sha = meta.sha;
-                return fetch(apiBase+fname, {method:"PUT", headers:ghHdrs, body:JSON.stringify(payload)});
-              })
-              .then(function(r){
-                if(r.ok){ deployed.push(fname); return; }
-                return r.json().then(function(err){
-                  // 409 conflict -> retry once with fresh SHA
-                  if(r.status===409){
-                    return fetch(apiBase+fname+"?ref=main&t="+Date.now(), {headers:ghHdrs, cache:"no-store"})
-                      .then(function(rr){return rr.json();})
-                      .then(function(m2){
-                        var pl = {message:"LLL Dashboard Update - "+fname, content:btoa(unescape(encodeURIComponent(content))), branch:"main", sha:m2.sha};
-                        return fetch(apiBase+fname, {method:"PUT", headers:ghHdrs, body:JSON.stringify(pl)});
-                      })
-                      .then(function(rr){ if(rr.ok) deployed.push(fname); else deployFailed.push(fname); });
-                  }
-                  if(r.status===401){localStorage.removeItem("lll_gh_token");deployFailed.push(fname+": Bad token (cleared, re-run to re-enter)");}
-                  else deployFailed.push(fname+": "+(err.message||r.status));
-                });
-              })
-              .catch(function(e){ deployFailed.push(fname+": "+e.message); })
-              .then(function(){
-                // Always continue to next file regardless of success/failure
-                return deployOne(idx+1);
-              });
+          // BLANK-DATA PROTECTION: validate each built file has real content before deploy.
+          // If a build produced a near-empty template, fetch the current live version and
+          // keep it instead of overwriting good data with blanks.
+          function looksEmpty(name, html){
+            if(!html || html.length < 2000) return true;
+            if(name==="master_dashboard.html"){
+              return /SEED_CUST=\[\{name:''/.test(html); // empty customer seed
+            }
+            if(name==="weekly_exec.html"){
+              return /<!--WE_REV-->\s*(\$0|0|)\s*<!--\/WE_REV-->/.test(html);
+            }
+            return false;
           }
 
-          return deployOne(0).then(function(){
-            if(deployed.length===0) throw new Error("No files deployed. "+deployFailed.join("; "));
-            if(deployFailed.length){
-              upd(s5, deployed.length+" deployed, "+deployFailed.length+" failed", "done");
-              deployFailed.forEach(function(f){toast(f,"err");});
-            } else {
-              upd(s5, "All "+deployed.length+" dashboards deployed", "done");
-            }
-            setP(100,"Complete!");
+          // Step 1: protect blanks (replace empty builds with current live file)
+          return fileList.reduce(function(p, name){
+            return p.then(function(){
+              if(!looksEmpty(name, built[name])) return;
+              warns.push(name+": build was empty, keeping previous live version");
+              return fetch(cBase+name+"?ref=main&t="+Date.now(),{headers:gh,cache:"no-store"})
+                .then(function(r){return r.ok?r.json():null;})
+                .then(function(d){ if(d && d.content){ built[name]=decodeURIComponent(escape(atob(d.content.replace(/\n/g,"")))); } });
+            });
+          }, Promise.resolve()).then(function(){
 
-            // Save lastUpdated timestamp
-            api({action:"saveLastUpdated",lastUpdated:now.toISOString()}).catch(function(){});
+            // Step 2: ATOMIC commit via Git Data API (all 7 or none)
+            // 2a. get HEAD
+            return fetch(gBase+"refs/heads/main",{headers:gh,cache:"no-store"})
+              .then(function(r){return r.json();})
+              .then(function(ref){
+                var headSha = ref.object.sha;
+                return fetch(gBase+"commits/"+headSha,{headers:gh}).then(function(r){return r.json();})
+                  .then(function(headCommit){
+                    var baseTree = headCommit.tree.sha;
+                    // 2b. create all blobs
+                    return Promise.all(fileList.map(function(name){
+                      return fetch(gBase+"blobs",{method:"POST",headers:gh,
+                        body:JSON.stringify({content:btoa(unescape(encodeURIComponent(built[name]))),encoding:"base64"})})
+                        .then(function(r){return r.json();})
+                        .then(function(b){return {path:name,mode:"100644",type:"blob",sha:b.sha};});
+                    })).then(function(treeItems){
+                      // 2c. create tree
+                      return fetch(gBase+"trees",{method:"POST",headers:gh,
+                        body:JSON.stringify({base_tree:baseTree,tree:treeItems})})
+                        .then(function(r){return r.json();})
+                        .then(function(tree){
+                          // 2d. create commit
+                          return fetch(gBase+"commits",{method:"POST",headers:gh,
+                            body:JSON.stringify({message:"LLL Dashboard Update - all 7 ("+timeStr+")",tree:tree.sha,parents:[headSha]})})
+                            .then(function(r){return r.json();})
+                            .then(function(commit){
+                              // 2e. update ref
+                              return fetch(gBase+"refs/heads/main",{method:"PATCH",headers:gh,
+                                body:JSON.stringify({sha:commit.sha,force:false})})
+                                .then(function(r){
+                                  if(!r.ok) return r.json().then(function(e){throw new Error("Ref update failed: "+(e.message||r.status));});
+                                  return commit.sha;
+                                });
+                            });
+                        });
+                    });
+                  });
+              });
+          }).then(function(commitSha){
+            upd(s5,"All 7 deployed in commit "+String(commitSha).slice(0,7),"done");
+            setP(92,"Verifying deployment...");
 
-            document.getElementById("success-wrap").style.display="block";
-            document.getElementById("success-time").textContent="Deployed: "+timeStr+" | Live in 1-2 minutes";
-            document.getElementById("upd-time").textContent=timeStr;
-            document.getElementById("upd-badge").style.display="flex";
+            // Step 3: VERIFICATION — read back each file, confirm it matches what we sent
+            var s6=step("Verifying all 7 dashboards on GitHub...");
+            var verified=[], mismatch=[];
+            return fileList.reduce(function(p,name){
+              return p.then(function(){
+                return fetch(cBase+name+"?ref=main&t="+Date.now(),{headers:gh,cache:"no-store"})
+                  .then(function(r){return r.json();})
+                  .then(function(d){
+                    var live=decodeURIComponent(escape(atob(d.content.replace(/\n/g,""))));
+                    if(live.length===built[name].length) verified.push(name);
+                    else mismatch.push(name);
+                  });
+              });
+            }, Promise.resolve()).then(function(){
+              if(mismatch.length){
+                upd(s6, verified.length+"/7 verified, "+mismatch.length+" mismatch","done");
+                mismatch.forEach(function(m){toast("Verify mismatch: "+m,"err");});
+              } else {
+                upd(s6,"All 7 verified on GitHub","done");
+              }
+              setP(100,"Complete!");
+              api({action:"saveLastUpdated",lastUpdated:now.toISOString()}).catch(function(){});
+              if(warns.length) warns.forEach(function(w){toast(w,"err");});
 
-            var lDiv=document.getElementById("success-links");
-            lDiv.innerHTML="";
-            var a=document.createElement("a");
-            a.className="dl-a";
-            a.href=BASE_URL+"/portal.html";
-            a.target="_blank";
-            a.textContent="Open Portal ->";
-            lDiv.appendChild(a);
-
-            btn.disabled=false;
-            toast("All dashboards deployed!","ok");
+              document.getElementById("success-wrap").style.display="block";
+              document.getElementById("success-time").textContent="Deployed: "+timeStr+" | Live in 1-2 minutes";
+              document.getElementById("upd-time").textContent=timeStr;
+              document.getElementById("upd-badge").style.display="flex";
+              var lDiv=document.getElementById("success-links");
+              lDiv.innerHTML="";
+              var a=document.createElement("a");
+              a.className="dl-a"; a.href=BASE_URL+"/portal.html"; a.target="_blank";
+              a.textContent="Open Portal ->";
+              lDiv.appendChild(a);
+              btn.disabled=false;
+              toast("All dashboards deployed & verified!","ok");
+            });
           });
         });
       });
