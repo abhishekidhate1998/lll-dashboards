@@ -426,15 +426,16 @@ function startProcess() {
         setP(72,"Deploying to GitHub...");
         var s5=step("Deploying all 7 dashboards to GitHub...");
 
-        // Get GitHub token from browser storage (prompt once, no Apps Script dependency)
-        var ghToken = localStorage.getItem("lll_gh_token") || "";
-        if(!ghToken){
-          ghToken = prompt("Enter your GitHub Personal Access Token (with repo scope).\n\nThis is stored only in this browser and used to deploy dashboards directly to GitHub.\n\nGet one at: github.com/settings/tokens");
-          if(!ghToken) throw new Error("GitHub token required to deploy.");
-          ghToken = ghToken.trim();
-          localStorage.setItem("lll_gh_token", ghToken);
-        }
-        return Promise.resolve().then(function(){
+        // Get GitHub token from Apps Script (works on ANY device).
+        // Falls back to browser prompt only if server token unavailable.
+        return api({action:"getConfig"}).then(function(cfg){
+          var ghToken = (cfg && cfg.githubToken) ? cfg.githubToken : (localStorage.getItem("lll_gh_token")||"");
+          if(!ghToken){
+            ghToken = prompt("GitHub token not found on server.\n\nEnter your GitHub Personal Access Token (repo scope) to deploy.\nGet one at: github.com/settings/tokens\n\n(Tip: set GITHUB_TOKEN in Apps Script Script Properties so this is automatic on all devices.)");
+            if(!ghToken) throw new Error("GitHub token required to deploy.");
+            ghToken = ghToken.trim();
+            localStorage.setItem("lll_gh_token", ghToken);
+          }
 
           var apiBase = "https://api.github.com/repos/"+GITHUB_OWNER+"/"+GITHUB_REPO+"/contents/";
           var ghHdrs  = {"Authorization":"token "+ghToken,"Accept":"application/vnd.github.v3+json","Content-Type":"application/json"};
