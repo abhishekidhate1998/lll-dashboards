@@ -109,7 +109,9 @@
   .kpi .v{font-family:'Oswald';font-weight:700;font-size:30px;margin-top:4px}
   .kpi .v.green{color:var(--green)} .kpi .v.gold{color:var(--gold)}
   .foot{color:var(--mut);font-size:12px;margin-top:30px;border-top:1px solid var(--line);padding-top:16px}
-  select.in-cell{appearance:none;cursor:pointer}
+  select.in-cell{appearance:none;cursor:pointer;background:var(--panel2);color:var(--ink)}
+select.in-cell option{background:var(--panel2);color:var(--ink)}
+select.in-cell optgroup{background:var(--panel2);color:var(--ink)}
   .tag{font-size:11px;color:var(--mut)}
 /* ══ LLL NAV ══ */
 #lll-nav{position:fixed;top:0;left:0;height:100vh;width:220px;background:linear-gradient(180deg,#0e2018,#0b1a14);border-right:1px solid #1e3028;z-index:9000;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .25s ease;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
@@ -145,6 +147,9 @@
 /* ══ MOBILE RESPONSIVE ══ */
 *{-webkit-text-size-adjust:100%}
 @media(max-width:600px){body{font-size:13px}[class*="g2"],[class*="g3"],[class*="g4"],[class*="g5"]{grid-template-columns:1fr !important}table{display:block;overflow-x:auto;white-space:nowrap}.card,.kpi,.panel{padding:12px !important}canvas{max-height:240px !important}input,select{font-size:16px !important}.tabs{flex-wrap:wrap !important}.tab{font-size:12px !important;padding:7px 10px !important}}
+/* Production table — ensure select/text cells show full content */
+#prod_table td select.in-cell{min-width:120px;text-overflow:ellipsis}
+#prod_table td{vertical-align:middle}
 </style>
 </head>
 <body><div id="lll-loader"><div class="lll-ld">&#127807;</div><div class="lll-lb"><div class="lll-lf"></div></div><div class="lll-lt">Loading dashboard...</div></div>
