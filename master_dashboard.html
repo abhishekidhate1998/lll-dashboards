@@ -1386,18 +1386,18 @@ function prodStage(r){
   if(asm==='completed' || loc.includes('vault')) return {cls:'s-mid',txt:'Final Production (awaiting testing)'};
   return {cls:'s-low',txt:'WIP'};
 }
-const PROD_COLS=[{h:'Date',k:'date',w:92},
-  {h:'Assembly #',k:'asm_no',w:96},
-  {h:'Distru',calc:r=>r.url?`<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline">open ↗</a>`:'—'},
-  {h:'Product / Output (strain)',k:'product',plain:true,w:250},
-  {h:'Brand',k:'brand',sel:BRANDS,w:110},
-  {h:'Batch / Lot #',k:'batch',w:110},{h:'Metrc Tag',k:'metrc',w:150},
-  {h:'Assembly',k:'assembly',sel:ASM_OPTS,w:110},
-  {h:'Metrc Location',k:'location',sel:LOC_OPTS,w:140},
-  {h:'Lab / COA',k:'lab',sel:LABS_OPTS,w:90},
-  {h:'Output / Batch Size',k:'wip',r:1,w:80},{h:'Exp Units',k:'exp',r:1,w:80},{h:'Actual Units',k:'units',r:1,w:80},
-  {h:'Yield Var',calc:r=>{const e=+r.exp||0,u=+r.units||0; if(!e||!u)return '—'; const v=(u-e)/e*100; return (v>=0?'+':'')+v.toFixed(1)+'%';},w:80},
-  {h:'Stage',status:1,w:110}];
+const PROD_COLS=[{h:'Date',k:'date',w:100},
+  {h:'Assembly #',k:'asm_no',w:115},
+  {h:'Distru',calc:r=>r.url?`<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline">open ↗</a>`:'—',w:70},
+  {h:'Product / Output (strain)',k:'product',plain:true,w:260},
+  {h:'Brand',k:'brand',sel:BRANDS,w:140},
+  {h:'Batch / Lot #',k:'batch',w:130},{h:'Metrc Tag',k:'metrc',w:175},
+  {h:'Assembly',k:'assembly',sel:ASM_OPTS,w:140},
+  {h:'Metrc Location',k:'location',sel:LOC_OPTS,w:170},
+  {h:'Lab / COA',k:'lab',sel:LABS_OPTS,w:115},
+  {h:'Output / Batch Size',k:'wip',r:1,w:95},{h:'Exp Units',k:'exp',r:1,w:90},{h:'Actual Units',k:'units',r:1,w:95},
+  {h:'Yield Var',calc:r=>{const e=+r.exp||0,u=+r.units||0; if(!e||!u)return '—'; const v=(u-e)/e*100; return (v>=0?'+':'')+v.toFixed(1)+'%';},w:90},
+  {h:'Stage',status:1,w:130}];
 function addBatch(){PROD.unshift({date:new Date().toISOString().slice(0,10),asm_no:'',url:'',brand:'Dr. Zodiak’s Moonrock',product:'',batch:'',metrc:'',assembly:'In Progress',location:'Production / WIP',lab:'Not Submitted',final:'',wip:'',exp:'',units:''});store.set('prod',PROD);prodT.render();buildOverview();}
 const SEED_PROD=[
   {date:'2026-06-02',asm_no:'AS-0013674',url:'https://app.distru.com/assemblies/0dfc683a-196e-4749-afd2-b7476d225229',brand:'The Growfather',product:'WIP Granddaddy Purp Berry Infused Flower',batch:'GF-WIP-GDP-6-2',metrc:'1A41103000034BD000014533',assembly:'In Progress',location:'Production / WIP',lab:'Not Submitted',final:'3675',wip:'3675',exp:'',units:''},
