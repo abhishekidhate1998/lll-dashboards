@@ -936,22 +936,28 @@ function combineCSV(files, category, keywords, dedupeKey) {
 async function readQBData(files) {
   const qb = { rev:0, gp:0, cogs:0, net:0, gp_pct:0, cash:0, ar:0, ap:0 };
   try {
-    // Combine ALL P&L files (sums revenue/profit across multiple periods)
+    // Use the MOST RECENT P&L file only (do NOT sum — different P&L files are
+    // different periods/scenarios; summing would multiply revenue incorrectly)
     const plFiles = findAllFiles(files, "quickbooks", ["profit", "loss", "p&l", "pl"]);
-    for (const plFile of plFiles) {
+    // Sort by modified date descending, pick the newest
+    plFiles.sort((a,b) => new Date(b.modified||0) - new Date(a.modified||0));
+    const plFile = plFiles[0];
+    if (plFile) {
       const rows = parseCSV(plFile.content);
       for (const r of rows) {
         const k = (r[Object.keys(r)[0]]||"").toLowerCase();
         const val = num(r[Object.keys(r)[1]]||0);
         if (!val) continue;
-        if (k.includes("total income") || k.includes("total revenue")) qb.rev += val;
-        else if (k.includes("gross profit")) qb.gp += val;
-        else if (k.includes("cost of goods sold") || k.includes("cost of sales")) qb.cogs += val;
-        else if (k.includes("net income") || k.includes("net profit")) qb.net += val;
+        if (k.includes("total income") || k.includes("total revenue")) qb.rev = val;
+        else if (k.includes("gross profit")) qb.gp = val;
+        else if (k.includes("cost of goods sold") || k.includes("cost of sales")) qb.cogs = val;
+        else if (k.includes("net income") || k.includes("net profit")) qb.net = val;
       }
     }
     // Balance sheet: use LATEST file only (point-in-time snapshot, not cumulative)
-    const bsFile = findFile(files, "quickbooks", ["balance"]);
+    const bsFiles = findAllFiles(files, "quickbooks", ["balance"]);
+    bsFiles.sort((a,b) => new Date(b.modified||0) - new Date(a.modified||0));
+    const bsFile = bsFiles[0];
     if (bsFile) {
       const rows = parseCSV(bsFile.content);
       for (const r of rows) {
