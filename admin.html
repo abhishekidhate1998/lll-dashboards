@@ -913,6 +913,15 @@ function findAllFiles(files, category, keywords) {
   return matched.length > 0 ? matched : (catFiles.length > 0 ? [catFiles[0]] : []);
 }
 
+function latestFile(files, category, keywords) {
+  // Returns the single most-recently-modified file matching any keyword.
+  // Use for SNAPSHOT data (P&L, balance sheet, analytics) where combining is wrong.
+  const matched = findAllFiles(files, category, keywords);
+  if (!matched.length) return null;
+  matched.sort((a,b) => new Date(b.modified||0) - new Date(a.modified||0));
+  return matched[0];
+}
+
 function combineCSV(files, category, keywords, dedupeKey) {
   // Parse and combine rows from ALL matching files
   // dedupeKey: optional column name to deduplicate on (e.g. 'Order Number')
@@ -1193,20 +1202,25 @@ async function readMetrcData(files) {
 async function readLitData(files) {
   const lit = { brands:[], dispensaries:[], categories:[], daily:[], menu:[] };
 
-  // Combine ALL brand analytics files (dedupe by Brand name)
-  lit.brands = combineCSV(files, 'lit_alerts', ['brandsanalytics', 'brands_analytics', 'overallbrands'], 'Brand');
+  // Use most-recent brand analytics file only (snapshots differ; combining is wrong)
+  const _bf = latestFile(files, 'lit_alerts', ['brandsanalytics', 'brands_analytics', 'overallbrands']);
+  lit.brands = _bf ? parseCSV(_bf.content) : [];
 
-  // Combine ALL dispensary analytics files (dedupe by Dispensary)
-  lit.dispensaries = combineCSV(files, 'lit_alerts', ['dispensariesanalytics', 'dispensary_analytics', 'overalldispensaries'], 'Dispensary');
+  // Use most-recent dispensary analytics file only
+  const _df = latestFile(files, 'lit_alerts', ['dispensariesanalytics', 'dispensary_analytics', 'overalldispensaries']);
+  lit.dispensaries = _df ? parseCSV(_df.content) : [];
 
-  // Combine ALL category analytics files (dedupe by Category)
-  lit.categories = combineCSV(files, 'lit_alerts', ['categoriesanalytics', 'category_analytics', 'overallcategories'], 'Category');
+  // Use most-recent category analytics file only
+  const _cf = latestFile(files, 'lit_alerts', ['categoriesanalytics', 'category_analytics', 'overallcategories']);
+  lit.categories = _cf ? parseCSV(_cf.content) : [];
 
-  // Combine ALL daily summary files (dedupe by Date for clean trend line)
-  lit.daily = combineCSV(files, 'lit_alerts', ['dailysummary', 'daily_summary', 'overalldaily'], 'Date');
+  // Use most-recent daily summary file only
+  const _df2 = latestFile(files, 'lit_alerts', ['dailysummary', 'daily_summary', 'overalldaily']);
+  lit.daily = _df2 ? parseCSV(_df2.content) : [];
 
-  // Combine ALL menu snapshot files (no dedupe — different dates = different rows)
-  lit.menu = combineCSV(files, 'lit_alerts', ['chris.littleleaflabs', 'menu_snapshot', 'littleleaflabs_0', 'littleleaflabs']);
+  // Use most-recent menu snapshot file only
+  const _mf = latestFile(files, 'lit_alerts', ['chris.littleleaflabs', 'menu_snapshot', 'littleleaflabs_0', 'littleleaflabs']);
+  lit.menu = _mf ? parseCSV(_mf.content) : [];
 
   // Compute shelf stats
   lit.total_doors = new Set(lit.menu.map(r => r['Dispensary'] || '')).size;
