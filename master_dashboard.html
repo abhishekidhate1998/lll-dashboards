@@ -17,7 +17,7 @@
      radial-gradient(900px 500px at 85% -10%, rgba(232,184,75,.10), transparent 60%),
      radial-gradient(700px 500px at -5% 5%, rgba(90,169,232,.07), transparent 55%),
      var(--bg);
-     color:var(--ink);font-family:'Barlow',system-ui,sans-serif;-webkit-font-smoothing:antialiasedoverflow-x:hidden;}
+     color:var(--ink);font-family:'Barlow',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
   .wrap{max-width:1180px;margin:0 auto;padding:0 18px 80px}
   header{position:sticky;top:0;z-index:50;background:rgba(13,15,20,.82);backdrop-filter:blur(10px);
      border-bottom:1px solid var(--line)}
@@ -47,7 +47,7 @@
   .note b{color:var(--gold2)}
   .note .src{color:var(--green)}
 
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(560px,100%),1fr));gap:18px;margin-top:10px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(560px,1fr));gap:18px;margin-top:10px}
   @media(max-width:680px){.grid{grid-template-columns:1fr}}
   .card{background:linear-gradient(180deg,var(--panel),#121620);border:1px solid var(--line);border-radius:16px;
      overflow:hidden;box-shadow:var(--shadow)}
@@ -58,7 +58,9 @@
   .pill{margin-left:auto;font-family:'Barlow Semi Condensed';font-weight:700;font-size:11px;letter-spacing:.5px;
      text-transform:uppercase;padding:5px 9px;border-radius:999px;border:1px solid var(--line);color:var(--gold);background:var(--chip);white-space:nowrap}
   table{width:100%;border-collapse:collapse;font-size:13px}
-  thead th{font-family:'Barlow Semi Condensed';text-transform:uppercase;letter-spacing:.5px;font-size:10.5px;color:var(--mut);text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);font-weight:700;position:sticky;top:var(--hh,58px);z-index:6;background:var(--panel2)}
+  thead th{font-family:'Barlow Semi Condensed';text-transform:uppercase;letter-spacing:.5px;font-size:10.5px;color:var(--mut);
+     text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);font-weight:700;
+     position:sticky;top:var(--hh,58px);z-index:6;background:var(--panel2)}
   thead th.r,tbody td.r{text-align:right}
   tbody td{padding:6px 12px;border-bottom:1px solid rgba(42,47,58,.55);font-size:13px}
   tbody tr:last-child td{border-bottom:0}
@@ -101,7 +103,7 @@
   .s-low{background:rgba(232,100,90,.15);color:var(--red)}
   .s-mid{background:rgba(232,184,75,.15);color:var(--gold)}
   .s-new{background:rgba(90,150,232,.18);color:var(--blue);font-weight:700}
-  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,45%),1fr));gap:14px;margin-top:14px}
+  .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px;margin-top:14px}
   .kpi{background:linear-gradient(180deg,var(--panel),#121620);border:1px solid var(--line);border-radius:14px;padding:16px}
   .kpi .k{font-family:'Barlow Semi Condensed';text-transform:uppercase;letter-spacing:.6px;color:var(--mut);font-size:11px;font-weight:700}
   .kpi .v{font-family:'Oswald';font-weight:700;font-size:30px;margin-top:4px}
@@ -141,67 +143,9 @@
 .lll-lt{color:#92a39c;font-size:13px;}
 
 /* ══ MOBILE RESPONSIVE ══ */
-
-/* Input cells — compact */
-.in-cell{min-width:0;width:100%;max-width:200px}
-td .in-cell.txt{max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-td .in-cell.txt:focus{white-space:normal;overflow:visible}
-/* Short-content columns — no wrap */
-td:first-child{white-space:nowrap}
 *{-webkit-text-size-adjust:100%}
-body{overflow-x:hidden}
-
-@media(max-width:768px){
-  /* Header & navigation */
-  .hbar{padding:10px 12px;gap:8px;flex-wrap:wrap}
-  .tabs{gap:3px;margin-left:0;width:100%}
-  .tab{font-size:11px!important;padding:6px 8px!important;flex:1;text-align:center}
-  .logo{font-size:13px}
-  /* Layout containers */
-  .wrap{padding:0 10px 60px}
-  .grid{grid-template-columns:1fr!important}
-  .kpis{grid-template-columns:repeat(auto-fit,minmax(140px,1fr))!important}
-  /* Nav */
-  #lll-nav{width:85vw!important}
-}
-
-@media(max-width:600px){
-  body{font-size:13px}
-  /* All multi-column grids → single column */
-  [class*="g2"],[class*="g3"],[class*="g4"],[class*="g5"],
-  .grid,.g2col,.g3col,.g4col{grid-template-columns:1fr!important}
-  /* Cards */
-  .card,.kpi,.panel{padding:10px!important}
-  /* KPI grid — 2 per row on phones */
-  .kpis{grid-template-columns:1fr 1fr!important;gap:8px!important}
-  /* Tables */
-  table{display:block;overflow-x:auto;white-space:nowrap;-webkit-overflow-scrolling:touch}
-  /* Charts */
-  canvas{max-height:200px!important;width:100%!important}
-  /* Inputs */
-  input,select{font-size:16px!important}
-  /* Tabs */
-  .tabs{flex-wrap:wrap!important;gap:4px!important}
-  .tab{font-size:11px!important;padding:6px 8px!important}
-  /* Fixed wide elements */
-  .chart-wrap,.chart-box{overflow-x:auto!important}
-  /* Cost rows */
-  .row{flex-wrap:wrap!important;gap:6px!important}
-  /* Section views */
-  .view{padding:0!important}
-  /* Sticky header reduced */
-  header{padding:0!important}
-  .hbar{padding:8px 10px!important;gap:6px!important}
-  .logo{font-size:12px!important}
-}
-
-@media(max-width:400px){
-  body{font-size:12px}
-  .kpis{grid-template-columns:1fr!important}
-  .tab{font-size:10px!important;padding:5px 6px!important}
-  .card,.kpi,.panel{padding:8px!important}
-  .wrap{padding:0 8px 60px!important}
-}</style>
+@media(max-width:600px){body{font-size:13px}[class*="g2"],[class*="g3"],[class*="g4"],[class*="g5"]{grid-template-columns:1fr !important}table{display:block;overflow-x:auto;white-space:nowrap}.card,.kpi,.panel{padding:12px !important}canvas{max-height:240px !important}input,select{font-size:16px !important}.tabs{flex-wrap:wrap !important}.tab{font-size:12px !important;padding:7px 10px !important}}
+</style>
 </head>
 <body><div id="lll-loader"><div class="lll-ld">&#127807;</div><div class="lll-lb"><div class="lll-lf"></div></div><div class="lll-lt">Loading dashboard...</div></div>
 <div id="lll-nav-backdrop" onclick="lllCloseNav()"></div>
@@ -648,7 +592,7 @@ body{overflow-x:hidden}
     <span><span class="status s-mid" style="padding:1px 8px">Label Batch</span> min testing met (passed) → designate for labeling; confirm vs Compliance label requirements — active</span>
     <span><span class="status s-ok" style="padding:1px 8px">Ready For Sale</span> tested, labeled, packaged &amp; released — <b>only sellable inventory</b></span>
   </div>
-  <div class="panel"><div class="ph"><h3>Active &amp; Recent Batches</h3><div class="right"><button class="btn" onclick="addBatch()">+ New Batch</button></div></div><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table id="prod_table"></table></div></div>
+  <div class="panel"><div class="ph"><h3>Active &amp; Recent Batches</h3><div class="right"><button class="btn" onclick="addBatch()">+ New Batch</button></div></div><table id="prod_table"></table></div>
 </section>
 
 <section class="view" id="v-labels">
@@ -1439,22 +1383,18 @@ function prodStage(r){
   if(asm==='completed' || loc.includes('vault')) return {cls:'s-mid',txt:'Final Production (awaiting testing)'};
   return {cls:'s-low',txt:'WIP'};
 }
-const PROD_COLS=[
-  {h:'Date',k:'date',w:82},
-  {h:'Assembly #',k:'asm_no',w:100},
-  {h:'Distru',calc:r=>r.url?`<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline">open ↗</a>`:'—',w:60},
-  {h:'Product / Output (strain)',k:'product',plain:true,w:220},
-  {h:'Brand',k:'brand',sel:BRANDS,w:100},
-  {h:'Batch / Lot #',k:'batch',w:110},
-  {h:'Metrc Tag',k:'metrc',w:140},
-  {h:'Assembly',k:'assembly',sel:ASM_OPTS,w:110},
-  {h:'Metrc Location',k:'location',sel:LOC_OPTS,w:130},
-  {h:'Lab / COA',k:'lab',sel:LABS_OPTS,w:90},
-  {h:'Output / Batch Size',k:'wip',r:1,w:80},
-  {h:'Exp Units',k:'exp',r:1,w:76},
-  {h:'Actual Units',k:'units',r:1,w:76},
-  {h:'Yield Var',calc:r=>{const e=+r.exp||0,u=+r.units||0; if(!e||!u)return '—'; const v=(u-e)/e*100; return (v>=0?'+':'')+v.toFixed(1)+'%';},w:72},
-  {h:'Stage',status:1,w:110}];
+const PROD_COLS=[{h:'Date',k:'date'},
+  {h:'Assembly #',k:'asm_no'},
+  {h:'Distru',calc:r=>r.url?`<a href="${r.url}" target="_blank" rel="noopener" style="color:var(--blue);text-decoration:underline">open ↗</a>`:'—'},
+  {h:'Product / Output (strain)',k:'product',plain:true,w:250},
+  {h:'Brand',k:'brand',sel:BRANDS},
+  {h:'Batch / Lot #',k:'batch'},{h:'Metrc Tag',k:'metrc'},
+  {h:'Assembly',k:'assembly',sel:ASM_OPTS},
+  {h:'Metrc Location',k:'location',sel:LOC_OPTS},
+  {h:'Lab / COA',k:'lab',sel:LABS_OPTS},
+  {h:'Output / Batch Size',k:'wip',r:1},{h:'Exp Units',k:'exp',r:1},{h:'Actual Units',k:'units',r:1},
+  {h:'Yield Var',calc:r=>{const e=+r.exp||0,u=+r.units||0; if(!e||!u)return '—'; const v=(u-e)/e*100; return (v>=0?'+':'')+v.toFixed(1)+'%';}},
+  {h:'Stage',status:1}];
 function addBatch(){PROD.unshift({date:new Date().toISOString().slice(0,10),asm_no:'',url:'',brand:'Dr. Zodiak’s Moonrock',product:'',batch:'',metrc:'',assembly:'In Progress',location:'Production / WIP',lab:'Not Submitted',final:'',wip:'',exp:'',units:''});store.set('prod',PROD);prodT.render();buildOverview();}
 const SEED_PROD=[
   {date:'2026-06-02',asm_no:'AS-0013674',url:'https://app.distru.com/assemblies/0dfc683a-196e-4749-afd2-b7476d225229',brand:'The Growfather',product:'WIP Granddaddy Purp Berry Infused Flower',batch:'GF-WIP-GDP-6-2',metrc:'1A41103000034BD000014533',assembly:'In Progress',location:'Production / WIP',lab:'Not Submitted',final:'3675',wip:'3675',exp:'',units:''},
