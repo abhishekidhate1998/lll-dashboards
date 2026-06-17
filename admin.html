@@ -957,10 +957,15 @@ async function readQBData(files) {
         const k = (r[Object.keys(r)[0]]||"").toLowerCase();
         const val = num(r[Object.keys(r)[1]]||0);
         if (!val) continue;
-        if (k.includes("total income") || k.includes("total revenue")) qb.rev = val;
-        else if (k.includes("gross profit")) qb.gp = val;
-        else if (k.includes("cost of goods sold") || k.includes("cost of sales")) qb.cogs = val;
-        else if (k.includes("net income") || k.includes("net profit")) qb.net = val;
+        // QB labels vary: "Total Income", "Total for Income", "Total Revenue" etc.
+        const isTotalIncome = (k.includes("total") && k.includes("income") && !k.includes("net") && !k.includes("other")) || k.includes("total revenue") || k.includes("total for income") || k.includes("total sales");
+        const isGP = k.includes("gross profit");
+        const isCOGS = (k.includes("total") && k.includes("cost of goods")) || k === "cost of goods sold" || k.includes("total cogs");
+        const isNet = k.includes("net income") || k.includes("net profit") || k === "net operating income";
+        if (isTotalIncome && !qb.rev) qb.rev = val;
+        else if (isGP && !qb.gp) qb.gp = val;
+        else if (isCOGS && !qb.cogs) qb.cogs = val;
+        else if (isNet) qb.net = val;
       }
     }
     // Balance sheet: use LATEST file only (point-in-time snapshot, not cumulative)
@@ -973,9 +978,13 @@ async function readQBData(files) {
         const k = (r[Object.keys(r)[0]]||"").toLowerCase();
         const val = num(r[Object.keys(r)[1]]||0);
         if (!val) continue;
-        if (k.includes("cash") && k.includes("bank")) qb.cash = val;
-        else if (k.includes("accounts receivable") && !qb.ar) qb.ar = val;
-        else if (k.includes("accounts payable") && !qb.ap) qb.ap = val;
+        // QB balance sheet: "Total for Bank Accounts" = cash; also handle "Total Cash"
+        const isCash = (k.includes("total") && k.includes("bank account")) || (k.includes("total") && k.includes("cash") && !k.includes("non")) || k.includes("total checking");
+        const isAR = k.includes("total for accounts receivable") || (k.includes("accounts receivable") && k.includes("total"));
+        const isAP = k.includes("total for accounts payable") || (k.includes("accounts payable") && k.includes("total"));
+        if (isCash && !qb.cash) qb.cash = val;
+        else if (isAR && !qb.ar) qb.ar = val;
+        else if (isAP && !qb.ap) qb.ap = val;
       }
     }
     if (qb.rev && qb.gp) qb.gp_pct = Math.round(qb.gp / qb.rev * 100);
