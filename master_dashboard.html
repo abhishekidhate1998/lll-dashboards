@@ -109,9 +109,7 @@
   .kpi .v{font-family:'Oswald';font-weight:700;font-size:30px;margin-top:4px}
   .kpi .v.green{color:var(--green)} .kpi .v.gold{color:var(--gold)}
   .foot{color:var(--mut);font-size:12px;margin-top:30px;border-top:1px solid var(--line);padding-top:16px}
-  select.in-cell{appearance:none;cursor:pointer;background:var(--panel2);color:var(--ink)}
-select.in-cell option{background:var(--panel2);color:var(--ink)}
-select.in-cell optgroup{background:var(--panel2);color:var(--ink)}
+  select.in-cell{appearance:none;cursor:pointer}
   .tag{font-size:11px;color:var(--mut)}
 /* ══ LLL NAV ══ */
 #lll-nav{position:fixed;top:0;left:0;height:100vh;width:220px;background:linear-gradient(180deg,#0e2018,#0b1a14);border-right:1px solid #1e3028;z-index:9000;display:flex;flex-direction:column;transform:translateX(-100%);transition:transform .25s ease;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;}
@@ -147,11 +145,6 @@ select.in-cell optgroup{background:var(--panel2);color:var(--ink)}
 /* ══ MOBILE RESPONSIVE ══ */
 *{-webkit-text-size-adjust:100%}
 @media(max-width:600px){body{font-size:13px}[class*="g2"],[class*="g3"],[class*="g4"],[class*="g5"]{grid-template-columns:1fr !important}table{display:block;overflow-x:auto;white-space:nowrap}.card,.kpi,.panel{padding:12px !important}canvas{max-height:240px !important}input,select{font-size:16px !important}.tabs{flex-wrap:wrap !important}.tab{font-size:12px !important;padding:7px 10px !important}}
-/* ── PRODUCTION TABLE RESPONSIVE ── */
-#prod_table td,#prod_table th{white-space:nowrap}
-#prod_table td .in-cell.txt{white-space:normal;min-width:180px;display:inline-block}
-#prod_table td select.in-cell{min-width:130px}
-#prod_table td input.in-cell{min-width:70px}
 </style>
 </head>
 <body><div id="lll-loader"><div class="lll-ld">&#127807;</div><div class="lll-lb"><div class="lll-lf"></div></div><div class="lll-lt">Loading dashboard...</div></div>
@@ -599,7 +592,7 @@ select.in-cell optgroup{background:var(--panel2);color:var(--ink)}
     <span><span class="status s-mid" style="padding:1px 8px">Label Batch</span> min testing met (passed) → designate for labeling; confirm vs Compliance label requirements — active</span>
     <span><span class="status s-ok" style="padding:1px 8px">Ready For Sale</span> tested, labeled, packaged &amp; released — <b>only sellable inventory</b></span>
   </div>
-  <div style="width:100vw;position:relative;left:50%;right:50%;margin-left:-50vw;margin-right:-50vw;padding:0 16px;box-sizing:border-box"><div class="panel" style="overflow:hidden"><div class="ph"><h3>Active &amp; Recent Batches</h3><div class="right"><button class="btn" onclick="addBatch()">+ New Batch</button></div></div><div style="overflow-x:auto;-webkit-overflow-scrolling:touch"><table id="prod_table" style="min-width:1300px"></table></div></div></div>
+  <div class="panel"><div class="ph"><h3>Active &amp; Recent Batches</h3><div class="right"><button class="btn" onclick="addBatch()">+ New Batch</button></div></div><table id="prod_table"></table></div>
 </section>
 
 <section class="view" id="v-labels">
