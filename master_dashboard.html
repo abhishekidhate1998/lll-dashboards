@@ -62,7 +62,7 @@
      text-align:left;padding:8px 12px;border-bottom:1px solid var(--line);font-weight:700;
      position:sticky;top:var(--hh,58px);z-index:6;background:var(--panel2)}
   thead th.r,tbody td.r{text-align:right}
-  tbody td{padding:6px 12px;border-bottom:1px solid rgba(42,47,58,.55);font-size:13px}
+  tbody td{padding:6px 12px;border-bottom:1px solid rgba(42,47,58,.55);font-size:13px;white-space:nowrap}
   tbody tr:last-child td{border-bottom:0}
   tbody td.mat{color:var(--ink);font-weight:500}
   tbody td.dim{color:var(--mut)}
@@ -595,7 +595,7 @@
     <span><span class="status s-mid" style="padding:1px 8px">Label Batch</span> min testing met (passed) → designate for labeling; confirm vs Compliance label requirements — active</span>
     <span><span class="status s-ok" style="padding:1px 8px">Ready For Sale</span> tested, labeled, packaged &amp; released — <b>only sellable inventory</b></span>
   </div>
-  <div class="panel"><div class="ph"><h3>Active &amp; Recent Batches</h3><div class="right"><button class="btn" onclick="addBatch()">+ New Batch</button></div></div><table id="prod_table"></table></div>
+  <div class="panel"><div class="ph"><h3>Active &amp; Recent Batches</h3><div class="right"><button class="btn" onclick="addBatch()">+ New Batch</button></div></div><div style="overflow-x:auto"><table id="prod_table"></table></div></div>
 </section>
 
 <section class="view" id="v-labels">
